@@ -32,6 +32,7 @@ export const detailsSchema = z.object({
   stats: z.array(statSchema).max(3),
   hours: z.string().optional(),
   arn: z.string().optional(),
+  gstin: z.string().optional(),
 })
 
 export const testimonialSchema = z.object({

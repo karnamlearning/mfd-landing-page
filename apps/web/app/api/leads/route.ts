@@ -3,7 +3,7 @@ import { json } from "@/lib/auth"
 import { getDb } from "@/lib/db"
 import { normalizePhone } from "@/lib/phone"
 import { requestHost } from "@/lib/public-site"
-import { getTenantBySlug } from "@/lib/tenant"
+import { getTenantBySlug, isPublicLive } from "@/lib/tenant"
 
 export const runtime = "nodejs"
 
@@ -30,7 +30,7 @@ export async function POST(req: Request) {
   const { slug } = await requestHost()
   if (!slug) return json({ error: "missing_tenant" }, 400)
   const tenant = await getTenantBySlug(slug)
-  if (!tenant || tenant.status === "suspended") return json({ error: "missing_tenant" }, 404)
+  if (!tenant || !isPublicLive(tenant)) return json({ error: "missing_tenant" }, 404)
 
   const db = getDb()
   await db.insert(leads).values({

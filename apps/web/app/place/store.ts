@@ -21,16 +21,21 @@ export const STEPS = [
   { id: "sections", n: 5, label: "Sections" },
   { id: "review", n: 6, label: "Review" },
   { id: "leads", n: 7, label: "Leads" },
+  { id: "publish", n: 8, label: "Publish" },
 ] as const
 
 export type StepId = (typeof STEPS)[number]["id"]
 export type Viewport = "mobile" | "desktop"
 export type TenantStatus = "draft" | "trial" | "active" | "suspended"
 
+export type TenantPlan = "monthly" | "yearly" | null
+
 export type ServerDraft = {
   config: TenantConfig
   slugLocked: boolean
   status: TenantStatus
+  plan: TenantPlan
+  trialEndsAt: string | null
   publicUrl: string
 }
 
@@ -47,6 +52,8 @@ type DraftState = {
   saveError: string | null
   slugLocked: boolean
   status: TenantStatus
+  plan: TenantPlan
+  trialEndsAt: string | null
   publicUrl: string
   setStep: (step: StepId) => void
   setViewport: (viewport: Viewport) => void
@@ -82,6 +89,8 @@ export const useDraft = create<DraftState>((set) => ({
   saveError: null,
   slugLocked: false,
   status: "draft",
+  plan: null,
+  trialEndsAt: null,
   publicUrl: "",
   setStep: (step) => set({ step }),
   setViewport: (viewport) => set({ viewport }),
@@ -124,6 +133,8 @@ export const useDraft = create<DraftState>((set) => ({
       config: payload.config,
       slugLocked: payload.slugLocked,
       status: payload.status,
+      plan: payload.plan ?? null,
+      trialEndsAt: payload.trialEndsAt ?? null,
       publicUrl: payload.publicUrl,
       hydrated: true,
       dirty: false,
@@ -134,6 +145,8 @@ export const useDraft = create<DraftState>((set) => ({
       config: { ...s.config, slug: payload.config.slug },
       slugLocked: payload.slugLocked,
       status: payload.status,
+      plan: payload.plan ?? null,
+      trialEndsAt: payload.trialEndsAt ?? null,
       publicUrl: payload.publicUrl,
       saveError: null,
     })),

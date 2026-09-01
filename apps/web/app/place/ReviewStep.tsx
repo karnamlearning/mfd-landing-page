@@ -1,11 +1,10 @@
 "use client"
 
-import { useState } from "react"
 import { QRCodeSVG } from "qrcode.react"
 import { fontPairs, themes } from "@mfd/tokens"
 import { slugifyName } from "@mfd/schema"
 import { saveConfig } from "./persist"
-import { useDraft, type ServerDraft } from "./store"
+import { useDraft } from "./store"
 import * as U from "./styles"
 
 const TEMPLATE_NAME = {
@@ -28,36 +27,13 @@ const SECTION_NAME: Record<string, string> = {
   whatsapp_strip: "WhatsApp strip",
 }
 
-export function ReviewStep() {
+export function ReviewStep({ onPublish }: { onPublish: () => void }) {
   const config = useDraft((s) => s.config)
   const slugLocked = useDraft((s) => s.slugLocked)
   const publicUrl = useDraft((s) => s.publicUrl)
   const setSlug = useDraft((s) => s.setSlug)
-  const applyServer = useDraft((s) => s.applyServer)
-  const [plan, setPlan] = useState<"monthly" | "yearly" | null>(null)
-  const [publishing, setPublishing] = useState(false)
-  const [publishError, setPublishError] = useState<string | null>(null)
   const visible = config.sections.filter((row) => row.on)
   const tools = config.addons.includes("tools")
-
-  async function publish() {
-    setPublishing(true)
-    setPublishError(null)
-    await saveConfig(true)
-    try {
-      const res = await fetch("/api/me/publish", { method: "POST" })
-      const data = (await res.json()) as ServerDraft & { error?: string }
-      if (!res.ok) {
-        setPublishError(data.error === "reserved_slug" ? "That URL is reserved. Pick another." : "Could not publish.")
-        return
-      }
-      applyServer(data)
-    } catch {
-      setPublishError("Could not publish.")
-    } finally {
-      setPublishing(false)
-    }
-  }
 
   return (
     <>
@@ -112,25 +88,11 @@ export function ReviewStep() {
         <dd>{config.details.city.trim() || "Sample until you type"}</dd>
       </U.Summary>
 
-      {!slugLocked ? (
-        <U.NextRow>
-          <U.NextBtn type="button" onClick={() => void publish()} disabled={publishing}>
-            {publishing ? "Publishing…" : "Publish site"}
-          </U.NextBtn>
-        </U.NextRow>
-      ) : null}
-      {publishError ? <U.Warn>{publishError}</U.Warn> : null}
-
-      <U.PayStack>
-        <U.PlanBtn type="button" $on={plan === "monthly"} onClick={() => setPlan("monthly")}>
-          <U.PlanName>₹299 / month</U.PlanName>
-          <U.PlanNote>About ₹10 a day.</U.PlanNote>
-        </U.PlanBtn>
-        <U.PlanBtn type="button" $on={plan === "yearly"} onClick={() => setPlan("yearly")}>
-          <U.PlanName>₹2,999 / year</U.PlanName>
-          <U.PlanNote>Two months free versus monthly.</U.PlanNote>
-        </U.PlanBtn>
-      </U.PayStack>
+      <U.NextRow>
+        <U.NextBtn type="button" onClick={onPublish}>
+          Publish
+        </U.NextBtn>
+      </U.NextRow>
     </>
   )
 }

@@ -1,4 +1,5 @@
 import { Site } from "@mfd/site-kit"
+import { PaywallView } from "./missing/view"
 import { loadPublicSite, requestHost, resolvePublicSite } from "@/lib/public-site"
 import { SignupApp } from "./signup/SignupApp"
 
@@ -13,6 +14,7 @@ export async function generateMetadata() {
       description: resolved.config.details.pitch?.trim() || "AMFI-registered mutual fund distributor.",
     }
   }
+  if (resolved.kind === "paywall") return { title: "Site paused" }
   if (resolved.kind === "missing") return { title: "Not found" }
   const { role } = await requestHost()
   if (role === "app") return { title: "Buyer Place" }
@@ -24,6 +26,7 @@ export async function generateMetadata() {
 
 export default async function HomePage() {
   const site = await loadPublicSite()
-  if (site) return <Site config={site.config} preview={false} />
+  if (site?.paywall) return <PaywallView />
+  if (site?.config) return <Site config={site.config} preview={false} />
   return <SignupApp />
 }

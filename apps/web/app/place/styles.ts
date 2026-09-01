@@ -29,6 +29,12 @@ export const Shell = styled.div`
   }
 `
 
+export const Chrome = styled.div`
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+`
+
 export const Top = styled.header`
   display: flex;
   align-items: center;
@@ -112,6 +118,15 @@ export const PayBtn = styled.button`
   font-weight: 600;
   background: ${({ theme }) => theme.primary};
   color: ${({ theme }) => theme.btnText};
+`
+
+export const TrialBanner = styled.div<{ $warn?: boolean }>`
+  padding: 0.45rem 1rem;
+  font-size: 0.78rem;
+  line-height: 1.4;
+  background: ${({ $warn, theme }) => ($warn ? "#fef3c7" : `${theme.primary}14`)};
+  color: ${({ $warn, theme }) => ($warn ? "#92400e" : theme.text)};
+  border-bottom: 1px solid ${({ theme }) => theme.text}12;
 `
 
 export const Body = styled.div`
@@ -228,6 +243,11 @@ export const NextBtn = styled.button`
   font-weight: 600;
   background: ${({ theme }) => theme.primary};
   color: ${({ theme }) => theme.btnText};
+
+  &:disabled {
+    opacity: 0.55;
+    cursor: default;
+  }
 `
 
 export const Stage = styled.section<{ $open: boolean }>`
@@ -823,33 +843,248 @@ export const Summary = styled.dl`
   }
 `
 
-export const PayStack = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 0.45rem;
-  margin-top: 1.1rem;
+export const ModalScrim = styled.div`
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: grid;
+  place-items: center;
+  padding: 1.25rem;
+  background: ${({ theme }) => theme.text}66;
+  backdrop-filter: blur(6px);
 `
 
-export const PlanBtn = styled.button<{ $on?: boolean }>`
-  border: 1px solid ${({ $on, theme }) => ($on ? theme.primary : `${theme.text}18`)};
-  background: ${({ $on, theme }) => ($on ? theme.primary : theme.bg)};
-  color: ${({ $on, theme }) => ($on ? theme.btnText : theme.text)};
-  border-radius: 12px;
-  padding: 0.7rem 0.85rem;
+export const ModalCard = styled.div`
+  width: min(32rem, 100%);
+  max-height: min(92vh, 44rem);
+  overflow: auto;
+  padding: 1.25rem 1.35rem 1.15rem;
+  border-radius: 20px;
+  background: ${({ theme }) => theme.surface};
+  color: ${({ theme }) => theme.text};
+  box-shadow:
+    0 1px 0 ${({ theme }) => theme.text}0a,
+    0 24px 64px ${({ theme }) => theme.text}28;
+`
+
+export const ModalTop = styled.div`
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+`
+
+export const ModalKicker = styled.p`
+  margin: 0 0 0.2rem;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: ${({ theme }) => theme.muted};
+`
+
+export const ModalTitle = styled.h2`
+  margin: 0;
+  font-size: 1.28rem;
+  font-weight: 650;
+  letter-spacing: -0.04em;
+  line-height: 1.2;
+`
+
+export const ModalLead = styled.p`
+  margin: 0.4rem 0 1rem;
+  font-size: 0.86rem;
+  line-height: 1.45;
+  color: ${({ theme }) => theme.muted};
+`
+
+export const ModalClose = styled.button`
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 2rem;
+  height: 2rem;
+  border: 0;
+  border-radius: 10px;
+  background: ${({ theme }) => theme.bg};
+  color: ${({ theme }) => theme.muted};
   cursor: pointer;
+
+  &:hover {
+    color: ${({ theme }) => theme.text};
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
+`
+
+export const PlanGrid = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.65rem;
+
+  @media (max-width: 520px) {
+    grid-template-columns: 1fr;
+  }
+`
+
+export const PlanCard = styled.button<{ $on: boolean }>`
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-height: 8rem;
+  padding: 0.85rem 2.35rem 0.9rem 0.95rem;
+  border-radius: 16px;
   text-align: left;
+  cursor: pointer;
+  border: 1.5px solid ${({ $on, theme }) => ($on ? theme.primary : `${theme.text}14`)};
+  background: ${({ $on, theme }) => ($on ? theme.surface : theme.bg)};
+  color: ${({ theme }) => theme.text};
+  box-shadow: ${({ $on, theme }) => ($on ? `0 0 0 3px ${theme.primary}18` : "none")};
+
+  &:hover:not(:disabled) {
+    border-color: ${({ $on, theme }) => ($on ? theme.primary : `${theme.text}28`)};
+  }
+
+  &:disabled {
+    cursor: default;
+  }
+`
+
+export const PlanHead = styled.span`
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem 0.45rem;
+  padding-right: 0.2rem;
+  margin-bottom: 0.7rem;
 `
 
 export const PlanName = styled.strong`
-  display: block;
-  font-size: 0.88rem;
+  font-size: 0.82rem;
+  font-weight: 650;
+  letter-spacing: -0.02em;
+`
+
+export const PlanTag = styled.span<{ $on: boolean }>`
+  display: inline-block;
+  padding: 0.1rem 0.4rem;
+  border-radius: 999px;
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  background: ${({ $on, theme }) => ($on ? theme.primary : `${theme.text}10`)};
+  color: ${({ $on, theme }) => ($on ? theme.btnText : theme.muted)};
+`
+
+export const PlanPrice = styled.span`
+  font-size: 1.55rem;
+  font-weight: 700;
+  letter-spacing: -0.045em;
+  line-height: 1.05;
+`
+
+export const PlanPeriod = styled.span`
+  margin-top: 0.18rem;
+  font-size: 0.78rem;
+  color: ${({ theme }) => theme.muted};
 `
 
 export const PlanNote = styled.span`
   display: block;
-  margin-top: 0.15rem;
+  margin-top: auto;
+  padding-top: 0.7rem;
   font-size: 0.72rem;
-  opacity: 0.8;
+  line-height: 1.35;
+  color: ${({ theme }) => theme.muted};
+`
+
+export const PlanMark = styled.span<{ $on: boolean }>`
+  position: absolute;
+  top: 0.9rem;
+  right: 0.85rem;
+  display: grid;
+  place-items: center;
+  width: 1.25rem;
+  height: 1.25rem;
+  border-radius: 999px;
+  background: ${({ $on, theme }) => ($on ? theme.primary : "transparent")};
+  color: ${({ theme }) => theme.btnText};
+  border: 1.5px solid ${({ $on, theme }) => ($on ? theme.primary : `${theme.text}22`)};
+`
+
+export const PlanIncludes = styled.p`
+  display: flex;
+  align-items: flex-start;
+  gap: 0.4rem;
+  margin: 0.8rem 0 0;
+  font-size: 0.78rem;
+  line-height: 1.4;
+  color: ${({ theme }) => theme.muted};
+
+  svg {
+    flex-shrink: 0;
+    margin-top: 0.12rem;
+    color: ${({ theme }) => theme.text};
+  }
+`
+
+export const ModalGst = styled.div`
+  margin-top: 0.95rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  font-size: 0.76rem;
+  color: ${({ theme }) => theme.muted};
+`
+
+export const GstLink = styled.button`
+  display: inline-block;
+  margin-top: 0.75rem;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: ${({ theme }) => theme.muted};
+  font-size: 0.76rem;
+  cursor: pointer;
+  text-align: left;
+
+  &:hover {
+    color: ${({ theme }) => theme.text};
+    text-decoration: underline;
+    text-underline-offset: 0.18em;
+  }
+`
+
+export const ModalCta = styled.button`
+  width: 100%;
+  margin-top: 1.05rem;
+  border: 0;
+  cursor: pointer;
+  border-radius: 12px;
+  padding: 0.82rem 1rem;
+  font-size: 0.92rem;
+  font-weight: 650;
+  letter-spacing: -0.02em;
+  background: ${({ theme }) => theme.primary};
+  color: ${({ theme }) => theme.btnText};
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: default;
+  }
+`
+
+export const ModalHint = styled.p`
+  margin: 0.55rem 0 0;
+  text-align: center;
+  font-size: 0.72rem;
+  line-height: 1.4;
+  color: ${({ theme }) => theme.muted};
 `
 
 export const SiteChrome = styled.div`

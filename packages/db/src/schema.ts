@@ -26,6 +26,7 @@ export const tenants = mysqlTable("tenants", {
   ownerEmail: varchar("owner_email", { length: 255 }),
   razorpaySubId: varchar("razorpay_sub_id", { length: 64 }),
   plan: mysqlEnum("plan", ["monthly", "yearly"]),
+  trialStartedAt: timestamp("trial_started_at", { mode: "date", fsp: 3 }),
   ...timestamps,
   updatedAt: timestamp("updated_at", { mode: "date", fsp: 3 }).notNull().defaultNow().onUpdateNow(),
 })

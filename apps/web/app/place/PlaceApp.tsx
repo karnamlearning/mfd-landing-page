@@ -10,6 +10,7 @@ import { FontStep } from "./FontStep"
 import { LeadsStep } from "./LeadsStep"
 import { usePersistDraft, saveConfig } from "./persist"
 import { PreviewFrame } from "./PreviewFrame"
+import { PublishModal, PublishStep } from "./PublishModal"
 import { ReviewStep } from "./ReviewStep"
 import { SectionsStep } from "./SectionsStep"
 import { STEPS, useDraft, type ServerDraft, type StepId } from "./store"
@@ -26,7 +27,7 @@ const NEXT: Partial<Record<StepId, StepId>> = {
   sections: "review",
 }
 
-function StepBody() {
+function StepBody({ onOpenPublish }: { onOpenPublish: () => void }) {
   const step = useDraft((s) => s.step)
   if (step === "details") return <DetailsStep />
   if (step === "template") return <TemplateStep />
@@ -34,7 +35,8 @@ function StepBody() {
   if (step === "font") return <FontStep />
   if (step === "sections") return <SectionsStep />
   if (step === "leads") return <LeadsStep />
-  return <ReviewStep />
+  if (step === "publish") return <PublishStep onOpen={onOpenPublish} />
+  return <ReviewStep onPublish={onOpenPublish} />
 }
 
 function AddonsRail() {
@@ -46,8 +48,8 @@ function AddonsRail() {
       <U.AddonCard $on={on}>
         <U.AddonName>Tools pack</U.AddonName>
         <U.AddonCopy>
-          Extra investor calculators on the Calculators section. Preview shows the extra slots as soon
-          as you add it.
+          Extra investor calculators on the Calculators section. Preview shows them immediately.
+          The live site only includes them after you pay.
         </U.AddonCopy>
         <U.AddonBtn type="button" $on={on} onClick={() => setToolsPack(!on)}>
           {on ? "Remove" : "Add"}
@@ -110,12 +112,23 @@ function Editor() {
   const slug = useDraft((s) => s.config.slug)
   const slugLocked = useDraft((s) => s.slugLocked)
   const status = useDraft((s) => s.status)
+  const trialEndsAt = useDraft((s) => s.trialEndsAt)
+  const [publishOpen, setPublishOpen] = useState(false)
   const next = NEXT[step]
   const yours = slugLocked || status !== "draft" || !isPhoneStubSlug(slug)
   usePersistDraft()
+  const trialUntil = trialEndsAt
+    ? new Intl.DateTimeFormat("en-IN", { dateStyle: "medium" }).format(new Date(trialEndsAt))
+    : null
+
+  function openPublish() {
+    setStep("publish")
+    setPublishOpen(true)
+  }
 
   return (
     <U.Shell>
+      <U.Chrome>
       <U.Top>
         <U.BrandMark>
           <U.BrandName>Advisorkhoj</U.BrandName>
@@ -137,25 +150,49 @@ function Editor() {
             Desktop
           </U.SegBtn>
         </U.Seg>
-        <U.PayBtn type="button" onClick={() => setStep("review")}>
-          Pay
+        <U.PayBtn type="button" onClick={openPublish}>
+          Publish
         </U.PayBtn>
       </U.Top>
+      {status === "trial" ? (
+        <U.TrialBanner>
+          Trial is live{trialUntil ? ` until ${trialUntil}` : ""}. Publish a plan to keep the site up and put
+          Tools pack on the public URL.
+        </U.TrialBanner>
+      ) : null}
+      {status === "suspended" ? (
+        <U.TrialBanner $warn>Public site is down. Publish a plan to restore it. Your pages are kept.</U.TrialBanner>
+      ) : null}
+      </U.Chrome>
       <U.Body>
         <U.Left>
           <U.Steps aria-label="Steps">
             {STEPS.map((s) => (
-              <U.StepBtn key={s.id} type="button" $on={s.id === step} onClick={() => setStep(s.id)}>
+              <U.StepBtn
+                key={s.id}
+                type="button"
+                $on={s.id === step}
+                onClick={() => {
+                  setStep(s.id)
+                  if (s.id === "publish") setPublishOpen(true)
+                }}
+              >
                 <U.StepN $on={s.id === step}>{s.n}</U.StepN>
                 {s.label}
               </U.StepBtn>
             ))}
           </U.Steps>
           <U.StepPanel>
-            <StepBody />
+            <StepBody onOpenPublish={openPublish} />
             {next ? (
               <U.NextRow>
-                <U.NextBtn type="button" onClick={() => setStep(next)}>
+                <U.NextBtn
+                  type="button"
+                  onClick={() => {
+                    setStep(next)
+                    if (next === "publish") setPublishOpen(true)
+                  }}
+                >
                   Next
                 </U.NextBtn>
               </U.NextRow>
@@ -165,6 +202,7 @@ function Editor() {
         <PreviewFrame />
         <AddonsRail />
       </U.Body>
+      <PublishModal open={publishOpen} onClose={() => setPublishOpen(false)} />
     </U.Shell>
   )
 }

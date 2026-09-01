@@ -1,5 +1,23 @@
 export function MissingView() {
   return (
+    <GenericStand
+      title="Page not found"
+      copy="This site is not available."
+    />
+  )
+}
+
+export function PaywallView() {
+  return (
+    <GenericStand
+      title="This site is paused"
+      copy="The trial has ended. The distributor needs to subscribe to keep the site live."
+    />
+  )
+}
+
+function GenericStand({ title, copy }: { title: string; copy: string }) {
+  return (
     <div
       style={{
         minHeight: "100vh",
@@ -12,8 +30,8 @@ export function MissingView() {
       }}
     >
       <div style={{ maxWidth: 420, textAlign: "center" }}>
-        <h1 style={{ margin: "0 0 0.5rem", fontSize: "1.4rem", letterSpacing: "-0.03em" }}>Page not found</h1>
-        <p style={{ margin: 0, color: "#57534e", lineHeight: 1.5 }}>This site is not available.</p>
+        <h1 style={{ margin: "0 0 0.5rem", fontSize: "1.4rem", letterSpacing: "-0.03em" }}>{title}</h1>
+        <p style={{ margin: 0, color: "#57534e", lineHeight: 1.5 }}>{copy}</p>
       </div>
     </div>
   )

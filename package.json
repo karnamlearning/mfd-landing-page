@@ -1,0 +1,16 @@
+{
+  "name": "mfd-landing-page",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev -w @mfd/web",
+    "build": "npm run build -w @mfd/web",
+    "start": "npm run start -w @mfd/web"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

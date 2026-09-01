@@ -1,4 +1,4 @@
-# MFD Site — Tech (now)
+# MFD Site - Tech (now)
 
 Companion to [ux.md](./ux.md). Now-scope only: Buyer Place, one renderer, publish to subdomain, Tools pack, leads, Razorpay.
 
@@ -83,7 +83,7 @@ Next.js: enable `compiler.styledComponents` and wrap the tree in a `StyledCompon
 
 Design is encoded so 1,000 MFDs cannot ship a 2017 brochure.
 
-- 8px grid, one type scale, real whitespace — spacing and type live on `theme.space` / `theme.font`
+- 8px grid, one type scale, real whitespace - spacing and type live on `theme.space` / `theme.font`
 - Themes: 8 packs from [ux.md](./ux.md) (`navy`, `forest`, …). Each pack is a **styled-components theme object**: `bg`, `surface`, `text`, `muted`, `primary`, `accent`, `btnText`. Swap via `<ThemeProvider theme={themes[config.theme]}>`.
 - Fonts: 5 pairs only (`modern`, `formal`, `friendly`, `classic`, `sharp`) applied as `theme.font` (heading/body family names from `next/font`)
 - Templates (`solo`, `practice`, `local`) change layout and default section order, not a different styling library
@@ -207,7 +207,7 @@ Public/preview tree:
 </ThemeProvider>
 ```
 
-`data-template={config.template}` may still sit on a wrapper for layout variants. Do not drive colours through Tailwind classes or a parallel CSS-variable sheet unless `tokens` also emit them for the registry — **theme object is canonical**.
+`data-template={config.template}` may still sit on a wrapper for layout variants. Do not drive colours through Tailwind classes or a parallel CSS-variable sheet unless `tokens` also emit them for the registry - **theme object is canonical**.
 
 ---
 
@@ -275,7 +275,7 @@ Custom domain later: CNAME to the app, `tenants.custom_domain`, SSL (Cloudflare 
 
 - Store keys in `config` URLs; files in object storage. Signed upload from Buyer Place.
 
-Draft vs published: v1 can write `config` in place (preview is client state until they click something that persists). Persist on: debounce (1–2s), blur, template/theme/font change, pay. Optional `config_draft` column if we need crash-safe editor later — not required to start.
+Draft vs published: v1 can write `config` in place (preview is client state until they click something that persists). Persist on: debounce (1–2s), blur, template/theme/font change, pay. Optional `config_draft` column if we need crash-safe editor later - not required to start.
 
 ---
 
@@ -307,18 +307,18 @@ Lead gate: calculator UI withholds the full result until name + mobile; then `PO
 - No ARN verification.
 - Add-ons on the draft: `addons: ["tools"]` immediately in preview. After pay, webhook sets `status=active` and paid add-ons stick.
 - Unpaid Tools pack: still previewable in Buyer Place; **public site ignores unpaid add-ons**.
-- Fail / cancel: `suspended` — public site down or paywall page; config kept.
+- Fail / cancel: `suspended` - public site down or paywall page; config kept.
 
 ---
 
 ## Build order
 
-1. **Tokens + Practice page** — hardcoded sample, new visual system. Gate: looks better than Investbux.
-2. **Schema + renderer** — JSON drives section order, theme, font, template.
-3. **Buyer Place** — details, template, theme, font, section list (dnd), add-ons rail, always-on preview.
-4. **Postgres + OTP** — persist tenant, publish to `{slug}.{base}`.
-5. **SIP BFF + home widget** — then lumpsum, goal SIP, retirement.
-6. **Tools pack flag** — extra tools when paid; preview-on, public-off until paid.
+1. **Tokens + Practice page** - hardcoded sample, new visual system. Gate: looks better than Investbux.
+2. **Schema + renderer** - JSON drives section order, theme, font, template.
+3. **Buyer Place** - details, template, theme, font, section list (dnd), add-ons rail, always-on preview.
+4. **Postgres + OTP** - persist tenant, publish to `{slug}.{base}`.
+5. **SIP BFF + home widget** - then lumpsum, goal SIP, retirement.
+6. **Tools pack flag** - extra tools when paid; preview-on, public-off until paid.
 7. **Razorpay + leads + WhatsApp notify.**
 
 Do not start step 3 until step 1 passes a visual check.
@@ -341,4 +341,4 @@ Do not start step 3 until step 1 passes a visual check.
 - Public icons come from `react-icons/fi` (+ `FaWhatsapp` only where needed).
 - Calculator results come from the BFF, not client-side invented math (except trivial display).
 - Unpaid `tools` add-on is visible in preview and absent on the public host.
-- One codebase, many tenants — no generated HTML repo per MFD.
+- One codebase, many tenants - no generated HTML repo per MFD.

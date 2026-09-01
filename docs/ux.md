@@ -1,4 +1,4 @@
-# MFD Site — UX (now)
+# MFD Site - UX (now)
 
 Buyer Place: an MFD configures a branded investor site, always sees a live preview with data filled in, and can attach add-ons before paying. After purchase, the same editor is “edit my site.”
 
@@ -10,7 +10,7 @@ This file is the now-scope only. Profiler, KYC, portfolio, transact, custom HTML
 
 ## Reference: Investbux
 
-Founder example: [investbux.in](https://www.investbux.in/) — a custom Advisorkhoj-built MFD site (Investbux Financial Services, Ambala). This is the **look and IA to productize**, not a site we clone page-for-page.
+Founder example: [investbux.in](https://www.investbux.in/) - a custom Advisorkhoj-built MFD site (Investbux Financial Services, Ambala). This is the **look and IA to productize**, not a site we clone page-for-page.
 
 ### What we take from it (now)
 
@@ -95,7 +95,7 @@ On a phone, stack: preview on top (collapsible), then controls, add-ons as a bot
 1. Preview is available at **every** stage (details, template, theme, font, sections, add-ons, pay).
 2. Preview uses **their filled fields**. Empty fields use **sample data** so the site never looks blank.
 3. Changing template, theme, font, section order, or an add-on updates the preview immediately.
-4. Sample data is clearly sample (e.g. muted label “Sample” on photo/name in the editor only — not on the published site).
+4. Sample data is clearly sample (e.g. muted label “Sample” on photo/name in the editor only - not on the published site).
 5. After they type, sample is replaced for that field and does not come back unless they clear it.
 
 ### Sample fill (until they type)
@@ -116,7 +116,7 @@ On a phone, stack: preview on top (collapsible), then controls, add-ons as a bot
 
 ---
 
-## Step 1 — Details
+## Step 1 - Details
 
 Fields:
 
@@ -143,7 +143,7 @@ Primary CTA on the live site is WhatsApp. Enquiry form is always on Contact.
 
 ---
 
-## Step 2 — Templates
+## Step 2 - Templates
 
 Three templates. Same tenant data, different layout and default section order. Switching template keeps details, theme (if compatible), font, and add-ons.
 
@@ -159,7 +159,7 @@ UI: three cards with a static thumbnail + “Preview this” which applies it to
 
 ---
 
-## Step 3 — Theme
+## Step 3 - Theme
 
 Colour **packs**, not a free hex picker.
 
@@ -182,7 +182,7 @@ UI: swatch row. Selected theme applies to preview instantly. Contrast must stay 
 
 ---
 
-## Step 4 — Font
+## Step 4 - Font
 
 **Pairs** only (heading + body). Four to six options:
 
@@ -198,7 +198,7 @@ UI: each option shows “Aa” in that pair. Applying updates preview headings a
 
 ---
 
-## Step 5 — Sections
+## Step 5 - Sections
 
 Fixed catalog. MFD can **show/hide** and **drag to reorder**. They cannot create new section types or edit HTML.
 
@@ -227,7 +227,7 @@ Reorder UI: vertical list with drag handle, eye toggle, optional “edit” for 
 
 ### Services ticks (inside Services section editor)
 
-Canned rows, tick to show. Each is a **card** (icon + title + 2-line canned copy). No inner product pages now — no “Read more” to a unique URL.
+Canned rows, tick to show. Each is a **card** (icon + title + 2-line canned copy). No inner product pages now - no “Read more” to a unique URL.
 
 **On by default:** Mutual funds, SIP, Goal-based investing
 
@@ -244,8 +244,8 @@ Always visible. Does not wait for a final step.
 ### Now: Tools pack
 
 - Extra **investor** calculators on the Calculators section (wrap existing Advisorkhoj APIs; do not rebuild math).
-- When off: base four only — SIP, lumpsum, goal SIP, retirement (each can be hidden in section options).
-- When on: preview immediately shows extra tools (target list, hide if API not ready): SWP, NPS, inflation, compounding, composite goal planner, SIP step-up, lumpsum target — same _class_ of tools as [Investbux calculators](https://www.investbux.in/), not a clone of every slug.
+- When off: base four only - SIP, lumpsum, goal SIP, retirement (each can be hidden in section options).
+- When on: preview immediately shows extra tools (target list, hide if API not ready): SWP, NPS, inflation, compounding, composite goal planner, SIP step-up, lumpsum target - same _class_ of tools as [Investbux calculators](https://www.investbux.in/), not a clone of every slug.
 - CTA: Add / Remove. Added state is selected until they pay; after pay it stays on the tenant.
 
 Add-ons do not replace MutualFundTools advisor tools (proposals, report builder, MFD planner). Those stay off this site.
@@ -254,7 +254,7 @@ Further add-ons (profiler, KYC, content, extra language) are **not shown** in th
 
 ---
 
-## Step 6 — Review and pay
+## Step 6 - Review and pay
 
 Summary: template, theme, font, visible sections (in order), add-ons, WhatsApp, city.
 
@@ -277,7 +277,7 @@ Mobile-first. WhatsApp is the primary conversion.
 - Footer disclaimer
 - WhatsApp (header button + strip if enabled)
 
-**Pages (thin — not Investbux’s mega sitemap)**
+**Pages (thin - not Investbux’s mega sitemap)**
 
 Default: one scrolling landing page; nav anchors to sections.
 

@@ -4,8 +4,10 @@ import { create } from "zustand"
 import {
   applyTemplate,
   emptyPracticeConfig,
+  familyMeta,
   lockedSectionIds,
   type AddonId,
+  type FamilyId,
   type SectionId,
   type ServiceId,
   type TemplateId,
@@ -17,7 +19,7 @@ import type { FontId, ThemeId } from "@mfd/tokens"
 
 export const STEPS = [
   { id: "details", n: 1, label: "Details" },
-  { id: "template", n: 2, label: "Template" },
+  { id: "template", n: 2, label: "Variant" },
   { id: "theme", n: 3, label: "Theme" },
   { id: "font", n: 4, label: "Font" },
   { id: "sections", n: 5, label: "Sections" },
@@ -63,6 +65,7 @@ type DraftState = {
   setViewport: (viewport: Viewport) => void
   setPreviewOpen: (open: boolean) => void
   patchDetails: (patch: Partial<TenantDetails>) => void
+  setFamily: (id: FamilyId, opts?: { look?: boolean }) => void
   setTemplate: (id: TemplateId) => void
   setTheme: (theme: ThemeId) => void
   setFont: (font: FontId) => void
@@ -105,6 +108,18 @@ export const useDraft = create<DraftState>((set) => ({
     set((s) => ({
       config: { ...s.config, details: { ...s.config.details, ...patch } },
     })),
+  setFamily: (id, opts) =>
+    set((s) => {
+      const look = familyMeta[id]
+      return {
+        config: {
+          ...s.config,
+          family: id,
+          pickedFamily: true,
+          ...(opts?.look ? { theme: look.theme, font: look.font } : {}),
+        },
+      }
+    }),
   setTemplate: (id) => set((s) => ({ config: applyTemplate(s.config, id) })),
   setTheme: (theme) => set((s) => ({ config: { ...s.config, theme } })),
   setFont: (font) => set((s) => ({ config: { ...s.config, font } })),

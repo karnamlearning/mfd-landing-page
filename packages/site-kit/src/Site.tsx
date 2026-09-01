@@ -15,7 +15,7 @@ import {
   FiX,
 } from "react-icons/fi"
 import { FaWhatsapp } from "react-icons/fa6"
-import { mergeSample, visibleToolIds, type SectionId, type TenantConfig, type ToolId } from "@mfd/schema"
+import { lockedSectionIds, mergeSample, visibleToolIds, type FamilyId, type SectionId, type TenantConfig, type TemplateId, type ToolId } from "@mfd/schema"
 import { fontPairs, getTheme } from "@mfd/tokens"
 import { brandCopy, brandService, type BrandCopy } from "./brand"
 import { copy, toolCopy, type Copy, type Locale } from "./copy"
@@ -46,7 +46,11 @@ const ICONS = {
   bonds: FiLayers,
 } as const
 
-const LOCKED = new Set<SectionId>(["hero", "contact"])
+function heroLayout(family: FamilyId, tpl: TemplateId): "split" | "overlay" | "center" {
+  if (family === "counter") return "center"
+  if (family === "folio" || tpl === "solo") return "split"
+  return "overlay"
+}
 
 export type SiteProps = {
   config: TenantConfig
@@ -56,6 +60,8 @@ export type SiteProps = {
   embedded?: boolean
   children?: ReactNode
 }
+
+const LOCKED = new Set<string>(lockedSectionIds)
 
 function activeSections(config: TenantConfig) {
   return config.sections
@@ -161,13 +167,15 @@ function HeroSection({ ctx }: { ctx: Ctx }) {
   const { config, t, wa } = ctx
   const d = config.details
   const tpl = config.template
-  const src = tpl === "solo" ? d.photoUrl || d.heroImageUrl : d.heroImageUrl || d.photoUrl
+  const family = config.family ?? "studio"
+  const layout = heroLayout(family, tpl)
+  const src = tpl === "solo" || family === "folio" ? d.photoUrl || d.heroImageUrl : d.heroImageUrl || d.photoUrl
 
   return (
-    <S.Hero id="top" $template={tpl}>
-      {src ? <S.HeroImg src={src} alt="" $template={tpl} /> : null}
-      {tpl !== "solo" ? <S.HeroShade /> : null}
-      <S.HeroCopy $template={tpl}>
+    <S.Hero id="top" $template={tpl} $layout={layout}>
+      {src ? <S.HeroImg src={src} alt="" $layout={layout} /> : null}
+      {layout !== "split" ? <S.HeroShade /> : null}
+      <S.HeroCopy $layout={layout}>
         <S.Eyebrow>{d.city}</S.Eyebrow>
         <S.HeroTitle $template={tpl}>{d.heroHeadline}</S.HeroTitle>
         <S.HeroLead>{d.pitch}</S.HeroLead>
@@ -206,7 +214,7 @@ function AboutSection({ ctx }: { ctx: Ctx }) {
               </S.MetaRow>
             ) : null}
           </div>
-          {config.template !== "solo" && d.photoUrl ? (
+          {config.template !== "solo" && config.family !== "folio" && d.photoUrl ? (
             <S.Portrait src={d.photoUrl} alt={d.name} />
           ) : null}
         </S.AboutGrid>
@@ -255,22 +263,25 @@ function CredentialsSection({ ctx }: { ctx: Ctx }) {
 
 function ServicesSection({ ctx }: { ctx: Ctx }) {
   const { config, t, b, locale } = ctx
+  const list = (config.family ?? "studio") === "folio"
   return (
     <S.Section id="services">
       <S.Wrap>
         <S.Kicker>{t.services}</S.Kicker>
         <S.H2>{b.servicesTitle}</S.H2>
         <S.SectionLead>{b.servicesLead}</S.SectionLead>
-        <S.ServiceGrid>
+        <S.ServiceGrid $list={list}>
           {config.services.map((id) => {
             const item = brandService(id, config.wording, locale)
             if (!item) return null
             const Icon = ICONS[id as keyof typeof ICONS] ?? FiPieChart
             return (
-              <S.ServiceCard key={id}>
-                <S.IconWrap>
-                  <Icon size={18} aria-hidden />
-                </S.IconWrap>
+              <S.ServiceCard key={id} $list={list}>
+                {list ? null : (
+                  <S.IconWrap>
+                    <Icon size={18} aria-hidden />
+                  </S.IconWrap>
+                )}
                 <S.ServiceTitle>{item.title}</S.ServiceTitle>
                 <S.ServiceCopy>{item.body}</S.ServiceCopy>
               </S.ServiceCard>
@@ -670,6 +681,7 @@ export function Site({ config, preview = false, embedded = false, children }: Si
         $heading={font.headingVar}
         $body={font.bodyVar}
         $template={resolved.template}
+        $family={resolved.family ?? "studio"}
         $embedded={embedded}
         onClickCapture={onPreviewClick}
       >

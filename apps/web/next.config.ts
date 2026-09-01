@@ -9,6 +9,7 @@ const nextConfig: NextConfig = {
   compiler: {
     styledComponents: true,
   },
+  devIndicators: false,
   outputFileTracingRoot: path.join(__dirname, "../.."),
   transpilePackages: ["@mfd/site-kit", "@mfd/tokens", "@mfd/schema", "@mfd/db"],
   serverExternalPackages: ["mysql2"],

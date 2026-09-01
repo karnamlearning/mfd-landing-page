@@ -1,7 +1,7 @@
 "use client"
 
 import { QRCodeSVG } from "qrcode.react"
-import { ADDON_LABEL, slugifyName } from "@mfd/schema"
+import { ADDON_LABEL, familyMeta, slugifyName } from "@mfd/schema"
 import { fontPairs, themes } from "@mfd/tokens"
 import { saveConfig } from "./persist"
 import { useDraft } from "./store"
@@ -73,6 +73,8 @@ export function ReviewStep({ onPublish }: { onPublish: () => void }) {
 
       <U.Summary>
         <dt>Template</dt>
+        <dd>{familyMeta[config.family ?? "studio"].name}</dd>
+        <dt>Variant</dt>
         <dd>{TEMPLATE_NAME[config.template]}</dd>
         <dt>Theme</dt>
         <dd>{themes[config.theme].name}</dd>

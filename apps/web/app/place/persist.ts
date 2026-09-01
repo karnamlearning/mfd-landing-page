@@ -57,6 +57,8 @@ export function usePersistDraft() {
   const hydrated = useDraft((s) => s.hydrated)
   const config = useDraft((s) => s.config)
   const prevLook = useRef({
+    family: config.family,
+    pickedFamily: config.pickedFamily,
     template: config.template,
     theme: config.theme,
     font: config.font,
@@ -70,6 +72,8 @@ export function usePersistDraft() {
       skip.current = false
       lastSaved = snapshot(config)
       prevLook.current = {
+        family: config.family,
+        pickedFamily: config.pickedFamily,
         template: config.template,
         theme: config.theme,
         font: config.font,
@@ -81,11 +85,15 @@ export function usePersistDraft() {
     useDraft.setState({ dirty: true })
     const key = config.addons.join(",")
     const instant =
+      prevLook.current.family !== config.family ||
+      prevLook.current.pickedFamily !== config.pickedFamily ||
       prevLook.current.template !== config.template ||
       prevLook.current.theme !== config.theme ||
       prevLook.current.font !== config.font ||
       prevLook.current.addons !== key
     prevLook.current = {
+      family: config.family,
+      pickedFamily: config.pickedFamily,
       template: config.template,
       theme: config.theme,
       font: config.font,

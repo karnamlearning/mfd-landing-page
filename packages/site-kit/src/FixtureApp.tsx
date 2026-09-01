@@ -15,9 +15,11 @@ export function FixtureApp() {
       <Site config={config} preview />
       <ThemeProvider theme={getTheme(config.theme)}>
         <LookDock
+          familyId={config.family ?? "studio"}
           templateId={config.template}
           themeId={config.theme}
           fontId={config.font}
+          onFamily={(id) => setConfig((c) => ({ ...c, family: id }))}
           onTemplate={(id: TemplateId) => setConfig((c) => applyTemplate(c, id))}
           onTheme={(id: ThemeId) => setConfig((c) => ({ ...c, theme: id }))}
           onFont={(id: FontId) => setConfig((c) => ({ ...c, font: id }))}

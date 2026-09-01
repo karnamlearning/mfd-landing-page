@@ -96,6 +96,8 @@ export const sampleFaq = [
 /** Hardcoded Practice demo — sample content, forest + formal. */
 export const samplePracticeConfig: TenantConfig = {
   slug: "rahul-sharma",
+  family: "studio",
+  pickedFamily: true,
   template: "practice",
   theme: "forest",
   font: "formal",
@@ -130,7 +132,7 @@ export const emptyPracticeConfig: TenantConfig = {
   faq: [],
 }
 
-/** New tenant draft — empty fields, preview fills sample until they type. */
+/** New tenant draft — empty fields, preview fills sample until they type. Gallery until they pick a template. */
 export function emptyDraftConfig(slug: string): TenantConfig {
-  return { ...emptyPracticeConfig, slug }
+  return { ...emptyPracticeConfig, slug, pickedFamily: false }
 }

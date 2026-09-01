@@ -1,14 +1,21 @@
 import styled, { css } from "styled-components"
-import type { TemplateId } from "@mfd/schema"
+import type { FamilyId, TemplateId } from "@mfd/schema"
 
-export const Root = styled.div<{ $heading: string; $body: string; $template: TemplateId; $embedded?: boolean }>`
+export const Root = styled.div<{
+  $heading: string
+  $body: string
+  $template: TemplateId
+  $family: FamilyId
+  $embedded?: boolean
+}>`
   --heading: ${({ $heading }) => $heading};
   --body: ${({ $body }) => $body};
   font-family: var(--body), system-ui, sans-serif;
   color: ${({ theme }) => theme.text};
   background: ${({ theme }) => theme.bg};
-  min-height: ${({ $embedded }) => ($embedded ? "auto" : "100vh")};
-  font-size: ${({ $template }) => ($template === "local" ? "1.08rem" : "1rem")};
+  min-height: ${({ $embedded }) => ($embedded ? "100%" : "100vh")};
+  font-size: ${({ $template, $family }) =>
+    $family === "folio" || $template === "local" ? "1.08rem" : $family === "counter" ? "0.97rem" : "1rem"};
   width: 100%;
   overflow-x: clip;
   padding-bottom: env(safe-area-inset-bottom, 0px);
@@ -19,9 +26,92 @@ export const Root = styled.div<{ $heading: string; $body: string; $template: Tem
   h2,
   h3 {
     font-family: var(--heading), Georgia, serif;
-    font-weight: 500;
-    letter-spacing: -0.02em;
+    font-weight: ${({ $family }) => ($family === "counter" ? 600 : 500)};
+    letter-spacing: ${({ $family }) => ($family === "folio" ? "-0.035em" : "-0.02em")};
   }
+
+  ${({ $family, theme }) =>
+    $family === "folio" &&
+    css`
+      header {
+        background: ${theme.surface};
+        border-bottom: 2px solid ${theme.text}18;
+        backdrop-filter: none;
+      }
+      h2 {
+        font-size: clamp(1.7rem, 4.8cqi, 2.7rem);
+        letter-spacing: -0.04em;
+      }
+      #about article {
+        background: transparent;
+        border: 0;
+        border-left: 2px solid ${theme.primary};
+        border-radius: 0;
+        padding: 0.15rem 0 0.15rem 1rem;
+      }
+      #about > div > div:last-of-type {
+        grid-template-columns: 1fr;
+        max-width: 42rem;
+        gap: 1.1rem;
+      }
+      #how ol {
+        grid-template-columns: 1fr;
+        max-width: 40rem;
+      }
+      #how li {
+        background: transparent;
+        border: 0;
+        border-bottom: 1px solid ${theme.text}12;
+        border-radius: 0;
+        padding: 1rem 0 1.15rem;
+      }
+      #testimonials blockquote {
+        background: transparent;
+        border: 0;
+        border-top: 1px solid ${theme.text}18;
+        border-radius: 0;
+        padding: 1.25rem 0 0.5rem;
+      }
+    `}
+
+  ${({ $family, theme }) =>
+    $family === "counter" &&
+    css`
+      header {
+        background: ${theme.primary};
+        color: ${theme.btnText};
+        border-bottom: 0;
+        backdrop-filter: none;
+      }
+      header a,
+      header button,
+      header span {
+        color: inherit;
+      }
+      header a[href*="wa.me"] {
+        background: ${theme.btnText};
+        color: ${theme.primary};
+      }
+      section {
+        padding-top: 2.1rem;
+        padding-bottom: 2.1rem;
+      }
+      #stats {
+        background: ${theme.primary};
+        color: ${theme.btnText};
+      }
+      #stats p {
+        color: inherit;
+      }
+      #how ol {
+        grid-template-columns: 1fr 1fr;
+      }
+      #how li,
+      #services article,
+      #testimonials blockquote {
+        border-radius: 0;
+      }
+    `}
 `
 
 export const Wrap = styled.div`
@@ -195,13 +285,13 @@ export const WaLabel = styled.span`
   }
 `
 
-export const Hero = styled.section<{ $template: TemplateId }>`
+export const Hero = styled.section<{ $template: TemplateId; $layout: "split" | "overlay" | "center" }>`
   position: relative;
   display: grid;
   color: #fafaf9;
 
-  ${({ $template, theme }) =>
-    $template === "solo"
+  ${({ $layout, $template, theme }) =>
+    $layout === "split"
       ? css`
           min-height: auto;
           color: ${theme.text};
@@ -214,23 +304,34 @@ export const Hero = styled.section<{ $template: TemplateId }>`
           @container site (min-width: 800px) {
             width: min(1120px, calc(100% - 2.5rem));
             margin: 2.5rem auto 0;
-            gap: 2.5rem;
+            gap: 2.75rem;
             grid-template-columns: 0.85fr 1.15fr;
           }
         `
-      : css`
-          min-height: 22rem;
-          align-items: end;
+      : $layout === "center"
+        ? css`
+            min-height: 22rem;
+            align-items: center;
+            justify-items: center;
+            text-align: center;
 
-          @container site (min-width: 800px) {
-            min-height: min(${$template === "local" ? "78vh, 680px" : "88vh, 760px"});
-          }
-        `}
+            @container site (min-width: 800px) {
+              min-height: min(76vh, 640px);
+            }
+          `
+        : css`
+            min-height: 22rem;
+            align-items: end;
+
+            @container site (min-width: 800px) {
+              min-height: min(${$template === "local" ? "78vh, 680px" : "88vh, 760px"});
+            }
+          `}
 `
 
-export const HeroImg = styled.img<{ $template: TemplateId }>`
-  ${({ $template }) =>
-    $template === "solo"
+export const HeroImg = styled.img<{ $layout: "split" | "overlay" | "center" }>`
+  ${({ $layout }) =>
+    $layout === "split"
       ? css`
           position: relative;
           width: 100%;
@@ -244,6 +345,7 @@ export const HeroImg = styled.img<{ $template: TemplateId }>`
           width: 100%;
           height: 100%;
           object-fit: cover;
+          opacity: ${$layout === "center" ? 0.45 : 1};
         `}
 `
 
@@ -258,15 +360,27 @@ export const HeroShade = styled.div`
   );
 `
 
-export const HeroCopy = styled.div<{ $template: TemplateId }>`
+export const HeroCopy = styled.div<{ $layout: "split" | "overlay" | "center" }>`
   position: relative;
-  ${({ $template }) =>
-    $template === "solo"
+  ${({ $layout }) =>
+    $layout === "split"
       ? css`
           padding: 0;
           max-width: 36rem;
         `
-      : css`
+      : $layout === "center"
+        ? css`
+            padding: 3.5rem 1.25rem;
+            max-width: 38rem;
+            margin: 0 auto;
+            width: min(38rem, calc(100% - 2rem));
+            justify-self: center;
+
+            @container site (min-width: 800px) {
+              padding: 5rem 0;
+            }
+          `
+        : css`
           padding: 3.25rem 0 2.25rem;
           max-width: 40rem;
           margin-left: max(1rem, calc((100% - 1120px) / 2));
@@ -454,21 +568,28 @@ export const CredLabel = styled.span`
   color: ${({ theme }) => theme.muted};
 `
 
-export const ServiceGrid = styled.div`
+export const ServiceGrid = styled.div<{ $list?: boolean }>`
   display: grid;
   gap: 0.85rem;
 
-  @container site (min-width: 520px) {
-    grid-template-columns: 1fr 1fr;
-  }
+  ${({ $list }) =>
+    $list
+      ? css`
+          gap: 0;
+        `
+      : css`
+          @container site (min-width: 520px) {
+            grid-template-columns: 1fr 1fr;
+          }
 
-  @container site (min-width: 900px) {
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1rem;
-  }
+          @container site (min-width: 900px) {
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+          }
+        `}
 `
 
-export const ServiceCard = styled.article`
+export const ServiceCard = styled.article<{ $list?: boolean }>`
   padding: 1.25rem 1.15rem 1.35rem;
   background: ${({ theme }) => theme.surface};
   border-radius: 4px;
@@ -477,6 +598,21 @@ export const ServiceCard = styled.article`
   @container site (min-width: 700px) {
     padding: 1.5rem 1.35rem 1.6rem;
   }
+
+  ${({ $list, theme }) =>
+    $list &&
+    css`
+      display: block;
+      padding: 1rem 0 1.15rem;
+      background: transparent;
+      border: 0;
+      border-bottom: 1px solid ${theme.text}12;
+      border-radius: 0;
+
+      @container site (min-width: 700px) {
+        padding: 1.15rem 0 1.25rem;
+      }
+    `}
 `
 
 export const IconWrap = styled.div`

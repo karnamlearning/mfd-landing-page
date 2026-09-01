@@ -1,7 +1,7 @@
 "use client"
 
 import styled from "styled-components"
-import { templateIds, type TemplateId } from "@mfd/schema"
+import { familyIds, familyMeta, templateIds, type FamilyId, type TemplateId } from "@mfd/schema"
 import { fontIds, fontPairs, themeIds, themes, type FontId, type ThemeId } from "@mfd/tokens"
 
 const Bar = styled.aside`
@@ -63,19 +63,31 @@ const FontChip = styled.button<{ $on: boolean }>`
 `
 
 type Props = {
+  familyId: FamilyId
   templateId: TemplateId
   themeId: ThemeId
   fontId: FontId
+  onFamily: (id: FamilyId) => void
   onTemplate: (id: TemplateId) => void
   onTheme: (id: ThemeId) => void
   onFont: (id: FontId) => void
 }
 
-export function LookDock({ templateId, themeId, fontId, onTemplate, onTheme, onFont }: Props) {
+export function LookDock({ familyId, templateId, themeId, fontId, onFamily, onTemplate, onTheme, onFont }: Props) {
   return (
     <Bar aria-label="Preview look">
       <div>
         <Label>Template</Label>
+        <Fonts>
+          {familyIds.map((id) => (
+            <FontChip key={id} type="button" $on={id === familyId} onClick={() => onFamily(id)}>
+              {familyMeta[id].name}
+            </FontChip>
+          ))}
+        </Fonts>
+      </div>
+      <div>
+        <Label>Variant</Label>
         <Fonts>
           {templateIds.map((id) => (
             <FontChip key={id} type="button" $on={id === templateId} onClick={() => onTemplate(id)}>

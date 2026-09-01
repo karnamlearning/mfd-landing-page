@@ -4,7 +4,7 @@ import { useEffect, useState } from "react"
 import { ThemeProvider } from "styled-components"
 import { FiCopy, FiEye, FiExternalLink, FiMonitor, FiSmartphone } from "react-icons/fi"
 import { FaWhatsapp } from "react-icons/fa6"
-import { ADDON_LABEL, ADDON_PRICE, addonIds, formatInr, isPhoneStubSlug, type AddonId } from "@mfd/schema"
+import { ADDON_LABEL, ADDON_PRICE, addonIds, familyIds, familyMeta, formatInr, isPhoneStubSlug, type AddonId } from "@mfd/schema"
 import { themes } from "@mfd/tokens"
 import { DetailsStep } from "./DetailsStep"
 import { FontStep } from "./FontStep"
@@ -16,6 +16,7 @@ import { ReviewStep } from "./ReviewStep"
 import { SectionsStep } from "./SectionsStep"
 import { STEPS, useDraft, type ServerDraft, type StepId } from "./store"
 import * as U from "./styles"
+import { TemplateGallery } from "./TemplateGallery"
 import { TemplateStep } from "./TemplateStep"
 import { ThemeStep } from "./ThemeStep"
 import { OtpForm } from "../signup/OtpForm"
@@ -76,9 +77,9 @@ const SALES_WA =
   "https://wa.me/919611235245?text=" +
   encodeURIComponent("Hi Advisorkhoj — I need a custom MFD site beyond Buyer Place.")
 
-function CustomSiteBar() {
+function CustomSiteBar({ dock }: { dock?: boolean }) {
   return (
-    <U.CustomBar>
+    <U.CustomBar $dock={dock}>
       <U.CustomCopy>
         <strong>Want a custom site?</strong>
         <U.CustomMore>
@@ -91,6 +92,23 @@ function CustomSiteBar() {
         Talk to us
       </U.CustomCta>
     </U.CustomBar>
+  )
+}
+
+function FamilySwitch({ onBrowse }: { onBrowse: () => void }) {
+  const family = useDraft((s) => s.config.family ?? "studio")
+  const setFamily = useDraft((s) => s.setFamily)
+  return (
+    <U.Seg aria-label="Template">
+      {familyIds.map((id) => (
+        <U.SegBtn key={id} type="button" $on={family === id} onClick={() => setFamily(id)}>
+          {familyMeta[id].name}
+        </U.SegBtn>
+      ))}
+      <U.SegBtn type="button" $on={false} onClick={onBrowse}>
+        All
+      </U.SegBtn>
+    </U.Seg>
   )
 }
 
@@ -149,7 +167,9 @@ function Editor() {
   const status = useDraft((s) => s.status)
   const trialEndsAt = useDraft((s) => s.trialEndsAt)
   const impersonating = useDraft((s) => s.impersonating)
+  const pickedFamily = useDraft((s) => s.config.pickedFamily)
   const [publishOpen, setPublishOpen] = useState(false)
+  const [browse, setBrowse] = useState(false)
   const next = NEXT[step]
   const yours = slugLocked || status !== "draft" || !isPhoneStubSlug(slug)
   usePersistDraft()
@@ -162,6 +182,15 @@ function Editor() {
     setPublishOpen(true)
   }
 
+  if (pickedFamily === false || browse) {
+    return (
+      <>
+        <TemplateGallery browsing={browse} onPicked={() => setBrowse(false)} />
+        <CustomSiteBar />
+      </>
+    )
+  }
+
   return (
     <U.Shell>
       <U.Chrome>
@@ -170,6 +199,7 @@ function Editor() {
           <U.BrandName>Advisorkhoj</U.BrandName>
           <U.BrandSub>{yours ? "Your site" : "Buyer Place"}</U.BrandSub>
         </U.BrandMark>
+        <FamilySwitch onBrowse={() => setBrowse(true)} />
         <SiteChrome />
         <U.TopGrow />
         <U.GhostBtn type="button" onClick={() => setPreviewOpen(!previewOpen)}>
@@ -244,7 +274,7 @@ function Editor() {
         <PreviewFrame />
         <AddonsRail />
       </U.Body>
-      <CustomSiteBar />
+      <CustomSiteBar dock />
       <PublishModal open={publishOpen} onClose={() => setPublishOpen(false)} />
     </U.Shell>
   )

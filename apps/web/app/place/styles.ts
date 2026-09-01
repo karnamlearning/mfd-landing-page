@@ -7,6 +7,7 @@ export const EditorGlobal = createGlobalStyle`
   body {
     background: ${({ theme }) => theme.bg};
     color: ${({ theme }) => theme.text};
+    font-family: var(--font-modern), system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;
   }
   a { color: inherit; text-decoration: none; }
@@ -15,8 +16,8 @@ export const EditorGlobal = createGlobalStyle`
 
 export const Shell = styled.div`
   display: grid;
-  grid-template-rows: auto minmax(0, 1fr);
-  height: 100vh;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  height: 100dvh;
   overflow: hidden;
   font-family: var(--font-modern), system-ui, sans-serif;
   color: ${({ theme }) => theme.text};
@@ -24,8 +25,9 @@ export const Shell = styled.div`
 
   @media (max-width: 760px) {
     height: auto;
-    min-height: 100vh;
+    min-height: 100dvh;
     overflow: auto;
+    grid-template-rows: auto auto auto;
   }
 `
 
@@ -140,6 +142,7 @@ export const Body = styled.div`
   display: grid;
   grid-template-columns: 268px minmax(0, 1fr) 236px;
   min-height: 0;
+  overflow: hidden;
 
   @media (max-width: 1100px) {
     grid-template-columns: 248px minmax(0, 1fr);
@@ -151,18 +154,18 @@ export const Body = styled.div`
     flex-direction: column;
     overflow: auto;
   }
-
-  padding-bottom: 4.5rem;
 `
 
 export const Left = styled.aside`
   display: flex;
   flex-direction: column;
   min-height: 0;
+  overflow: hidden;
   border-right: 1px solid ${({ theme }) => theme.text}12;
   background: ${({ theme }) => theme.surface};
 
   @media (max-width: 760px) {
+    overflow: visible;
     border-right: 0;
     border-bottom: 1px solid ${({ theme }) => theme.text}12;
   }
@@ -260,12 +263,9 @@ export const NextBtn = styled.button`
 `
 
 export const Stage = styled.section<{ $open: boolean }>`
+  position: relative;
   min-width: 0;
   min-height: 0;
-  display: flex;
-  justify-content: center;
-  align-items: stretch;
-  padding: 1.1rem;
   background:
     radial-gradient(1200px 400px at 50% -10%, ${({ theme }) => theme.text}08, transparent),
     ${({ theme }) => theme.bg};
@@ -276,32 +276,41 @@ export const Stage = styled.section<{ $open: boolean }>`
   }
 
   @media (max-width: 760px) {
-    display: ${({ $open }) => ($open ? "flex" : "none")};
+    display: ${({ $open }) => ($open ? "block" : "none")};
     height: min(72vh, 680px);
     flex-shrink: 0;
-    padding: 0.75rem;
   }
 `
 
 export const Frame = styled.div<{ $desktop: boolean }>`
-  width: ${({ $desktop }) => ($desktop ? "100%" : "390px")};
-  max-width: 100%;
-  height: 100%;
+  position: absolute;
   overflow: auto;
   background: ${({ theme }) => theme.surface};
   border: 1px solid ${({ theme }) => theme.text}16;
   box-shadow: 0 18px 50px ${({ theme }) => theme.text}14;
+  overscroll-behavior: contain;
+  scroll-behavior: smooth;
   ${({ $desktop }) =>
     $desktop
       ? css`
+          inset: 1.1rem;
           border-radius: 12px;
         `
       : css`
+          top: 1.1rem;
+          bottom: 1.1rem;
+          left: 50%;
+          width: min(390px, calc(100% - 2.2rem));
+          transform: translateX(-50%);
           border-radius: 28px;
-          width: min(390px, 100%);
         `}
-  overscroll-behavior: contain;
-  scroll-behavior: smooth;
+
+  @media (max-width: 760px) {
+    inset: 0.75rem;
+    width: auto;
+    transform: none;
+    border-radius: ${({ $desktop }) => ($desktop ? "12px" : "28px")};
+  }
 `
 
 export const Rail = styled.aside`
@@ -667,13 +676,120 @@ export const TplBlurb = styled.span`
 `
 
 export const TplAction = styled.span<{ $on: boolean }>`
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
   margin-top: 0.5rem;
   font-size: 0.72rem;
   font-weight: 650;
   letter-spacing: 0.04em;
   text-transform: uppercase;
   color: ${({ $on, theme }) => ($on ? theme.primary : theme.muted)};
+`
+
+export const Gallery = styled.div`
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+  padding: 2rem 1.25rem 6rem;
+  background: ${({ theme }) => theme.bg};
+  color: ${({ theme }) => theme.text};
+  font-family: var(--font-modern), system-ui, sans-serif;
+`
+
+export const GalleryLead = styled.p`
+  margin: 0;
+  max-width: 36rem;
+  font-size: 0.92rem;
+  line-height: 1.5;
+  color: ${({ theme }) => theme.muted};
+`
+
+export const GalleryGrid = styled.div`
+  display: grid;
+  gap: 0.85rem;
+  width: min(56rem, 100%);
+
+  @media (min-width: 760px) {
+    grid-template-columns: 1fr 1fr;
+  }
+`
+
+export const GalleryCard = styled.button<{ $on: boolean; $id: string }>`
+  display: block;
+  text-align: left;
+  text-decoration: none;
+  color: inherit;
+  border: 1px solid ${({ $on, theme }) => ($on ? theme.primary : `${theme.text}16`)};
+  background: ${({ theme }) => theme.surface};
+  border-radius: 16px;
+  padding: 0.75rem;
+  cursor: pointer;
+  box-shadow: ${({ $on, theme }) => ($on ? `0 0 0 1px ${theme.primary}` : "none")};
+`
+
+export const GalleryThumb = styled.div<{ $id: string }>`
+  height: 110px;
+  border-radius: 12px;
+  margin-bottom: 0.7rem;
+  overflow: hidden;
+  position: relative;
+
+  ${({ $id }) =>
+    $id === "studio"
+      ? css`
+          background:
+            linear-gradient(#0f2a22cc, #0f2a22aa),
+            linear-gradient(90deg, #134e3a, #1b6b4a);
+          &::after {
+            content: "";
+            position: absolute;
+            left: 14px;
+            bottom: 14px;
+            width: 42%;
+            height: 10px;
+            border-radius: 4px;
+            background: #f3efe6;
+          }
+        `
+      : $id === "folio"
+        ? css`
+            display: grid;
+            grid-template-columns: 1.1fr 0.9fr;
+            background: #f6f0e6;
+            &::before {
+              content: "";
+              margin: 18px 14px;
+              background: linear-gradient(#2a2118 0 10px, transparent 10px 18px, #a56b35 18px 22px) no-repeat;
+            }
+            &::after {
+              content: "";
+              background: #c4b8a4;
+            }
+          `
+        : $id === "counter"
+          ? css`
+              background: #0e0e0e;
+              &::after {
+                content: "";
+                position: absolute;
+                inset: 28% 18%;
+                border: 1px solid #f5f5f4;
+              }
+            `
+          : css`
+              background: #ece7dc;
+              &::after {
+                content: "+";
+                position: absolute;
+                inset: 0;
+                display: grid;
+                place-items: center;
+                font-size: 2rem;
+                color: #7a4e28;
+              }
+            `}
 `
 
 export const SwatchGrid = styled.div`
@@ -1296,29 +1412,44 @@ export const LeadTable = styled.table`
   }
 `
 
-export const CustomBar = styled.div`
-  position: fixed;
-  left: 50%;
-  bottom: max(0.85rem, env(safe-area-inset-bottom));
+export const CustomBar = styled.div<{ $dock?: boolean }>`
   z-index: 30;
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  width: min(40rem, calc(100vw - 1.5rem));
-  transform: translateX(-50%);
   padding: 0.65rem 0.7rem 0.65rem 1rem;
-  border-radius: 16px;
   background: ${({ theme }) => theme.surface};
   color: ${({ theme }) => theme.text};
+  font-family: var(--font-modern), system-ui, sans-serif;
   border: 1px solid ${({ theme }) => theme.text}16;
-  box-shadow:
-    0 1px 0 ${({ theme }) => theme.text}0a,
-    0 16px 40px ${({ theme }) => theme.text}24;
 
-  @media (max-width: 560px) {
-    width: calc(100vw - 1rem);
-    padding: 0.6rem 0.65rem 0.6rem 0.85rem;
-  }
+  ${({ $dock, theme }) =>
+    $dock
+      ? css`
+          position: relative;
+          width: 100%;
+          border-radius: 0;
+          border-left: 0;
+          border-right: 0;
+          border-bottom: 0;
+          box-shadow: 0 -8px 24px ${theme.text}10;
+        `
+      : css`
+          position: fixed;
+          left: 50%;
+          bottom: max(0.85rem, env(safe-area-inset-bottom));
+          width: min(40rem, calc(100vw - 1.5rem));
+          transform: translateX(-50%);
+          border-radius: 16px;
+          box-shadow:
+            0 1px 0 ${theme.text}0a,
+            0 16px 40px ${theme.text}24;
+
+          @media (max-width: 560px) {
+            width: calc(100vw - 1rem);
+            padding: 0.6rem 0.65rem 0.6rem 0.85rem;
+          }
+        `}
 `
 
 export const CustomCopy = styled.p`

@@ -1,6 +1,6 @@
 "use client"
 
-import { useRef, type MouseEvent } from "react"
+import { type MouseEvent } from "react"
 import { Site } from "@mfd/site-kit"
 import { useDraft } from "./store"
 import * as U from "./styles"

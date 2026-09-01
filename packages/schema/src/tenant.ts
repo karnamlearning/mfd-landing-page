@@ -1,6 +1,6 @@
 import { z } from "zod"
 import { fontIds, themeIds } from "@mfd/tokens"
-import { addonIds, sectionIds, serviceIds, templateIds, toolIds } from "./ids"
+import { addonIds, familyIds, sectionIds, serviceIds, templateIds, toolIds } from "./ids"
 
 export const credentialSchema = z.object({
   label: z.string().min(1),
@@ -105,6 +105,8 @@ export const sectionSchema = z.object({
 export const tenantConfigSchema = z
   .object({
     slug: z.string().min(1),
+    family: z.enum(familyIds).default("studio"),
+    pickedFamily: z.boolean().optional(),
     template: z.enum(templateIds),
     theme: z.enum(themeIds),
     font: z.enum(fontIds),

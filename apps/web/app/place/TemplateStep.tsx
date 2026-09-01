@@ -4,7 +4,7 @@ import type { TemplateId } from "@mfd/schema"
 import { useDraft } from "./store"
 import * as U from "./styles"
 
-const TEMPLATES: Array<{ id: TemplateId; name: string; blurb: string }> = [
+const VARIANTS: Array<{ id: TemplateId; name: string; blurb: string }> = [
   {
     id: "solo",
     name: "Solo Advisor",
@@ -13,7 +13,7 @@ const TEMPLATES: Array<{ id: TemplateId; name: string; blurb: string }> = [
   {
     id: "practice",
     name: "Practice / Office",
-    blurb: "Investbux-like. Firm logo, lifestyle hero, credentials, service cards, stats.",
+    blurb: "Firm logo, lifestyle or editorial hero, credentials, service cards, stats.",
   },
   {
     id: "local",
@@ -28,16 +28,18 @@ export function TemplateStep() {
 
   return (
     <>
-      <U.StepTitle>Template</U.StepTitle>
-      <U.StepLead>Same details, different layout. Theme, font, and add-ons stay as they are.</U.StepLead>
+      <U.StepTitle>Variant</U.StepTitle>
+      <U.StepLead>
+        Same template, different emphasis. Layout stays; hero, type size, and default sections change.
+      </U.StepLead>
       <U.CardGrid>
-        {TEMPLATES.map((tpl) => {
-          const on = tpl.id === current
+        {VARIANTS.map((row) => {
+          const on = row.id === current
           return (
-            <U.TplCard key={tpl.id} type="button" $on={on} onClick={() => setTemplate(tpl.id)}>
-              <U.TplThumb $id={tpl.id} />
-              <U.TplName>{tpl.name}</U.TplName>
-              <U.TplBlurb>{tpl.blurb}</U.TplBlurb>
+            <U.TplCard key={row.id} type="button" $on={on} onClick={() => setTemplate(row.id)}>
+              <U.TplThumb $id={row.id} />
+              <U.TplName>{row.name}</U.TplName>
+              <U.TplBlurb>{row.blurb}</U.TplBlurb>
               <U.TplAction $on={on}>{on ? "Selected" : "Preview this"}</U.TplAction>
             </U.TplCard>
           )

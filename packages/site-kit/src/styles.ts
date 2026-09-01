@@ -1,13 +1,13 @@
 import styled, { css } from "styled-components"
 import type { TemplateId } from "@mfd/schema"
 
-export const Root = styled.div<{ $heading: string; $body: string; $template: TemplateId }>`
+export const Root = styled.div<{ $heading: string; $body: string; $template: TemplateId; $embedded?: boolean }>`
   --heading: ${({ $heading }) => $heading};
   --body: ${({ $body }) => $body};
   font-family: var(--body), system-ui, sans-serif;
   color: ${({ theme }) => theme.text};
   background: ${({ theme }) => theme.bg};
-  min-height: 100vh;
+  min-height: ${({ $embedded }) => ($embedded ? "auto" : "100vh")};
   font-size: ${({ $template }) => ($template === "local" ? "1.08rem" : "1rem")};
 
   h1,
@@ -53,6 +53,14 @@ export const BrandName = styled.span`
   font-size: 1.15rem;
   font-weight: 600;
   letter-spacing: -0.03em;
+`
+
+export const Logo = styled.img`
+  display: block;
+  height: 36px;
+  width: auto;
+  max-width: 168px;
+  object-fit: contain;
 `
 
 export const Tagline = styled.span`

@@ -16,7 +16,11 @@ function mergeDetails(details: TenantDetails): TenantDetails {
     heroHeadline: emptyStr(details.heroHeadline) ? s.heroHeadline : details.heroHeadline,
     pitch: emptyStr(details.pitch) ? s.pitch : details.pitch,
     whatsapp: emptyStr(details.whatsapp) ? s.whatsapp : details.whatsapp,
-    phone: emptyStr(details.phone) ? s.phone : details.phone,
+    phone: emptyStr(details.phone)
+      ? emptyStr(details.whatsapp)
+        ? s.phone
+        : details.whatsapp
+      : details.phone,
     email: emptyStr(details.email) ? s.email : details.email,
     address: emptyStr(details.address) ? s.address : details.address,
     city: emptyStr(details.city) ? s.city : details.city,

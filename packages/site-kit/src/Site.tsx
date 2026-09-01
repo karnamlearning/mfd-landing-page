@@ -13,10 +13,9 @@ import {
   FiTarget,
 } from "react-icons/fi"
 import { FaWhatsapp } from "react-icons/fa6"
-import type { SectionId, TenantConfig } from "@mfd/schema"
-import { mergeSample } from "@mfd/schema"
+import { baseToolIds, mergeSample, visibleToolIds, type SectionId, type TenantConfig } from "@mfd/schema"
 import { fontPairs, getTheme } from "@mfd/tokens"
-import { copy, serviceCopy, type Copy, type Locale } from "./copy"
+import { copy, serviceCopy, toolCopy, type Copy, type Locale } from "./copy"
 import { GlobalStyle } from "./GlobalStyle"
 import * as S from "./styles"
 import { firstName, inr, sipFuture, waHref } from "./utils"
@@ -38,6 +37,8 @@ export type SiteProps = {
   config: TenantConfig
   /** When true, empty fields are filled from sampleFill. Never true on the public host. */
   preview?: boolean
+  /** Nested in Buyer Place — do not paint document `body`. */
+  embedded?: boolean
   children?: ReactNode
 }
 
@@ -68,7 +69,11 @@ function Header({ ctx, locale, onLocale }: { ctx: Ctx; locale: Locale; onLocale:
     <S.HeaderBar>
       <S.HeaderInner>
         <S.Brand href="/">
-          <S.BrandName>{config.details.name}</S.BrandName>
+          {config.details.logoUrl ? (
+            <S.Logo src={config.details.logoUrl} alt={config.details.name} />
+          ) : (
+            <S.BrandName>{config.details.name}</S.BrandName>
+          )}
           <S.Tagline>{t.amfi}</S.Tagline>
         </S.Brand>
         <S.Nav>
@@ -239,11 +244,13 @@ function HowSection({ ctx }: { ctx: Ctx }) {
 }
 
 function CalculatorsSection({ ctx }: { ctx: Ctx }) {
-  const { t } = ctx
+  const { config, t, locale } = ctx
   const [monthly, setMonthly] = useState(10000)
   const [years, setYears] = useState(15)
   const [ret, setRet] = useState(12)
   const projected = useMemo(() => sipFuture(monthly, years, ret), [monthly, years, ret])
+  const extras = visibleToolIds(config).filter((id) => !(baseToolIds as readonly string[]).includes(id))
+  const hi = locale === "hi"
 
   return (
     <S.Section id="calculators">
@@ -291,6 +298,20 @@ function CalculatorsSection({ ctx }: { ctx: Ctx }) {
             </p>
           </S.Result>
         </S.CalcGrid>
+        {extras.length ? (
+          <S.ServiceGrid style={{ marginTop: "2rem" }}>
+            {extras.map((id) => {
+              const item = toolCopy[id]
+              if (!item) return null
+              return (
+                <S.ServiceCard key={id}>
+                  <S.ServiceTitle>{hi ? item.titleHi : item.title}</S.ServiceTitle>
+                  <S.ServiceCopy>{hi ? item.blurbHi : item.blurb}</S.ServiceCopy>
+                </S.ServiceCard>
+              )
+            })}
+          </S.ServiceGrid>
+        ) : null}
       </S.Wrap>
     </S.Section>
   )
@@ -427,7 +448,7 @@ const registry: Record<SectionId, (ctx: Ctx) => ReactNode> = {
   whatsapp_strip: (ctx) => <WhatsappStrip ctx={ctx} />,
 }
 
-export function Site({ config, preview = false, children }: SiteProps) {
+export function Site({ config, preview = false, embedded = false, children }: SiteProps) {
   const resolved = mergeSample(config, preview)
   const [locale, setLocale] = useState<Locale>("en")
   const theme = getTheme(resolved.theme)
@@ -443,8 +464,8 @@ export function Site({ config, preview = false, children }: SiteProps) {
 
   return (
     <ThemeProvider theme={theme}>
-      <S.Root $heading={font.headingVar} $body={font.bodyVar} $template={resolved.template}>
-        <GlobalStyle />
+      <S.Root $heading={font.headingVar} $body={font.bodyVar} $template={resolved.template} $embedded={embedded}>
+        <GlobalStyle $embedded={embedded} />
         <Header ctx={ctx} locale={locale} onLocale={setLocale} />
         {children ??
           activeSections(resolved).map((row) => {

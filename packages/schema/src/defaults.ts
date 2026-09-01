@@ -42,6 +42,7 @@ export const sectionsByTemplate: Record<TemplateId, Array<{ id: SectionId; on: b
   ],
 }
 
+/** Replace section order/on with the template defaults. Details, theme, font, and add-ons stay. */
 export function applyTemplate<T extends { template: TemplateId; sections: Array<{ id: SectionId; on: boolean }> }>(
   config: T,
   template: TemplateId,

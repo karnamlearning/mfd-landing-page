@@ -5,15 +5,17 @@ import { ThemeProvider } from "styled-components"
 import {
   FiHeart,
   FiLayers,
+  FiMenu,
   FiPieChart,
   FiRefreshCw,
   FiRepeat,
   FiShield,
   FiSunrise,
   FiTarget,
+  FiX,
 } from "react-icons/fi"
 import { FaWhatsapp } from "react-icons/fa6"
-import { baseToolIds, mergeSample, visibleToolIds, type SectionId, type TenantConfig } from "@mfd/schema"
+import { mergeSample, visibleToolIds, type SectionId, type TenantConfig } from "@mfd/schema"
 import { fontPairs, getTheme } from "@mfd/tokens"
 import { copy, serviceCopy, toolCopy, type Copy, type Locale } from "./copy"
 import { ChromeContext } from "./chrome-context"
@@ -60,18 +62,32 @@ type Ctx = {
 }
 
 function Header({ ctx, locale, onLocale }: { ctx: Ctx; locale: Locale; onLocale: (l: Locale) => void }) {
-  const { config, t, wa } = ctx
+  const { config, t, wa, preview, embedded } = ctx
+  const [menu, setMenu] = useState(false)
   const on = new Set(activeSections(config).map((s) => s.id))
+  const hash = preview || embedded ? "#" : "/#"
   const links = [
-    { id: "about" as const, href: "/#about", label: t.about },
-    { id: "services" as const, href: "/#services", label: t.services },
+    { id: "about" as const, href: `${hash}about`, label: t.about },
+    { id: "services" as const, href: `${hash}services`, label: t.services },
     { id: "calculators" as const, href: "/calculators", label: t.calculators },
-    { id: "contact" as const, href: "/#contact", label: t.contact },
+    { id: "contact" as const, href: `${hash}contact`, label: t.contact },
+  ].filter((l) => on.has(l.id))
+  const menuLinks = [
+    { id: "about" as const, href: `${hash}about`, label: t.about },
+    { id: "services" as const, href: `${hash}services`, label: t.services },
+    { id: "how" as const, href: `${hash}how`, label: t.howNav },
+    { id: "calculators" as const, href: "/calculators", label: t.calculators },
+    { id: "testimonials" as const, href: `${hash}testimonials`, label: t.quotesNav },
+    { id: "faq" as const, href: `${hash}faq`, label: t.faqNav },
+    { id: "contact" as const, href: `${hash}contact`, label: t.contact },
   ].filter((l) => on.has(l.id))
 
   return (
     <S.HeaderBar>
       <S.HeaderInner>
+        <S.MenuBtn type="button" aria-label={t.menu} aria-expanded={menu} onClick={() => setMenu((v) => !v)}>
+          {menu ? <FiX size={18} /> : <FiMenu size={18} />}
+        </S.MenuBtn>
         <S.Brand href="/">
           {config.details.logoUrl ? (
             <S.Logo src={config.details.logoUrl} alt={config.details.name} />
@@ -100,9 +116,20 @@ function Header({ ctx, locale, onLocale }: { ctx: Ctx; locale: Locale; onLocale:
         ) : null}
         <S.WaBtn href={wa} target="_blank" rel="noreferrer">
           <FaWhatsapp size={16} aria-hidden />
-          {t.wa}
+          <S.WaLabel>{t.wa}</S.WaLabel>
         </S.WaBtn>
       </S.HeaderInner>
+      {menu ? (
+        <S.Wrap>
+          <S.MobileNav>
+            {menuLinks.map((l) => (
+              <a key={l.id} href={l.href} onClick={() => setMenu(false)}>
+                {l.label}
+              </a>
+            ))}
+          </S.MobileNav>
+        </S.Wrap>
+      ) : null}
     </S.HeaderBar>
   )
 }
@@ -121,10 +148,15 @@ function HeroSection({ ctx }: { ctx: Ctx }) {
         <S.Eyebrow>{d.city}</S.Eyebrow>
         <S.HeroTitle $template={tpl}>{d.heroHeadline}</S.HeroTitle>
         <S.HeroLead>{d.pitch}</S.HeroLead>
-        <S.WaBtn href={wa} target="_blank" rel="noreferrer">
-          <FaWhatsapp size={16} aria-hidden />
-          {t.talkTo(firstName(d.name))}
-        </S.WaBtn>
+        <S.HeroActions>
+          <S.WaBtn href={wa} target="_blank" rel="noreferrer">
+            <FaWhatsapp size={16} aria-hidden />
+            {t.talkTo(firstName(d.name))}
+          </S.WaBtn>
+          {ctx.config.sections.some((s) => s.id === "calculators" && s.on) ? (
+            <S.GhostBtn href={ctx.preview || ctx.embedded ? "#calculators" : "/#calculators"}>{t.seeCalcs}</S.GhostBtn>
+          ) : null}
+        </S.HeroActions>
       </S.HeroCopy>
     </S.Hero>
   )
@@ -134,19 +166,37 @@ function AboutSection({ ctx }: { ctx: Ctx }) {
   const { config, t, locale } = ctx
   const d = config.details
   const bio = locale === "hi" && d.bioHi ? d.bioHi : d.bio
+  const langs = d.languages.filter(Boolean).join(" · ")
   return (
     <S.Section id="about">
       <S.Wrap>
         <S.AboutGrid>
           <div>
-            <S.Kicker>{t.about}</S.Kicker>
+            <S.Kicker>{t.welcome}</S.Kicker>
             <S.H2>{t.aboutTitle(d.city)}</S.H2>
             <S.Bio>{bio}</S.Bio>
+            {langs || d.hours ? (
+              <S.MetaRow>
+                {langs ? langs : null}
+                {langs && d.hours ? " · " : null}
+                {d.hours ? `${t.hoursLabel}: ${d.hours}` : null}
+              </S.MetaRow>
+            ) : null}
           </div>
           {config.template !== "solo" && d.photoUrl ? (
             <S.Portrait src={d.photoUrl} alt={d.name} />
           ) : null}
         </S.AboutGrid>
+        <S.Kicker style={{ marginTop: "2rem" }}>{t.about}</S.Kicker>
+        <S.H2>{t.whyTitle}</S.H2>
+        <S.WhyGrid>
+          {t.why.map((item) => (
+            <S.WhyCard key={item.title}>
+              <S.ServiceTitle>{item.title}</S.ServiceTitle>
+              <S.ServiceCopy>{item.body}</S.ServiceCopy>
+            </S.WhyCard>
+          ))}
+        </S.WhyGrid>
       </S.Wrap>
     </S.Section>
   )
@@ -169,7 +219,7 @@ function CredentialsSection({ ctx }: { ctx: Ctx }) {
               <S.CredMeta>
                 <S.CredLabel>{c.label}</S.CredLabel>
                 <strong>
-                  {c.name} · {c.number}
+                  {c.name} ARN No {c.number}
                 </strong>
               </S.CredMeta>
             </S.CredCard>
@@ -187,6 +237,7 @@ function ServicesSection({ ctx }: { ctx: Ctx }) {
       <S.Wrap>
         <S.Kicker>{t.services}</S.Kicker>
         <S.H2>{t.servicesTitle}</S.H2>
+        <S.SectionLead>{t.servicesLead}</S.SectionLead>
         <S.ServiceGrid>
           {config.services.map((id) => {
             const item = serviceCopy[id]
@@ -234,6 +285,7 @@ function HowSection({ ctx }: { ctx: Ctx }) {
       <S.Wrap>
         <S.Kicker>{t.howKicker}</S.Kicker>
         <S.H2>{t.howTitle}</S.H2>
+        <S.SectionLead>{t.howLead}</S.SectionLead>
         <S.StepGrid>
           {t.how.map((step, i) => (
             <S.Step key={step.title}>
@@ -251,7 +303,7 @@ function HowSection({ ctx }: { ctx: Ctx }) {
 function CalculatorsSection({ ctx }: { ctx: Ctx }) {
   const { config, t, locale, preview, embedded } = ctx
   const visible = visibleToolIds(config)
-  const extras = visible.filter((id) => !(baseToolIds as readonly string[]).includes(id))
+  const rest = visible.filter((id) => id !== "sip")
   const hi = locale === "hi"
   const showSip = visible.includes("sip")
 
@@ -260,10 +312,11 @@ function CalculatorsSection({ ctx }: { ctx: Ctx }) {
       <S.Wrap>
         <S.Kicker>{t.planning}</S.Kicker>
         <S.H2>{t.calcTitle}</S.H2>
+        <S.SectionLead>{t.calcLead}</S.SectionLead>
         {showSip ? <Calculator tool="sip" config={config} t={t} preview={preview} compact /> : null}
-        {extras.length ? (
+        {rest.length ? (
           <S.ServiceGrid style={{ marginTop: "2rem" }}>
-            {extras.map((id) => {
+            {rest.map((id) => {
               const item = toolCopy[id]
               if (!item) return null
               const card = (
@@ -289,10 +342,13 @@ function CalculatorsSection({ ctx }: { ctx: Ctx }) {
 
 function TestimonialsSection({ ctx }: { ctx: Ctx }) {
   const items = ctx.config.testimonials
+  const t = ctx.t
   if (!items.length) return null
   return (
     <S.Section id="testimonials">
       <S.Wrap>
+        <S.Kicker>{t.quotesKicker}</S.Kicker>
+        <S.H2>{t.quotesTitle}</S.H2>
         <S.QuoteGrid>
           {items.map((item) => (
             <S.Quote key={item.name}>
@@ -309,11 +365,13 @@ function TestimonialsSection({ ctx }: { ctx: Ctx }) {
 }
 
 function FaqSection({ ctx }: { ctx: Ctx }) {
-  const { config, locale } = ctx
+  const { config, locale, t } = ctx
   if (!config.faq.length) return null
   return (
     <S.Section id="faq">
       <S.Wrap>
+        <S.Kicker>{t.faqKicker}</S.Kicker>
+        <S.H2>{t.faqTitle}</S.H2>
         <S.FaqList>
           {config.faq.map((item) => (
             <div key={item.q}>
@@ -328,7 +386,7 @@ function FaqSection({ ctx }: { ctx: Ctx }) {
 }
 
 function ContactSection({ ctx }: { ctx: Ctx }) {
-  const { config, t, preview } = ctx
+  const { config, t, preview, wa } = ctx
   const d = config.details
   const [sent, setSent] = useState(false)
   const [busy, setBusy] = useState(false)
@@ -378,13 +436,28 @@ function ContactSection({ ctx }: { ctx: Ctx }) {
             <S.H2>{t.contactTitle}</S.H2>
             <S.Bio>
               {d.address}
-              <br />
-              {d.city}
-              <br />
-              {d.hours}
-              <br />
-              <a href={`mailto:${d.email}`}>{d.email}</a>
+              {d.city && (!d.address || !d.address.toLowerCase().includes(d.city.toLowerCase()))
+                ? `${d.address ? ", " : ""}${d.city}`
+                : null}
             </S.Bio>
+            <S.ContactList>
+              {d.phone ? (
+                <a href={`tel:+91${d.phone.replace(/\D/g, "").slice(-10)}`}>
+                  {t.call}: {d.phone}
+                </a>
+              ) : null}
+              {d.whatsapp ? (
+                <a href={wa} target="_blank" rel="noreferrer">
+                  {t.wa}: {d.whatsapp}
+                </a>
+              ) : null}
+              {d.email ? <a href={`mailto:${d.email}`}>{d.email}</a> : null}
+              {d.hours ? (
+                <span>
+                  {t.hoursLabel}: {d.hours}
+                </span>
+              ) : null}
+            </S.ContactList>
           </div>
           {sent ? (
             <S.Bio>{t.sent}</S.Bio>
@@ -440,17 +513,31 @@ function WhatsappStrip({ ctx }: { ctx: Ctx }) {
 
 function Footer({ ctx }: { ctx: Ctx }) {
   const d = ctx.config.details
+  const t = ctx.t
   return (
     <S.Foot>
       <S.Wrap>
         <S.FootTop>
           <div>
             <S.BrandName>{d.name}</S.BrandName>
-            <p>
-              {d.address}, {d.city}
-            </p>
+            <S.ContactList>
+              <span>
+                {d.address}
+                {d.city && (!d.address || !d.address.toLowerCase().includes(d.city.toLowerCase()))
+                  ? `${d.address ? ", " : ""}${d.city}`
+                  : null}
+              </span>
+              {d.phone ? <span>{t.call}: {d.phone}</span> : null}
+              {d.email ? <a href={`mailto:${d.email}`}>{d.email}</a> : null}
+              {d.hours ? <span>{t.hoursLabel}: {d.hours}</span> : null}
+            </S.ContactList>
           </div>
-          <a href="/disclosures">{ctx.t.disclosures}</a>
+          <S.FootNav>
+            <a href="/">{t.home}</a>
+            <a href={ctx.preview || ctx.embedded ? "#services" : "/#services"}>{t.services}</a>
+            <a href="/calculators">{t.calculators}</a>
+            <a href="/disclosures">{t.disclosures}</a>
+          </S.FootNav>
         </S.FootTop>
         <S.Disclaimer>{ctx.t.disclaimer(d.name)}</S.Disclaimer>
       </S.Wrap>

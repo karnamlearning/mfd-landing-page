@@ -296,6 +296,7 @@ export const Frame = styled.div<{ $desktop: boolean }>`
         `
       : css`
           border-radius: 28px;
+          width: min(390px, 100%);
         `}
 `
 

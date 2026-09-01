@@ -9,6 +9,11 @@ export const Root = styled.div<{ $heading: string; $body: string; $template: Tem
   background: ${({ theme }) => theme.bg};
   min-height: ${({ $embedded }) => ($embedded ? "auto" : "100vh")};
   font-size: ${({ $template }) => ($template === "local" ? "1.08rem" : "1rem")};
+  width: 100%;
+  overflow-x: hidden;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  container-type: inline-size;
+  container-name: site;
 
   h1,
   h2,
@@ -20,8 +25,12 @@ export const Root = styled.div<{ $heading: string; $body: string; $template: Tem
 `
 
 export const Wrap = styled.div`
-  width: min(1120px, calc(100% - 2.5rem));
+  width: min(1120px, calc(100% - 2rem));
   margin-inline: auto;
+
+  @container site (min-width: 700px) {
+    width: min(1120px, calc(100% - 2.5rem));
+  }
 `
 
 export const HeaderBar = styled.header`
@@ -37,8 +46,13 @@ export const HeaderInner = styled(Wrap)`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 1rem;
-  padding: 0.9rem 0;
+  gap: 0.65rem;
+  padding: 0.7rem 0;
+
+  @container site (min-width: 860px) {
+    gap: 1rem;
+    padding: 0.9rem 0;
+  }
 `
 
 export const Brand = styled.a`
@@ -46,28 +60,84 @@ export const Brand = styled.a`
   flex-direction: column;
   gap: 2px;
   min-width: 0;
+  flex: 1;
 `
 
 export const BrandName = styled.span`
   font-family: var(--heading), Georgia, serif;
-  font-size: 1.15rem;
+  font-size: 1.02rem;
   font-weight: 600;
   letter-spacing: -0.03em;
+  line-height: 1.2;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+
+  @container site (min-width: 860px) {
+    font-size: 1.15rem;
+  }
 `
 
 export const Logo = styled.img`
   display: block;
-  height: 36px;
+  height: 30px;
   width: auto;
-  max-width: 168px;
+  max-width: 132px;
   object-fit: contain;
+
+  @container site (min-width: 860px) {
+    height: 36px;
+    max-width: 168px;
+  }
 `
 
 export const Tagline = styled.span`
-  font-size: 0.68rem;
+  font-size: 0.58rem;
   letter-spacing: 0.04em;
   text-transform: uppercase;
   color: ${({ theme }) => theme.muted};
+  line-height: 1.35;
+  max-width: 100%;
+
+  @container site (min-width: 860px) {
+    font-size: 0.68rem;
+  }
+`
+
+export const MenuBtn = styled.button`
+  display: grid;
+  place-items: center;
+  width: 2.4rem;
+  height: 2.4rem;
+  flex-shrink: 0;
+  border: 1px solid ${({ theme }) => theme.text}18;
+  background: ${({ theme }) => theme.surface};
+  color: ${({ theme }) => theme.text};
+  border-radius: 10px;
+  cursor: pointer;
+
+  @container site (min-width: 860px) {
+    display: none;
+  }
+`
+
+export const MobileNav = styled.nav`
+  display: grid;
+  gap: 0.15rem;
+  padding: 0.35rem 0 0.85rem;
+  border-top: 1px solid ${({ theme }) => theme.text}10;
+
+  a {
+    display: block;
+    padding: 0.55rem 0;
+    font-size: 0.95rem;
+    color: ${({ theme }) => theme.text};
+  }
+
+  @container site (min-width: 860px) {
+    display: none;
+  }
 `
 
 export const Nav = styled.nav`
@@ -76,7 +146,7 @@ export const Nav = styled.nav`
   font-size: 0.9rem;
   color: ${({ theme }) => theme.muted};
 
-  @media (min-width: 860px) {
+  @container site (min-width: 860px) {
     display: flex;
   }
 
@@ -104,11 +174,25 @@ export const WaBtn = styled.a`
   display: inline-flex;
   align-items: center;
   gap: 0.45rem;
+  flex-shrink: 0;
   background: ${({ theme }) => theme.primary};
   color: ${({ theme }) => theme.btnText};
-  padding: 0.55rem 0.95rem;
+  padding: 0.5rem 0.7rem;
   border-radius: 999px;
-  font-size: 0.85rem;
+  font-size: 0.82rem;
+
+  @container site (min-width: 860px) {
+    padding: 0.55rem 0.95rem;
+    font-size: 0.85rem;
+  }
+`
+
+export const WaLabel = styled.span`
+  display: none;
+
+  @container site (min-width: 480px) {
+    display: inline;
+  }
 `
 
 export const Hero = styled.section<{ $template: TemplateId }>`
@@ -123,17 +207,24 @@ export const Hero = styled.section<{ $template: TemplateId }>`
           color: ${theme.text};
           background: ${theme.bg};
           align-items: center;
-          width: min(1120px, calc(100% - 2.5rem));
-          margin: 2.5rem auto 0;
-          gap: 2.5rem;
+          width: min(1120px, calc(100% - 2rem));
+          margin: 1.5rem auto 0;
+          gap: 1.5rem;
 
-          @media (min-width: 800px) {
+          @container site (min-width: 800px) {
+            width: min(1120px, calc(100% - 2.5rem));
+            margin: 2.5rem auto 0;
+            gap: 2.5rem;
             grid-template-columns: 0.85fr 1.15fr;
           }
         `
       : css`
-          min-height: min(${$template === "local" ? "78vh, 680px" : "88vh, 760px"});
+          min-height: 22rem;
           align-items: end;
+
+          @container site (min-width: 800px) {
+            min-height: min(${$template === "local" ? "78vh, 680px" : "88vh, 760px"});
+          }
         `}
 `
 
@@ -176,11 +267,17 @@ export const HeroCopy = styled.div<{ $template: TemplateId }>`
           max-width: 36rem;
         `
       : css`
-          padding: 5.5rem 0 4rem;
+          padding: 3.25rem 0 2.25rem;
           max-width: 40rem;
-          margin-left: max(1.25rem, calc((100% - 1120px) / 2));
+          margin-left: max(1rem, calc((100% - 1120px) / 2));
           margin-right: auto;
-          width: min(40rem, calc(100% - 2.5rem));
+          width: min(40rem, calc(100% - 2rem));
+
+          @container site (min-width: 800px) {
+            padding: 5.5rem 0 4rem;
+            width: min(40rem, calc(100% - 2.5rem));
+            margin-left: max(1.25rem, calc((100% - 1120px) / 2));
+          }
         `}
 `
 
@@ -195,20 +292,48 @@ export const Eyebrow = styled.p`
 export const HeroTitle = styled.h1<{ $template: TemplateId }>`
   margin: 0 0 1rem;
   line-height: 1.12;
+  overflow-wrap: anywhere;
   font-size: ${({ $template }) =>
-    $template === "local" ? "clamp(2.4rem, 5vw, 3.6rem)" : "clamp(2.1rem, 4.6vw, 3.35rem)"};
+    $template === "local" ? "clamp(1.55rem, 7.2cqi, 3.6rem)" : "clamp(1.45rem, 6.4cqi, 3.35rem)"};
 `
 
-export const HeroLead = styled.p`
-  margin: 0 0 1.6rem;
-  font-size: 1.05rem;
-  line-height: 1.55;
-  max-width: 34rem;
+export const HeroActions = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.7rem;
+`
+
+export const GhostBtn = styled.a`
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5rem 0.95rem;
+  border-radius: 999px;
+  border: 1px solid currentColor;
+  font-size: 0.88rem;
   opacity: 0.92;
 `
 
+export const HeroLead = styled.p`
+  margin: 0 0 1.25rem;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  max-width: 34rem;
+  opacity: 0.92;
+
+  @container site (min-width: 700px) {
+    margin: 0 0 1.6rem;
+    font-size: 1.05rem;
+    line-height: 1.55;
+  }
+`
+
 export const Section = styled.section`
-  padding: ${({ theme }) => theme.space[6]} 0;
+  padding: 2.75rem 0;
+
+  @container site (min-width: 800px) {
+    padding: ${({ theme }) => theme.space[6]} 0;
+  }
 `
 
 export const Kicker = styled.p`
@@ -220,16 +345,24 @@ export const Kicker = styled.p`
 `
 
 export const H2 = styled.h2`
-  margin: 0 0 1.5rem;
-  font-size: clamp(1.7rem, 3vw, 2.25rem);
+  margin: 0 0 0.75rem;
+  font-size: clamp(1.45rem, 4.2cqi, 2.25rem);
   line-height: 1.2;
+`
+
+export const SectionLead = styled.p`
+  margin: 0 0 1.5rem;
+  max-width: 38rem;
+  font-size: 0.98rem;
+  line-height: 1.6;
+  color: ${({ theme }) => theme.muted};
 `
 
 export const AboutGrid = styled.div`
   display: grid;
   gap: ${({ theme }) => theme.space[4]};
 
-  @media (min-width: 800px) {
+  @container site (min-width: 800px) {
     grid-template-columns: 1.2fr 0.8fr;
     align-items: center;
   }
@@ -237,9 +370,38 @@ export const AboutGrid = styled.div`
 
 export const Bio = styled.p`
   margin: 0;
-  font-size: 1.12rem;
+  font-size: 1.02rem;
   line-height: 1.7;
   color: ${({ theme }) => theme.muted};
+
+  @container site (min-width: 700px) {
+    font-size: 1.12rem;
+  }
+`
+
+export const MetaRow = styled.p`
+  margin: 1.15rem 0 0;
+  font-size: 0.88rem;
+  line-height: 1.5;
+  color: ${({ theme }) => theme.text};
+`
+
+export const WhyGrid = styled.div`
+  display: grid;
+  gap: 0.85rem;
+  margin-top: 0;
+
+  @container site (min-width: 700px) {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+  }
+`
+
+export const WhyCard = styled.article`
+  padding: 1.15rem 1.1rem 1.25rem;
+  background: ${({ theme }) => theme.surface};
+  border: 1px solid ${({ theme }) => theme.text}10;
+  border-radius: 4px;
 `
 
 export const Portrait = styled.img`
@@ -253,7 +415,7 @@ export const CredGrid = styled.div`
   display: grid;
   gap: 1rem;
 
-  @media (min-width: 700px) {
+  @container site (min-width: 700px) {
     grid-template-columns: 1fr 1fr;
   }
 `
@@ -294,18 +456,27 @@ export const CredLabel = styled.span`
 
 export const ServiceGrid = styled.div`
   display: grid;
-  gap: 1rem;
+  gap: 0.85rem;
 
-  @media (min-width: 700px) {
+  @container site (min-width: 520px) {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  @container site (min-width: 900px) {
     grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
   }
 `
 
 export const ServiceCard = styled.article`
-  padding: 1.5rem 1.35rem 1.6rem;
+  padding: 1.25rem 1.15rem 1.35rem;
   background: ${({ theme }) => theme.surface};
   border-radius: 4px;
   border: 1px solid ${({ theme }) => theme.text}10;
+
+  @container site (min-width: 700px) {
+    padding: 1.5rem 1.35rem 1.6rem;
+  }
 `
 
 export const IconWrap = styled.div`
@@ -333,18 +504,19 @@ export const ServiceCopy = styled.p`
 
 export const StatRow = styled.div`
   display: grid;
-  gap: ${({ theme }) => theme.space[4]};
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
   text-align: center;
 
-  @media (min-width: 700px) {
-    grid-template-columns: repeat(3, 1fr);
+  @container site (min-width: 700px) {
+    gap: ${({ theme }) => theme.space[4]};
   }
 `
 
 export const StatValue = styled.p`
   margin: 0;
   font-family: var(--heading), Georgia, serif;
-  font-size: clamp(2.4rem, 5vw, 3.4rem);
+  font-size: clamp(1.7rem, 5.5cqi, 3.4rem);
   line-height: 1;
 `
 
@@ -361,8 +533,12 @@ export const StepGrid = styled.ol`
   padding: 0;
   list-style: none;
 
-  @media (min-width: 800px) {
-    grid-template-columns: repeat(3, 1fr);
+  @container site (min-width: 700px) {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  @container site (min-width: 1100px) {
+    grid-template-columns: repeat(4, 1fr);
   }
 `
 
@@ -390,7 +566,7 @@ export const CalcGrid = styled.div`
   border-radius: 4px;
   padding: ${({ theme }) => theme.space[4]};
 
-  @media (min-width: 800px) {
+  @container site (min-width: 800px) {
     grid-template-columns: 1fr 1fr;
     align-items: center;
   }
@@ -413,7 +589,9 @@ export const Input = styled.input`
   color: ${({ theme }) => theme.text};
   outline: none;
   font-family: inherit;
+  font-size: 1rem;
   box-sizing: border-box;
+  width: 100%;
 `
 
 export const PhoneField = styled.div`
@@ -440,6 +618,7 @@ export const PhoneInput = styled.input`
   color: ${({ theme }) => theme.text};
   outline: none;
   font-family: inherit;
+  font-size: 1rem;
 `
 
 export const Area = styled.textarea`
@@ -451,6 +630,8 @@ export const Area = styled.textarea`
   outline: none;
   min-height: 4.5rem;
   resize: vertical;
+  font-size: 1rem;
+  width: 100%;
 `
 
 export const Result = styled.div`
@@ -469,15 +650,20 @@ export const ResultK = styled.p`
 export const ResultN = styled.p`
   margin: 0;
   font-family: var(--heading), Georgia, serif;
-  font-size: 2.4rem;
+  font-size: clamp(1.7rem, 6vw, 2.4rem);
+  word-break: break-word;
 `
 
 export const QuoteGrid = styled.div`
   display: grid;
   gap: 1rem;
 
-  @media (min-width: 700px) {
+  @container site (min-width: 700px) {
     grid-template-columns: 1fr 1fr;
+  }
+
+  @container site (min-width: 1100px) {
+    grid-template-columns: repeat(3, 1fr);
   }
 `
 
@@ -500,19 +686,19 @@ export const Quote = styled.blockquote`
   }
 `
 
-export const FaqList = styled.dl`
+export const FaqList = styled.div`
   margin: 0;
   display: grid;
   gap: 1.25rem;
 `
 
-export const FaqQ = styled.dt`
+export const FaqQ = styled.h3`
   font-family: var(--heading), Georgia, serif;
   font-size: 1.15rem;
   margin: 0 0 0.35rem;
 `
 
-export const FaqA = styled.dd`
+export const FaqA = styled.p`
   margin: 0;
   color: ${({ theme }) => theme.muted};
   line-height: 1.55;
@@ -522,8 +708,21 @@ export const ContactGrid = styled.div`
   display: grid;
   gap: ${({ theme }) => theme.space[5]};
 
-  @media (min-width: 800px) {
+  @container site (min-width: 800px) {
     grid-template-columns: 0.9fr 1.1fr;
+  }
+`
+
+export const ContactList = styled.div`
+  margin-top: 1.1rem;
+  display: grid;
+  gap: 0.35rem;
+  font-size: 0.95rem;
+  line-height: 1.45;
+
+  a {
+    text-decoration: underline;
+    text-underline-offset: 0.16em;
   }
 `
 
@@ -549,10 +748,14 @@ export const Submit = styled.button`
 `
 
 export const Foot = styled.footer`
-  padding: ${({ theme }) => theme.space[5]} 0 ${({ theme }) => theme.space[8]};
+  padding: 2.25rem 0 calc(5.5rem + env(safe-area-inset-bottom, 0px));
   border-top: 1px solid ${({ theme }) => theme.text}12;
   color: ${({ theme }) => theme.muted};
   font-size: 0.88rem;
+
+  @container site (min-width: 860px) {
+    padding: ${({ theme }) => theme.space[5]} 0 ${({ theme }) => theme.space[8]};
+  }
 `
 
 export const FootTop = styled.div`
@@ -561,6 +764,18 @@ export const FootTop = styled.div`
   justify-content: space-between;
   gap: 1.5rem;
   margin-bottom: ${({ theme }) => theme.space[4]};
+`
+
+export const FootNav = styled.nav`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.15rem;
+  font-size: 0.88rem;
+
+  a {
+    text-decoration: underline;
+    text-underline-offset: 0.16em;
+  }
 `
 
 export const Disclaimer = styled.p`
@@ -578,12 +793,12 @@ export const Strip = styled.a`
   justify-content: center;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.75rem;
+  padding: 0.75rem 0.75rem calc(0.75rem + env(safe-area-inset-bottom, 0px));
   background: ${({ theme }) => theme.primary};
   color: ${({ theme }) => theme.btnText};
-  font-size: 0.92rem;
+  font-size: 0.88rem;
 
-  @media (min-width: 860px) {
+  @container site (min-width: 860px) {
     display: none;
   }
 `

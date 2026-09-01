@@ -3,11 +3,29 @@ export type Locale = "en" | "hi"
 export type Copy = {
   amfi: string
   about: string
+  welcome: string
   services: string
   calculators: string
   contact: string
   registration: string
   planning: string
+  quotesTitle: string
+  quotesKicker: string
+  quotesNav: string
+  faqTitle: string
+  faqKicker: string
+  faqNav: string
+  howNav: string
+  whyTitle: string
+  why: Array<{ title: string; body: string }>
+  servicesLead: string
+  howLead: string
+  calcLead: string
+  seeCalcs: string
+  home: string
+  call: string
+  hoursLabel: string
+  menu: string
   aboutTitle: (city: string) => string
   recordTitle: string
   servicesTitle: string
@@ -59,11 +77,45 @@ export const copy: Record<Locale, Copy> = {
   en: {
     amfi: "AMFI Registered Mutual Fund Distributor",
     about: "About",
+    welcome: "Welcome",
     services: "Services",
     calculators: "Calculators",
     contact: "Contact",
     registration: "Registration",
     planning: "Planning",
+    quotesTitle: "What families say",
+    quotesKicker: "From the practice",
+    quotesNav: "Stories",
+    faqTitle: "Questions we hear often",
+    faqKicker: "FAQ",
+    faqNav: "FAQ",
+    howNav: "How we work",
+    whyTitle: "Why families start here",
+    why: [
+      {
+        title: "One WhatsApp number",
+        body: "Call, message, or write the form. The same person replies. No call centre, no scheme ads in the inbox.",
+      },
+      {
+        title: "Categories, not a pitch",
+        body: "Equity, debt, or hybrid — mapped to how long you can stay invested. Scheme names stay a conversation, not a banner.",
+      },
+      {
+        title: "A SIP you can keep",
+        body: "We pick an amount that fits this year. When salary, a child, or a house changes the picture, we sit down again.",
+      },
+    ],
+    servicesLead:
+      "Mutual funds, SIPs, and a few related tools. Insurance and bonds only if this practice actually offers them. Nothing here is a recommendation to buy a named scheme.",
+    howLead:
+      "Same beats every time: understand the goal and the horizon, map a category, then start through the AMC or platform you already use.",
+    calcLead:
+      "Illustrations only. Change the monthly amount and years. Figures are not a scheme’s past or future return.",
+    seeCalcs: "See calculators",
+    home: "Home",
+    call: "Call",
+    hoursLabel: "Hours",
+    menu: "Menu",
     aboutTitle: (city) => `A practice in ${city}, not a product pitch.`,
     recordTitle: "On the record.",
     servicesTitle: "What we sit down to do.",
@@ -95,9 +147,10 @@ export const copy: Record<Locale, Copy> = {
     disclaimer: (name) =>
       `Mutual fund investments are subject to market risks, read all scheme related documents carefully. ${name} is an AMFI-registered mutual fund distributor. This website does not offer financial planning or guaranteed returns.`,
     how: [
-      { title: "Talk", body: "A short call or WhatsApp. Goals, time horizon, what you can save." },
-      { title: "Map", body: "Suitable fund categories — not a scheme pitch on the website." },
-      { title: "Start", body: "SIP or lump sum through the AMC / platform. You stay in control." },
+      { title: "Talk", body: "A short call or WhatsApp. What you are saving for, how long you can stay invested, and an amount you can keep without stretching the month." },
+      { title: "Map", body: "Fund categories that fit that horizon — equity, debt, or hybrid. Not a scheme pitch on the website. Risk is said in plain language." },
+      { title: "Start", body: "SIP or lump sum through the AMC or platform. You stay in control of the folio. We do not log in as you." },
+      { title: "Review", body: "Once or twice a year, or when life changes. We check whether the SIP still matches the goal — not whether last quarter looked exciting." },
     ],
     toolsIndex: "Calculators",
     allTools: "All calculators",
@@ -124,11 +177,44 @@ export const copy: Record<Locale, Copy> = {
   hi: {
     amfi: "AMFI पंजीकृत म्यूचुअल फंड वितरक",
     about: "परिचय",
+    welcome: "स्वागत",
     services: "सेवाएँ",
     calculators: "कैलकुलेटर",
     contact: "संपर्क",
     registration: "पंजीकरण",
     planning: "योजना",
+    quotesTitle: "परिवार क्या कहते हैं",
+    quotesKicker: "अभ्यास से",
+    quotesNav: "कहानियाँ",
+    faqTitle: "अक्सर पूछे जाने वाले प्रश्न",
+    faqKicker: "प्रश्न",
+    faqNav: "प्रश्न",
+    howNav: "कैसे काम करते हैं",
+    whyTitle: "यहाँ से शुरू क्यों",
+    why: [
+      {
+        title: "एक व्हाट्सऐप नंबर",
+        body: "कॉल, संदेश, या फ़ॉर्म। वही व्यक्ति जवाब देता है। कोई कॉल सेंटर नहीं, इनबॉक्स में स्कीम विज्ञापन नहीं।",
+      },
+      {
+        title: "श्रेणी, पिच नहीं",
+        body: "इक्विटी, डेट या हाइब्रिड — कितने समय तक निवेश रह सकते हैं। स्कीम नाम बातचीत में रहता है, बैनर पर नहीं।",
+      },
+      {
+        title: "SIP जिसे निभा सकें",
+        body: "इस साल की आय के हिसाब से राशि। वेतन, बच्चा या घर बदले तो फिर बैठते हैं।",
+      },
+    ],
+    servicesLead:
+      "म्यूचुअल फंड, SIP, और कुछ संबंधित उपकरण। बीमा और बॉन्ड तभी जब यह अभ्यास वाकई देता है। यहाँ किसी नामित स्कीम की सिफारिश नहीं है।",
+    howLead:
+      "हर बार वही क्रम: लक्ष्य और समय समझना, श्रेणी चुनना, फिर उसी AMC या प्लेटफॉर्म से शुरू करना जिसका आप उपयोग करते हैं।",
+    calcLead: "केवल उदाहरण। मासिक राशि और वर्ष बदलें। आंकड़े किसी स्कीम का पिछला या भविष्य का रिटर्न नहीं हैं।",
+    seeCalcs: "कैलकुलेटर देखें",
+    home: "होम",
+    call: "कॉल",
+    hoursLabel: "समय",
+    menu: "मेनू",
     aboutTitle: (city) => `${city} में एक साधारण प्रक्रिया, प्रोडक्ट पिच नहीं।`,
     recordTitle: "रिकॉर्ड पर।",
     servicesTitle: "जिस पर हम बैठकर बात करते हैं।",
@@ -159,9 +245,10 @@ export const copy: Record<Locale, Copy> = {
     disclaimer: (name) =>
       `म्यूचुअल फंड निवेश बाजार जोखिमों के अधीन हैं, निवेश से पहले सभी स्कीम दस्तावेज़ पढ़ें। ${name} AMFI पंजीकृत म्यूचुअल फंड वितरक हैं। यह वेबसाइट वित्तीय योजना या गारंटीशुदा रिटर्न नहीं देती।`,
     how: [
-      { title: "बात", body: "एक छोटी कॉल या व्हाट्सऐप। लक्ष्य, समय, और आप कितना बचा सकते हैं।" },
-      { title: "नक्शा", body: "उपयुक्त फंड श्रेणियाँ — वेबसाइट पर स्कीम की सिफारिश नहीं।" },
-      { title: "शुरुआत", body: "AMC / प्लेटफॉर्म से SIP या एकमुश्त। नियंत्रण आपके पास रहता है।" },
+      { title: "बात", body: "एक छोटी कॉल या व्हाट्सऐप। लक्ष्य, समय, और एक राशि जिसे बिना महीने खींचे निभा सकें।" },
+      { title: "नक्शा", body: "उस समय-सीमा के लिए श्रेणी — इक्विटी, डेट या हाइब्रिड। वेबसाइट पर स्कीम पिच नहीं। जोखिम सादी भाषा में।" },
+      { title: "शुरुआत", body: "AMC / प्लेटफॉर्म से SIP या एकमुश्त। फोलियो आपके नियंत्रण में। हम आपके रूप में लॉगिन नहीं करते।" },
+      { title: "समीक्षा", body: "साल में एक-दो बार, या ज़िंदगी बदले तब। SIP लक्ष्य से मेल खाती है या नहीं — पिछली तिमाही चमकदार थी या नहीं।" },
     ],
     toolsIndex: "कैलकुलेटर",
     allTools: "सभी कैलकुलेटर",
@@ -191,26 +278,26 @@ export const toolCopy: Record<string, { title: string; titleHi: string; blurb: s
   sip: {
     title: "SIP",
     titleHi: "SIP",
-    blurb: "Monthly investing over a period.",
-    blurbHi: "एक अवधि तक मासिक निवेश।",
+    blurb: "A monthly amount, a number of years, and an assumed rate. See how a SIP could add up on paper.",
+    blurbHi: "मासिक राशि, वर्ष, और एक माना गया दर। कागज़ पर SIP कैसे जुड़ सकती है।",
   },
   lumpsum: {
     title: "Lumpsum",
     titleHi: "एकमुश्त",
-    blurb: "One-time investment growth.",
-    blurbHi: "एक बार के निवेश की वृद्धि।",
+    blurb: "A one-time amount left invested for a period. Useful when you have a bonus or matured deposit to place.",
+    blurbHi: "एक बार की राशि, एक अवधि तक। बोनस या मैच्योर जमा रखने पर उपयोगी।",
   },
   goal_sip: {
     title: "Goal SIP",
     titleHi: "लक्ष्य SIP",
-    blurb: "SIP needed for a target amount.",
-    blurbHi: "लक्ष्य राशि के लिए ज़रूरी SIP।",
+    blurb: "Back-solve the monthly SIP that could reach a target — education, a house down-payment, or a written number.",
+    blurbHi: "लक्ष्य राशि तक पहुँचने के लिए ज़रूरी मासिक SIP — शिक्षा, घर, या एक लिखी संख्या।",
   },
   retirement: {
     title: "Retirement",
     titleHi: "सेवानिवृत्ति",
-    blurb: "Savings needed for retirement.",
-    blurbHi: "सेवानिवृत्ति के लिए बचत।",
+    blurb: "Today’s monthly expense, years to go, and inflation. An illustration of corpus — not a pension promise.",
+    blurbHi: "आज का मासिक खर्च, बचे वर्ष, महंगाई। कॉर्पस का उदाहरण — पेंशन का वादा नहीं।",
   },
   swp: {
     title: "SWP",
@@ -263,32 +350,32 @@ export const serviceCopy: Record<
   mutual_funds: {
     title: "Mutual funds",
     titleHi: "म्यूचुअल फंड",
-    body: "Equity, debt, and hybrid schemes mapped to how long you can stay invested — not to a slogan.",
-    bodyHi: "इक्विटी, डेट और हाइब्रिड — कितने समय तक निवेश रह सकते हैं, उसी से मैप।",
+    body: "Equity, debt, and hybrid schemes mapped to how long you can stay invested — not to a slogan. We explain the category; the scheme name comes later, in conversation.",
+    bodyHi: "इक्विटी, डेट और हाइब्रिड — कितने समय तक निवेश रह सकते हैं, उसी से मैप। श्रेणी यहाँ; स्कीम नाम बातचीत में।",
   },
   sip: {
     title: "SIP",
     titleHi: "SIP",
-    body: "A monthly amount you can actually keep. We set it up, review it, and change it when life changes.",
-    bodyHi: "एक मासिक राशि जिसे आप निभा सकें। ज़िंदगी बदले तो SIP भी बदल सकते हैं।",
+    body: "A monthly amount you can actually keep. We set it up through the AMC or platform, review it, and change it when income or a goal changes.",
+    bodyHi: "एक मासिक राशि जिसे आप निभा सकें। AMC या प्लेटफॉर्म से शुरू; आय या लक्ष्य बदले तो SIP भी।",
   },
   goals: {
     title: "Goal-based investing",
     titleHi: "लक्ष्य के अनुसार निवेश",
-    body: "Education, a home, retirement. Categories that fit the goal — scheme choice stays a conversation.",
-    bodyHi: "शिक्षा, घर, सेवानिवृत्ति। श्रेणी लक्ष्य से जुड़ती है — स्कीम चुनाव बातचीत में रहता है।",
+    body: "Education, a home, retirement. Each goal gets a horizon and a category. Scheme choice stays a conversation — this page will not name one.",
+    bodyHi: "शिक्षा, घर, सेवानिवृत्ति। हर लक्ष्य की समय-सीमा और श्रेणी। स्कीम चुनाव बातचीत में — इस पेज पर नाम नहीं।",
   },
   stp_swp: {
     title: "STP / SWP",
     titleHi: "STP / SWP",
-    body: "Move or withdraw on a plan, not on a hunch.",
-    bodyHi: "योजना के साथ स्थानांतरण या निकासी, अंदाज़े से नहीं।",
+    body: "Move money from one category toward another on a written schedule (STP), or take a regular withdrawal (SWP). Not a reaction to last week’s market.",
+    bodyHi: "एक श्रेणी से दूसरी की ओर निर्धारित स्थानांतरण (STP), या नियमित निकासी (SWP)। पिछले हफ्ते के बाज़ार की प्रतिक्रिया नहीं।",
   },
   retirement: {
     title: "Retirement",
     titleHi: "सेवानिवृत्ति",
-    body: "A corpus conversation in mutual fund categories, with risk said out loud.",
-    bodyHi: "म्यूचुअल फंड श्रेणियों में कॉर्पस की बात, जोखिम साफ़ कहा जाता है।",
+    body: "A corpus conversation in mutual fund categories. Time horizon comes first. Risk is said out loud. This is not a pension product and not a guaranteed income plan.",
+    bodyHi: "म्यूचुअल फंड श्रेणियों में कॉर्पस की बात। पहले समय-सीमा, जोखिम साफ़। यह पेंशन उत्पाद या गारंटीशुदा आय नहीं है।",
   },
   life_insurance: {
     title: "Life insurance",
@@ -305,7 +392,7 @@ export const serviceCopy: Record<
   bonds: {
     title: "Bonds",
     titleHi: "बॉन्ड",
-    body: "Fixed-income options as a complement, not a replacement for a risk talk.",
-    bodyHi: "फिक्स्ड इनकम पूरक है, जोखिम की बात की जगह नहीं।",
+    body: "Fixed-income options as a complement to equity funds — for money you may need sooner. Not a substitute for talking about risk, and not a promise of yield.",
+    bodyHi: "इक्विटी के पूरक के रूप में फिक्स्ड इनकम — जल्दी चाहिए हो तो। जोखिम की बात की जगह नहीं, यील्ड का वादा नहीं।",
   },
 }

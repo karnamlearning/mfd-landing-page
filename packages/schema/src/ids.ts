@@ -30,7 +30,7 @@ export const serviceIds = [
 ] as const
 export type ServiceId = (typeof serviceIds)[number]
 
-export const defaultServiceIds: ServiceId[] = ["mutual_funds", "sip", "goals"]
+export const defaultServiceIds: ServiceId[] = ["mutual_funds", "sip", "goals", "retirement", "stp_swp", "bonds"]
 
 export const baseToolIds = ["sip", "lumpsum", "goal_sip", "retirement"] as const
 export const addonToolIds = [

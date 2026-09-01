@@ -13,6 +13,8 @@ export const GlobalStyle = createGlobalStyle<{ $embedded?: boolean }>`
           html,
           body {
             margin: 0;
+            overflow-x: hidden;
+            -webkit-text-size-adjust: 100%;
           }
           body {
             background: ${theme.bg};

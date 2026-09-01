@@ -1,6 +1,6 @@
 "use client"
 
-import { Fragment, useState, type FormEvent, type ReactNode } from "react"
+import { Fragment, useEffect, useLayoutEffect, useRef, useState, type FormEvent, type MouseEvent, type ReactNode } from "react"
 import { ThemeProvider } from "styled-components"
 import {
   FiHeart,
@@ -15,14 +15,24 @@ import {
   FiX,
 } from "react-icons/fi"
 import { FaWhatsapp } from "react-icons/fa6"
-import { mergeSample, visibleToolIds, type SectionId, type TenantConfig } from "@mfd/schema"
+import { mergeSample, visibleToolIds, type SectionId, type TenantConfig, type ToolId } from "@mfd/schema"
 import { fontPairs, getTheme } from "@mfd/tokens"
 import { copy, serviceCopy, toolCopy, type Copy, type Locale } from "./copy"
 import { ChromeContext } from "./chrome-context"
 import { Calculator } from "./Calculator"
+import { DisclosuresBody, ToolBody, ToolsIndex } from "./Tools"
 import { GlobalStyle } from "./GlobalStyle"
 import * as S from "./styles"
-import { firstName, waHref } from "./utils"
+import { firstName, parseInternalHref, scrollSiteTo, waHref } from "./utils"
+
+function onHashNav(e: MouseEvent<HTMLAnchorElement>) {
+  if (e.currentTarget.closest("[data-preview-nav]")) return
+  const href = e.currentTarget.getAttribute("href") ?? ""
+  if (!href.includes("#")) return
+  e.preventDefault()
+  const id = href.slice(href.indexOf("#") + 1).split("?")[0] || "top"
+  scrollSiteTo(e.currentTarget, id)
+}
 
 const ICONS = {
   mutual_funds: FiPieChart,
@@ -59,28 +69,32 @@ type Ctx = {
   wa: string
   preview: boolean
   embedded: boolean
+  previewPath: string
 }
 
 function Header({ ctx, locale, onLocale }: { ctx: Ctx; locale: Locale; onLocale: (l: Locale) => void }) {
-  const { config, t, wa, preview, embedded } = ctx
+  const { config, t, wa, previewPath } = ctx
   const [menu, setMenu] = useState(false)
   const on = new Set(activeSections(config).map((s) => s.id))
-  const hash = preview || embedded ? "#" : "/#"
   const links = [
-    { id: "about" as const, href: `${hash}about`, label: t.about },
-    { id: "services" as const, href: `${hash}services`, label: t.services },
+    { id: "about" as const, href: "/#about", label: t.about },
+    { id: "services" as const, href: "/#services", label: t.services },
     { id: "calculators" as const, href: "/calculators", label: t.calculators },
-    { id: "contact" as const, href: `${hash}contact`, label: t.contact },
+    { id: "contact" as const, href: "/#contact", label: t.contact },
   ].filter((l) => on.has(l.id))
   const menuLinks = [
-    { id: "about" as const, href: `${hash}about`, label: t.about },
-    { id: "services" as const, href: `${hash}services`, label: t.services },
-    { id: "how" as const, href: `${hash}how`, label: t.howNav },
+    { id: "about" as const, href: "/#about", label: t.about },
+    { id: "services" as const, href: "/#services", label: t.services },
+    { id: "how" as const, href: "/#how", label: t.howNav },
     { id: "calculators" as const, href: "/calculators", label: t.calculators },
-    { id: "testimonials" as const, href: `${hash}testimonials`, label: t.quotesNav },
-    { id: "faq" as const, href: `${hash}faq`, label: t.faqNav },
-    { id: "contact" as const, href: `${hash}contact`, label: t.contact },
+    { id: "testimonials" as const, href: "/#testimonials", label: t.quotesNav },
+    { id: "faq" as const, href: "/#faq", label: t.faqNav },
+    { id: "contact" as const, href: "/#contact", label: t.contact },
   ].filter((l) => on.has(l.id))
+
+  useEffect(() => {
+    setMenu(false)
+  }, [previewPath])
 
   return (
     <S.HeaderBar>
@@ -88,7 +102,7 @@ function Header({ ctx, locale, onLocale }: { ctx: Ctx; locale: Locale; onLocale:
         <S.MenuBtn type="button" aria-label={t.menu} aria-expanded={menu} onClick={() => setMenu((v) => !v)}>
           {menu ? <FiX size={18} /> : <FiMenu size={18} />}
         </S.MenuBtn>
-        <S.Brand href="/">
+        <S.Brand href="/" onClick={onHashNav}>
           {config.details.logoUrl ? (
             <S.Logo src={config.details.logoUrl} alt={config.details.name} />
           ) : (
@@ -99,9 +113,9 @@ function Header({ ctx, locale, onLocale }: { ctx: Ctx; locale: Locale; onLocale:
         </S.Brand>
         <S.Nav>
           {links.map((l) => (
-            <a key={l.id} href={l.href}>
-              {l.label}
-            </a>
+            <a key={l.id} href={l.href} onClick={onHashNav}>
+                {l.label}
+              </a>
           ))}
         </S.Nav>
         {config.template === "local" ? (
@@ -123,7 +137,14 @@ function Header({ ctx, locale, onLocale }: { ctx: Ctx; locale: Locale; onLocale:
         <S.Wrap>
           <S.MobileNav>
             {menuLinks.map((l) => (
-              <a key={l.id} href={l.href} onClick={() => setMenu(false)}>
+              <a
+                key={l.id}
+                href={l.href}
+                onClick={(e) => {
+                  setMenu(false)
+                  onHashNav(e)
+                }}
+              >
                 {l.label}
               </a>
             ))}
@@ -154,7 +175,7 @@ function HeroSection({ ctx }: { ctx: Ctx }) {
             {t.talkTo(firstName(d.name))}
           </S.WaBtn>
           {ctx.config.sections.some((s) => s.id === "calculators" && s.on) ? (
-            <S.GhostBtn href={ctx.preview || ctx.embedded ? "#calculators" : "/#calculators"}>{t.seeCalcs}</S.GhostBtn>
+            <S.GhostBtn href="/#calculators" onClick={onHashNav}>{t.seeCalcs}</S.GhostBtn>
           ) : null}
         </S.HeroActions>
       </S.HeroCopy>
@@ -301,7 +322,7 @@ function HowSection({ ctx }: { ctx: Ctx }) {
 }
 
 function CalculatorsSection({ ctx }: { ctx: Ctx }) {
-  const { config, t, locale, preview, embedded } = ctx
+  const { config, t, locale, preview } = ctx
   const visible = visibleToolIds(config)
   const rest = visible.filter((id) => id !== "sip")
   const hi = locale === "hi"
@@ -325,9 +346,7 @@ function CalculatorsSection({ ctx }: { ctx: Ctx }) {
                   <S.ServiceCopy>{hi ? item.blurbHi : item.blurb}</S.ServiceCopy>
                 </S.ServiceCard>
               )
-              return embedded ? (
-                <div key={id}>{card}</div>
-              ) : (
+              return (
                 <a key={id} href={`/calculators/${id}`} style={{ color: "inherit", textDecoration: "none" }}>
                   {card}
                 </a>
@@ -515,7 +534,7 @@ function Footer({ ctx }: { ctx: Ctx }) {
   const d = ctx.config.details
   const t = ctx.t
   return (
-    <S.Foot>
+    <S.Foot id="footer">
       <S.Wrap>
         <S.FootTop>
           <div>
@@ -533,10 +552,18 @@ function Footer({ ctx }: { ctx: Ctx }) {
             </S.ContactList>
           </div>
           <S.FootNav>
-            <a href="/">{t.home}</a>
-            <a href={ctx.preview || ctx.embedded ? "#services" : "/#services"}>{t.services}</a>
-            <a href="/calculators">{t.calculators}</a>
-            <a href="/disclosures">{t.disclosures}</a>
+            <a href="/" onClick={onHashNav}>
+              {t.home}
+            </a>
+            <a href="/#services" onClick={onHashNav}>
+              {t.services}
+            </a>
+            <a href="/calculators" onClick={onHashNav}>
+              {t.calculators}
+            </a>
+            <a href="/disclosures" onClick={onHashNav}>
+              {t.disclosures}
+            </a>
           </S.FootNav>
         </S.FootTop>
         <S.Disclaimer>{ctx.t.disclaimer(d.name)}</S.Disclaimer>
@@ -559,9 +586,25 @@ const registry: Record<SectionId, (ctx: Ctx) => ReactNode> = {
   whatsapp_strip: (ctx) => <WhatsappStrip ctx={ctx} />,
 }
 
+function PreviewInner({ path, ctx }: { path: string; ctx: Ctx }) {
+  const { config, locale, preview } = ctx
+  if (path === "/calculators") return <ToolsIndex config={config} locale={locale} />
+  if (path.startsWith("/calculators/")) {
+    const tool = path.slice("/calculators/".length)
+    if (!visibleToolIds(config).includes(tool as ToolId)) return <ToolsIndex config={config} locale={locale} />
+    return <ToolBody config={config} tool={tool} locale={locale} preview={preview} />
+  }
+  if (path === "/disclosures") {
+    return <DisclosuresBody name={config.details.name} arn={config.details.arn ?? ""} />
+  }
+  return null
+}
+
 export function Site({ config, preview = false, embedded = false, children }: SiteProps) {
   const resolved = mergeSample(config, preview)
   const [locale, setLocale] = useState<Locale>("en")
+  const [nav, setNav] = useState({ path: "/", hash: "top", tick: 0 })
+  const rootRef = useRef<HTMLDivElement>(null)
   const theme = getTheme(resolved.theme)
   const font = fontPairs[resolved.font]
   const t = copy[resolved.template === "local" ? locale : "en"]
@@ -573,7 +616,38 @@ export function Site({ config, preview = false, embedded = false, children }: Si
     wa,
     preview,
     embedded,
+    previewPath: nav.path,
   }
+
+  useLayoutEffect(() => {
+    if (!embedded) return
+    const root = rootRef.current
+    if (!root) return
+    scrollSiteTo(root, nav.hash || "top")
+  }, [embedded, nav.hash, nav.path, nav.tick])
+
+  function onPreviewClick(e: MouseEvent<HTMLDivElement>) {
+    if (!embedded) return
+    const a = (e.target as HTMLElement).closest("a")
+    if (!a || a.target === "_blank") return
+    const href = a.getAttribute("href") ?? ""
+    const parsed = parseInternalHref(href)
+    if (!parsed) return
+    e.preventDefault()
+    e.stopPropagation()
+    const path = parsed.path
+    const hash = parsed.hash || (path === "/" ? "top" : "top")
+    setNav((s) => ({ path, hash, tick: s.tick + 1 }))
+  }
+
+  const previewPage = embedded ? <PreviewInner path={nav.path} ctx={ctx} /> : null
+  const body =
+    (embedded && nav.path !== "/" ? previewPage : null) ??
+    children ??
+    activeSections(resolved).map((row) => {
+      const render = registry[row.id]
+      return render ? <Fragment key={row.id}>{render(ctx)}</Fragment> : null
+    })
 
   return (
     <ThemeProvider theme={theme}>
@@ -585,14 +659,19 @@ export function Site({ config, preview = false, embedded = false, children }: Si
           arn: resolved.details.arn ?? "",
         }}
       >
-      <S.Root $heading={font.headingVar} $body={font.bodyVar} $template={resolved.template} $embedded={embedded}>
+      <S.Root
+        ref={rootRef}
+        data-site-root
+        data-preview-nav={embedded ? "" : undefined}
+        $heading={font.headingVar}
+        $body={font.bodyVar}
+        $template={resolved.template}
+        $embedded={embedded}
+        onClickCapture={onPreviewClick}
+      >
         <GlobalStyle $embedded={embedded} />
         <Header ctx={ctx} locale={locale} onLocale={setLocale} />
-        {children ??
-          activeSections(resolved).map((row) => {
-            const render = registry[row.id]
-            return render ? <Fragment key={row.id}>{render(ctx)}</Fragment> : null
-          })}
+        {body}
         <Footer ctx={ctx} />
       </S.Root>
       </ChromeContext.Provider>

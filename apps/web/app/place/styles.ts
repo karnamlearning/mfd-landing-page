@@ -298,6 +298,8 @@ export const Frame = styled.div<{ $desktop: boolean }>`
           border-radius: 28px;
           width: min(390px, 100%);
         `}
+  overscroll-behavior: contain;
+  scroll-behavior: smooth;
 `
 
 export const Rail = styled.aside`

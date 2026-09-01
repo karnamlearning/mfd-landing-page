@@ -10,7 +10,7 @@ export const Root = styled.div<{ $heading: string; $body: string; $template: Tem
   min-height: ${({ $embedded }) => ($embedded ? "auto" : "100vh")};
   font-size: ${({ $template }) => ($template === "local" ? "1.08rem" : "1rem")};
   width: 100%;
-  overflow-x: hidden;
+  overflow-x: clip;
   padding-bottom: env(safe-area-inset-bottom, 0px);
   container-type: inline-size;
   container-name: site;

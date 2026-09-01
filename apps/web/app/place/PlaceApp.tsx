@@ -113,6 +113,7 @@ function Editor() {
   const slugLocked = useDraft((s) => s.slugLocked)
   const status = useDraft((s) => s.status)
   const trialEndsAt = useDraft((s) => s.trialEndsAt)
+  const impersonating = useDraft((s) => s.impersonating)
   const [publishOpen, setPublishOpen] = useState(false)
   const next = NEXT[step]
   const yours = slugLocked || status !== "draft" || !isPhoneStubSlug(slug)
@@ -154,6 +155,12 @@ function Editor() {
           Publish
         </U.PayBtn>
       </U.Top>
+      {impersonating ? (
+        <U.TrialBanner $warn>
+          Ops impersonation — you are editing this distributor’s site.{" "}
+          <a href="/admin">Back to ops</a>
+        </U.TrialBanner>
+      ) : null}
       {status === "trial" ? (
         <U.TrialBanner>
           Trial is live{trialUntil ? ` until ${trialUntil}` : ""}. Publish a plan to keep the site up and put

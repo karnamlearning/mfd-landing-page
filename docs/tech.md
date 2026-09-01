@@ -293,7 +293,10 @@ Draft vs published: v1 can write `config` in place (preview is client state unti
 | POST    | `/api/billing/webhook`  | Activate / suspend               |
 | POST    | `/api/tools/:id`        | BFF to Advisorkhoj calculator    |
 | POST    | `/api/leads`            | Public, tenant from host or body |
-| GET     | `/api/admin/tenants`    | Ops, later                       |
+| GET     | `/api/admin/tenants`                 | Ops list                         |
+| POST    | `/api/admin/login`                   | Ops cookie                       |
+| POST    | `/api/admin/tenants/:id/impersonate` | Open Buyer Place as that tenant  |
+| POST    | `/api/admin/tenants/:id/suspend`     | Suspend or restore               |
 
 Public site is RSC/SSR from `tenants.config` by host. No public GET of another tenant’s config.
 
@@ -329,9 +332,21 @@ Do not start step 3 until step 1 passes a visual check.
 
 ## Ops (minimal)
 
-- Env: DB, OTP, Razorpay, S3, Advisorkhoj API key, WhatsApp.
-- `/admin`: list tenants, impersonate (load their config in Buyer Place), suspend. Can be a protected route, not a product.
-- Logging: tenant id on every tools/leads call.
+- Env: `DATABASE_URL`, `AUTH_SECRET`, `HOST_BASE` / `HOST_PROTOCOL` / `HOST_PORT` / `COOKIE_DOMAIN`, OTP, Razorpay, optional S3, optional `TOOLS_API_*`, `ADMIN_SECRET`.
+- `/admin` on the **apex** host: list tenants, impersonate (loads their Buyer Place), suspend / restore. Cookie `mfd_admin`. Local secret defaults to `admin` if `ADMIN_SECRET` is unset. Production 404s the route until the secret is set. Tenant slugs cannot open `/admin`.
+- Logging: `tenant_id` on tools and leads (`[tools]`, `[leads]`, `[leads.list]`, `[admin.*]`). No phone or name in logs.
+- Errors: generic 404 (`/missing`), paywall, App Router `error` / `global-error`.
+
+### Staging
+
+One wildcard is enough for founder demo:
+
+1. DNS: `HOST_BASE` A/AAAA (or CNAME) to the app. Wildcard `*.HOST_BASE` to the same place.
+2. TLS: wildcard (or HTTPS proxy) covering `HOST_BASE`, `app.HOST_BASE`, and `*.HOST_BASE`.
+3. Env: `HOST_PROTOCOL=https`, empty `HOST_PORT`, `COOKIE_DOMAIN=.HOST_BASE`, production `AUTH_SECRET` / `ADMIN_SECRET` / `DATABASE_URL`. Turn off `OTP_DEV` and `BILLING_DEV`. Set Razorpay, and S3/tools if used.
+4. Check: apex OTP, `app.{base}/place` editor, `{slug}.{base}` public, `/admin` list + impersonate + suspend.
+
+Run `npm run build -w @mfd/web` then `npm run start -w @mfd/web` behind that TLS terminator.
 
 ---
 

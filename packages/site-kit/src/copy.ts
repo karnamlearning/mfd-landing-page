@@ -28,6 +28,8 @@ export type Copy = {
   city: string
   message: string
   disclosures: string
+  disclosuresTitle: string
+  disclosuresBody: (name: string, arn: string) => string[]
   disclaimer: (name: string) => string
   how: Array<{ title: string; body: string }>
   toolsIndex: string
@@ -83,6 +85,13 @@ export const copy: Record<Locale, Copy> = {
     city: "City",
     message: "Message",
     disclosures: "Commission disclosures",
+    disclosuresTitle: "Commission disclosures",
+    disclosuresBody: (name, arn) => [
+      `${name} is an AMFI-registered Mutual Fund Distributor${arn ? ` (ARN ${arn})` : ""}. This website is for information only. It is not an offer, solicitation, or recommendation to buy or sell any mutual fund scheme, and it is not investment advice.`,
+      "Mutual fund investments are subject to market risks. Please read all scheme related documents carefully before investing. Past performance is not a guide to future returns. NAVs and returns are not guaranteed.",
+      "The distributor may receive commission from asset management companies for distributing mutual fund schemes, as permitted by SEBI and AMFI. Commission differs by scheme and can change. Details are in the scheme documents and are available from the distributor on request.",
+      "Nothing on this website should be read as a promise of returns. Figures on calculators are illustrations, not actual scheme performance.",
+    ],
     disclaimer: (name) =>
       `Mutual fund investments are subject to market risks, read all scheme related documents carefully. ${name} is an AMFI-registered mutual fund distributor. This website does not offer financial planning or guaranteed returns.`,
     how: [
@@ -140,6 +149,13 @@ export const copy: Record<Locale, Copy> = {
     city: "शहर",
     message: "संदेश",
     disclosures: "कमीशन विवरण",
+    disclosuresTitle: "कमीशन विवरण",
+    disclosuresBody: (name, arn) => [
+      `${name} AMFI पंजीकृत म्यूचुअल फंड वितरक हैं${arn ? ` (ARN ${arn})` : ""}। यह वेबसाइट केवल जानकारी के लिए है। यह किसी स्कीम को खरीदने या बेचने का प्रस्ताव या सिफारिश नहीं है, और निवेश सलाह भी नहीं है।`,
+      "म्यूचुअल फंड निवेश बाजार जोखिमों के अधीन हैं। निवेश से पहले सभी स्कीम संबंधित दस्तावेज़ ध्यान से पढ़ें। पिछला प्रदर्शन भविष्य के रिटर्न का संकेत नहीं है। NAV और रिटर्न की गारंटी नहीं है।",
+      "वितरक को SEBI और AMFI की अनुमति के अनुसार AMC से कमीशन मिल सकता है। कमीशन स्कीम के अनुसार अलग होता है और बदल सकता है। विवरण स्कीम दस्तावेज़ों में हैं और वितरक से माँगने पर उपलब्ध हैं।",
+      "इस वेबसाइट पर कुछ भी रिटर्न का वादा नहीं है। कैलकुलेटर के आंकड़े उदाहरण हैं, किसी स्कीम का वास्तविक प्रदर्शन नहीं।",
+    ],
     disclaimer: (name) =>
       `म्यूचुअल फंड निवेश बाजार जोखिमों के अधीन हैं, निवेश से पहले सभी स्कीम दस्तावेज़ पढ़ें। ${name} AMFI पंजीकृत म्यूचुअल फंड वितरक हैं। यह वेबसाइट वित्तीय योजना या गारंटीशुदा रिटर्न नहीं देती।`,
     how: [

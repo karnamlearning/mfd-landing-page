@@ -11,7 +11,7 @@ import * as U from "./styles"
 type AssetKind = "logo" | "photo" | "hero"
 
 const PRESET_LANGS = ["English", "Hindi"] as const
-const BANNED = /financial planner|guaranteed|assured returns/i
+const BANNED = /financial planner|financial planning|guaranteed|assured returns/i
 
 function AssetField({
   label,
@@ -113,6 +113,7 @@ export function DetailsStep() {
   }
 
   const bioWarn = d.bio && BANNED.test(d.bio)
+  const bioHiWarn = d.bioHi && BANNED.test(d.bioHi)
 
   return (
     <div
@@ -269,13 +270,14 @@ export function DetailsStep() {
             value={d.bio ?? ""}
             onChange={(e) => set("bio", e.target.value)}
           />
-          <U.Hint>Do not use “financial planner”, “guaranteed”, or “assured returns”.</U.Hint>
+          <U.Hint>Do not use “financial planner”, “financial planning”, “guaranteed”, or “assured returns”.</U.Hint>
           {bioWarn ? <U.Warn>That phrase is risky under AMFI rules — consider rephrasing.</U.Warn> : null}
         </U.Field>
         {local ? (
           <U.Field>
             Bio (Hindi)
             <U.Area rows={3} maxLength={400} value={d.bioHi ?? ""} onChange={(e) => set("bioHi", e.target.value)} />
+            {bioHiWarn ? <U.Warn>That phrase is risky under AMFI rules — consider rephrasing.</U.Warn> : null}
           </U.Field>
         ) : null}
         <U.Field>

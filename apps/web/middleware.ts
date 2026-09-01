@@ -15,6 +15,12 @@ export function middleware(req: NextRequest) {
     pathname.startsWith("/_next") ||
     pathname.startsWith("/uploads")
 
+  if (parsed.role === "public" && (pathname === "/admin" || pathname.startsWith("/admin/"))) {
+    const url = req.nextUrl.clone()
+    url.pathname = "/missing"
+    return NextResponse.rewrite(url, { request: { headers } })
+  }
+
   if (parsed.role === "app" && !pass && pathname !== "/place" && !pathname.startsWith("/place/")) {
     const url = req.nextUrl.clone()
     url.pathname = "/place"

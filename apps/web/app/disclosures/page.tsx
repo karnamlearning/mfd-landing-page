@@ -15,9 +15,10 @@ export default async function DisclosuresPage() {
   const config = site?.config ?? samplePracticeConfig
   const preview = !site?.config
   const name = config.details.name.trim() || (preview ? samplePracticeConfig.details.name : "")
+  const arn = config.details.arn?.trim() ?? ""
   return (
     <Site config={config} preview={preview}>
-      <DisclosuresBody name={name} />
+      <DisclosuresBody name={name} arn={arn} />
     </Site>
   )
 }

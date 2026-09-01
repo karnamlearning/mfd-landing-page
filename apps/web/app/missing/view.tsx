@@ -1,22 +1,25 @@
 export function MissingView() {
-  return (
-    <GenericStand
-      title="Page not found"
-      copy="This site is not available."
-    />
-  )
+  return <ErrorStand title="Page not found" copy="This site is not available." />
 }
 
 export function PaywallView() {
   return (
-    <GenericStand
+    <ErrorStand
       title="This site is paused"
       copy="The trial has ended. The distributor needs to subscribe to keep the site live."
     />
   )
 }
 
-function GenericStand({ title, copy }: { title: string; copy: string }) {
+export function ErrorStand({
+  title,
+  copy,
+  onRetry,
+}: {
+  title: string
+  copy: string
+  onRetry?: () => void
+}) {
   return (
     <div
       style={{
@@ -30,8 +33,38 @@ function GenericStand({ title, copy }: { title: string; copy: string }) {
       }}
     >
       <div style={{ maxWidth: 420, textAlign: "center" }}>
+        <p
+          style={{
+            margin: "0 0 0.35rem",
+            fontSize: "0.68rem",
+            letterSpacing: "0.1em",
+            textTransform: "uppercase",
+            color: "#78716c",
+          }}
+        >
+          Advisorkhoj
+        </p>
         <h1 style={{ margin: "0 0 0.5rem", fontSize: "1.4rem", letterSpacing: "-0.03em" }}>{title}</h1>
         <p style={{ margin: 0, color: "#57534e", lineHeight: 1.5 }}>{copy}</p>
+        {onRetry ? (
+          <button
+            type="button"
+            onClick={onRetry}
+            style={{
+              marginTop: "1.15rem",
+              border: 0,
+              borderRadius: 999,
+              padding: "0.5rem 1rem",
+              background: "#1c1917",
+              color: "#fff",
+              font: "inherit",
+              fontSize: "0.84rem",
+              cursor: "pointer",
+            }}
+          >
+            Try again
+          </button>
+        ) : null}
       </div>
     </div>
   )

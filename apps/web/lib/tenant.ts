@@ -26,6 +26,16 @@ export function isPublicLive(row: TenantRow) {
   return false
 }
 
+/** After ops unsuspend: paid stays live, an open trial resumes, otherwise draft. */
+export function statusAfterRestore(row: TenantRow): TenantStatus {
+  if (row.razorpaySubId || row.plan) return "active"
+  if (row.trialStartedAt) {
+    const end = new Date(row.trialStartedAt.getTime() + TRIAL_DAYS * 24 * 60 * 60 * 1000)
+    if (Date.now() < end.getTime()) return "trial"
+  }
+  return "draft"
+}
+
 export type MeConfigPayload = {
   config: TenantConfig
   slugLocked: boolean
@@ -33,6 +43,7 @@ export type MeConfigPayload = {
   plan: TenantPlan
   trialEndsAt: string | null
   publicUrl: string
+  impersonating?: boolean
 }
 
 export function toMePayload(row: TenantRow): MeConfigPayload {

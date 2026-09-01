@@ -9,6 +9,7 @@ export type Session = {
   userId: number
   tenantId: number
   phone: string
+  impersonated?: boolean
 }
 
 function secret() {
@@ -25,6 +26,7 @@ export async function signSession(session: Session): Promise<string> {
     userId: session.userId,
     tenantId: session.tenantId,
     phone: session.phone,
+    ...(session.impersonated ? { imp: 1 } : {}),
   }
   return new SignJWT(payload)
     .setProtectedHeader({ alg: "HS256" })
@@ -40,7 +42,7 @@ export async function readSessionToken(token: string): Promise<Session | null> {
     const tenantId = Number(payload.tenantId)
     const phone = typeof payload.phone === "string" ? payload.phone : ""
     if (!userId || !tenantId || !phone) return null
-    return { userId, tenantId, phone }
+    return { userId, tenantId, phone, impersonated: payload.imp === 1 }
   } catch {
     return null
   }

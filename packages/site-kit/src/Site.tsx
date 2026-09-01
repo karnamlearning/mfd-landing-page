@@ -16,6 +16,7 @@ import { FaWhatsapp } from "react-icons/fa6"
 import { baseToolIds, mergeSample, visibleToolIds, type SectionId, type TenantConfig } from "@mfd/schema"
 import { fontPairs, getTheme } from "@mfd/tokens"
 import { copy, serviceCopy, toolCopy, type Copy, type Locale } from "./copy"
+import { ChromeContext } from "./chrome-context"
 import { Calculator } from "./Calculator"
 import { GlobalStyle } from "./GlobalStyle"
 import * as S from "./styles"
@@ -77,6 +78,7 @@ function Header({ ctx, locale, onLocale }: { ctx: Ctx; locale: Locale; onLocale:
           ) : (
             <S.BrandName>{config.details.name}</S.BrandName>
           )}
+          {/* Locked AMFI bar — not a section, not editable, not hideable. */}
           <S.Tagline>{t.amfi}</S.Tagline>
         </S.Brand>
         <S.Nav>
@@ -488,6 +490,14 @@ export function Site({ config, preview = false, embedded = false, children }: Si
 
   return (
     <ThemeProvider theme={theme}>
+      <ChromeContext.Provider
+        value={{
+          locale: ctx.locale,
+          t,
+          name: resolved.details.name,
+          arn: resolved.details.arn ?? "",
+        }}
+      >
       <S.Root $heading={font.headingVar} $body={font.bodyVar} $template={resolved.template} $embedded={embedded}>
         <GlobalStyle $embedded={embedded} />
         <Header ctx={ctx} locale={locale} onLocale={setLocale} />
@@ -498,6 +508,7 @@ export function Site({ config, preview = false, embedded = false, children }: Si
           })}
         <Footer ctx={ctx} />
       </S.Root>
+      </ChromeContext.Provider>
     </ThemeProvider>
   )
 }

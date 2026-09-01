@@ -1,6 +1,7 @@
 import { leads } from "@mfd/db"
 import { json } from "@/lib/auth"
 import { getDb } from "@/lib/db"
+import { logError, logEvent } from "@/lib/log"
 import { normalizePhone } from "@/lib/phone"
 import { requestHost } from "@/lib/public-site"
 import { getTenantBySlug, isPublicLive } from "@/lib/tenant"
@@ -33,15 +34,20 @@ export async function POST(req: Request) {
   if (!tenant || !isPublicLive(tenant)) return json({ error: "missing_tenant" }, 404)
 
   const db = getDb()
-  await db.insert(leads).values({
-    tenantId: tenant.id,
-    name,
-    mobile,
-    city: (body.city ?? "").trim() || null,
-    message: (body.message ?? "").trim() || null,
-    source,
-    payload: body.payload ?? null,
-  })
-  console.info(`[leads] tenant=${tenant.id} source=${source}`)
+  try {
+    await db.insert(leads).values({
+      tenantId: tenant.id,
+      name,
+      mobile,
+      city: (body.city ?? "").trim() || null,
+      message: (body.message ?? "").trim() || null,
+      source,
+      payload: body.payload ?? null,
+    })
+  } catch (err) {
+    logError("leads.fail", err, { tenant_id: tenant.id, source })
+    return json({ error: "save_failed" }, 500)
+  }
+  logEvent("leads", { tenant_id: tenant.id, source })
   return json({ ok: true })
 }

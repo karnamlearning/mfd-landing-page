@@ -17,7 +17,7 @@ export async function GET() {
   if (error || !session) return error!
   const row = await getTenant(session.tenantId)
   if (!row) return json({ error: "missing_tenant" }, 404)
-  return json(toMePayload(row))
+  return json({ ...toMePayload(row), impersonating: Boolean(session.impersonated) })
 }
 
 export async function PUT(req: Request) {
@@ -70,5 +70,5 @@ export async function PUT(req: Request) {
 
   const next = await getTenant(session.tenantId)
   if (!next) return json({ error: "missing_tenant" }, 404)
-  return json(toMePayload(next))
+  return json({ ...toMePayload(next), impersonating: Boolean(session.impersonated) })
 }

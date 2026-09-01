@@ -2,6 +2,7 @@
 
 import { visibleToolIds, type TenantConfig, type ToolId } from "@mfd/schema"
 import { copy, toolCopy, type Locale } from "./copy"
+import { useChrome } from "./chrome-context"
 import { Calculator } from "./Calculator"
 import * as S from "./styles"
 
@@ -80,20 +81,23 @@ export function ToolPlaceholder(props: {
   return <ToolBody {...props} />
 }
 
-export function DisclosuresBody({ name }: { name: string }) {
+export function DisclosuresBody({ name, arn = "" }: { name: string; arn?: string }) {
+  const chrome = useChrome()
+  const t = chrome?.t ?? copy.en
+  const displayName = chrome?.name || name
+  const displayArn = (chrome?.arn || arn).trim()
+  const paras = t.disclosuresBody(displayName, displayArn)
+
   return (
     <S.Section>
       <S.Wrap>
-        <S.H2>Commission disclosures</S.H2>
-        <S.Bio>
-          This distributor may receive commission from AMCs as permitted by SEBI / AMFI. Details are
-          available on request and will be published here when the live site is connected to the
-          MFD’s ARN.
-        </S.Bio>
-        <S.Bio style={{ marginTop: "1rem" }}>
-          Mutual fund investments are subject to market risks, read all scheme related documents
-          carefully. {name} is an AMFI-registered mutual fund distributor.
-        </S.Bio>
+        <S.Kicker>{t.disclosures}</S.Kicker>
+        <S.H2>{t.disclosuresTitle}</S.H2>
+        {paras.map((p) => (
+          <S.Bio key={p.slice(0, 40)} style={{ marginTop: "1rem" }}>
+            {p}
+          </S.Bio>
+        ))}
       </S.Wrap>
     </S.Section>
   )

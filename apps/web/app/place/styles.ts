@@ -127,6 +127,13 @@ export const TrialBanner = styled.div<{ $warn?: boolean }>`
   background: ${({ $warn, theme }) => ($warn ? "#fef3c7" : `${theme.primary}14`)};
   color: ${({ $warn, theme }) => ($warn ? "#92400e" : theme.text)};
   border-bottom: 1px solid ${({ theme }) => theme.text}12;
+
+  a {
+    color: inherit;
+    font-weight: 650;
+    text-decoration: underline;
+    text-underline-offset: 0.16em;
+  }
 `
 
 export const Body = styled.div`

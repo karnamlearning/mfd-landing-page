@@ -37,6 +37,7 @@ export type ServerDraft = {
   plan: TenantPlan
   trialEndsAt: string | null
   publicUrl: string
+  impersonating?: boolean
 }
 
 const LOCKED = new Set<string>(lockedSectionIds)
@@ -55,6 +56,7 @@ type DraftState = {
   plan: TenantPlan
   trialEndsAt: string | null
   publicUrl: string
+  impersonating: boolean
   setStep: (step: StepId) => void
   setViewport: (viewport: Viewport) => void
   setPreviewOpen: (open: boolean) => void
@@ -92,6 +94,7 @@ export const useDraft = create<DraftState>((set) => ({
   plan: null,
   trialEndsAt: null,
   publicUrl: "",
+  impersonating: false,
   setStep: (step) => set({ step }),
   setViewport: (viewport) => set({ viewport }),
   setPreviewOpen: (previewOpen) => set({ previewOpen }),
@@ -136,6 +139,7 @@ export const useDraft = create<DraftState>((set) => ({
       plan: payload.plan ?? null,
       trialEndsAt: payload.trialEndsAt ?? null,
       publicUrl: payload.publicUrl,
+      impersonating: Boolean(payload.impersonating),
       hydrated: true,
       dirty: false,
       saveError: null,

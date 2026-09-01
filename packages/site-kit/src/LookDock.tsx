@@ -1,6 +1,7 @@
 "use client"
 
 import styled from "styled-components"
+import { templateIds, type TemplateId } from "@mfd/schema"
 import { fontIds, fontPairs, themeIds, themes, type FontId, type ThemeId } from "@mfd/tokens"
 
 const Bar = styled.aside`
@@ -62,15 +63,27 @@ const FontChip = styled.button<{ $on: boolean }>`
 `
 
 type Props = {
+  templateId: TemplateId
   themeId: ThemeId
   fontId: FontId
+  onTemplate: (id: TemplateId) => void
   onTheme: (id: ThemeId) => void
   onFont: (id: FontId) => void
 }
 
-export function LookDock({ themeId, fontId, onTheme, onFont }: Props) {
+export function LookDock({ templateId, themeId, fontId, onTemplate, onTheme, onFont }: Props) {
   return (
     <Bar aria-label="Preview look">
+      <div>
+        <Label>Template</Label>
+        <Fonts>
+          {templateIds.map((id) => (
+            <FontChip key={id} type="button" $on={id === templateId} onClick={() => onTemplate(id)}>
+              {id}
+            </FontChip>
+          ))}
+        </Fonts>
+      </div>
       <div>
         <Label>Theme</Label>
         <Swatches>

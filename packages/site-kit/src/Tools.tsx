@@ -2,6 +2,7 @@
 
 import { visibleToolIds, type TenantConfig, type ToolId } from "@mfd/schema"
 import { copy, toolCopy, type Locale } from "./copy"
+import { Calculator } from "./Calculator"
 import * as S from "./styles"
 
 function loc(locale: Locale, config: TenantConfig) {
@@ -37,14 +38,16 @@ export function ToolsIndex({ config, locale = "en" }: { config: TenantConfig; lo
   )
 }
 
-export function ToolPlaceholder({
+export function ToolBody({
   config,
   tool,
   locale = "en",
+  preview,
 }: {
   config: TenantConfig
   tool: string
   locale?: Locale
+  preview?: boolean
 }) {
   const t = copy[loc(locale, config)]
   const item = toolCopy[tool as ToolId]
@@ -61,10 +64,20 @@ export function ToolPlaceholder({
         <S.Kicker>{t.toolsIndex}</S.Kicker>
         <S.H2>{item ? (hi ? item.titleHi : item.title) : tool}</S.H2>
         <S.Bio>{item ? (hi ? item.blurbHi : item.blurb) : null}</S.Bio>
-        <S.Bio style={{ marginTop: "1rem" }}>{t.toolPlaceholder}</S.Bio>
+        <div style={{ marginTop: "1.5rem" }}>
+          <Calculator tool={tool as ToolId} config={config} t={t} preview={preview} />
+        </div>
       </S.Wrap>
     </S.Section>
   )
+}
+
+export function ToolPlaceholder(props: {
+  config: TenantConfig
+  tool: string
+  locale?: Locale
+}) {
+  return <ToolBody {...props} />
 }
 
 export function DisclosuresBody({ name }: { name: string }) {

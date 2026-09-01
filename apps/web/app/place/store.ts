@@ -20,6 +20,7 @@ export const STEPS = [
   { id: "font", n: 4, label: "Font" },
   { id: "sections", n: 5, label: "Sections" },
   { id: "review", n: 6, label: "Review" },
+  { id: "leads", n: 7, label: "Leads" },
 ] as const
 
 export type StepId = (typeof STEPS)[number]["id"]

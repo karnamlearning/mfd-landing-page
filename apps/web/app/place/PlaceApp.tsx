@@ -7,6 +7,7 @@ import { isPhoneStubSlug } from "@mfd/schema"
 import { themes } from "@mfd/tokens"
 import { DetailsStep } from "./DetailsStep"
 import { FontStep } from "./FontStep"
+import { LeadsStep } from "./LeadsStep"
 import { usePersistDraft, saveConfig } from "./persist"
 import { PreviewFrame } from "./PreviewFrame"
 import { ReviewStep } from "./ReviewStep"
@@ -32,6 +33,7 @@ function StepBody() {
   if (step === "theme") return <ThemeStep />
   if (step === "font") return <FontStep />
   if (step === "sections") return <SectionsStep />
+  if (step === "leads") return <LeadsStep />
   return <ReviewStep />
 }
 

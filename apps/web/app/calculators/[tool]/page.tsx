@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation"
 import { samplePracticeConfig, visibleToolIds, type ToolId } from "@mfd/schema"
-import { Site, ToolPlaceholder } from "@mfd/site-kit"
+import { Site, ToolBody } from "@mfd/site-kit"
 import { loadPublicSite } from "@/lib/public-site"
 
 export const dynamic = "force-dynamic"
@@ -17,7 +17,7 @@ export default async function ToolPage({ params }: Props) {
 
   return (
     <Site config={config} preview={preview}>
-      <ToolPlaceholder config={config} tool={id} />
+      <ToolBody config={config} tool={id} preview={preview} />
     </Site>
   )
 }

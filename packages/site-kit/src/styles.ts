@@ -541,6 +541,11 @@ export const Submit = styled.button`
   color: ${({ theme }) => theme.btnText};
   padding: 0.7rem 1.2rem;
   border-radius: 999px;
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: default;
+  }
 `
 
 export const Foot = styled.footer`
@@ -581,4 +586,36 @@ export const Strip = styled.a`
   @media (min-width: 860px) {
     display: none;
   }
+`
+
+export const CalcBtn = styled.button`
+  border: 0;
+  cursor: pointer;
+  margin-top: 0.4rem;
+  border-radius: 10px;
+  padding: 0.55rem 0.9rem;
+  font-size: 0.88rem;
+  font-weight: 600;
+  background: ${({ theme }) => theme.primary};
+  color: ${({ theme }) => theme.btnText};
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: default;
+  }
+`
+
+export const WaResult = styled.a`
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 1rem;
+  color: ${({ theme }) => theme.primary};
+  font-weight: 600;
+`
+
+export const LeadBox = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
 `

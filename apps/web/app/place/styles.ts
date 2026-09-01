@@ -979,3 +979,29 @@ export const MissingInner = styled.div`
     line-height: 1.5;
   }
 `
+
+export const LeadTable = styled.table`
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.78rem;
+
+  th,
+  td {
+    text-align: left;
+    padding: 0.5rem 0.4rem;
+    border-bottom: 1px solid ${({ theme }) => theme.text}12;
+    vertical-align: middle;
+  }
+
+  th {
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: ${({ theme }) => theme.muted};
+  }
+
+  td:last-child {
+    white-space: nowrap;
+  }
+`

@@ -1,6 +1,6 @@
 "use client"
 
-import { Fragment, useMemo, useState, type FormEvent, type ReactNode } from "react"
+import { Fragment, useState, type FormEvent, type ReactNode } from "react"
 import { ThemeProvider } from "styled-components"
 import {
   FiHeart,
@@ -16,9 +16,10 @@ import { FaWhatsapp } from "react-icons/fa6"
 import { baseToolIds, mergeSample, visibleToolIds, type SectionId, type TenantConfig } from "@mfd/schema"
 import { fontPairs, getTheme } from "@mfd/tokens"
 import { copy, serviceCopy, toolCopy, type Copy, type Locale } from "./copy"
+import { Calculator } from "./Calculator"
 import { GlobalStyle } from "./GlobalStyle"
 import * as S from "./styles"
-import { firstName, inr, sipFuture, waHref } from "./utils"
+import { firstName, waHref } from "./utils"
 
 const ICONS = {
   mutual_funds: FiPieChart,
@@ -53,6 +54,8 @@ type Ctx = {
   t: Copy
   locale: Locale
   wa: string
+  preview: boolean
+  embedded: boolean
 }
 
 function Header({ ctx, locale, onLocale }: { ctx: Ctx; locale: Locale; onLocale: (l: Locale) => void }) {
@@ -244,70 +247,35 @@ function HowSection({ ctx }: { ctx: Ctx }) {
 }
 
 function CalculatorsSection({ ctx }: { ctx: Ctx }) {
-  const { config, t, locale } = ctx
-  const [monthly, setMonthly] = useState(10000)
-  const [years, setYears] = useState(15)
-  const [ret, setRet] = useState(12)
-  const projected = useMemo(() => sipFuture(monthly, years, ret), [monthly, years, ret])
-  const extras = visibleToolIds(config).filter((id) => !(baseToolIds as readonly string[]).includes(id))
+  const { config, t, locale, preview, embedded } = ctx
+  const visible = visibleToolIds(config)
+  const extras = visible.filter((id) => !(baseToolIds as readonly string[]).includes(id))
   const hi = locale === "hi"
+  const showSip = visible.includes("sip")
 
   return (
     <S.Section id="calculators">
       <S.Wrap>
         <S.Kicker>{t.planning}</S.Kicker>
         <S.H2>{t.calcTitle}</S.H2>
-        <S.CalcGrid>
-          <div>
-            <S.Field>
-              {t.monthly}
-              <S.Input
-                type="number"
-                min={500}
-                value={monthly}
-                onChange={(e) => setMonthly(Number(e.target.value) || 0)}
-              />
-            </S.Field>
-            <S.Field>
-              {t.years}
-              <S.Input
-                type="number"
-                min={1}
-                max={40}
-                value={years}
-                onChange={(e) => setYears(Number(e.target.value) || 1)}
-              />
-            </S.Field>
-            <S.Field>
-              {t.expected}
-              <S.Input
-                type="number"
-                min={1}
-                max={20}
-                value={ret}
-                onChange={(e) => setRet(Number(e.target.value) || 1)}
-              />
-            </S.Field>
-          </div>
-          <S.Result>
-            <S.ResultK>{t.illustrative}</S.ResultK>
-            <S.ResultN>{inr(projected)}</S.ResultN>
-            <S.ServiceCopy>{t.calcNote}</S.ServiceCopy>
-            <p style={{ marginTop: "1rem" }}>
-              <a href="/calculators">{t.allTools}</a>
-            </p>
-          </S.Result>
-        </S.CalcGrid>
+        {showSip ? <Calculator tool="sip" config={config} t={t} preview={preview} compact /> : null}
         {extras.length ? (
           <S.ServiceGrid style={{ marginTop: "2rem" }}>
             {extras.map((id) => {
               const item = toolCopy[id]
               if (!item) return null
-              return (
-                <S.ServiceCard key={id}>
+              const card = (
+                <S.ServiceCard>
                   <S.ServiceTitle>{hi ? item.titleHi : item.title}</S.ServiceTitle>
                   <S.ServiceCopy>{hi ? item.blurbHi : item.blurb}</S.ServiceCopy>
                 </S.ServiceCard>
+              )
+              return embedded ? (
+                <div key={id}>{card}</div>
+              ) : (
+                <a key={id} href={`/calculators/${id}`} style={{ color: "inherit", textDecoration: "none" }}>
+                  {card}
+                </a>
               )
             })}
           </S.ServiceGrid>
@@ -358,11 +326,47 @@ function FaqSection({ ctx }: { ctx: Ctx }) {
 }
 
 function ContactSection({ ctx }: { ctx: Ctx }) {
-  const { config, t } = ctx
+  const { config, t, preview } = ctx
   const d = config.details
-  function onSubmit(e: FormEvent) {
+  const [sent, setSent] = useState(false)
+  const [busy, setBusy] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
+    const fd = new FormData(e.currentTarget)
+    const name = String(fd.get("name") ?? "").trim()
+    const mobile = String(fd.get("mobile") ?? "").replace(/\D/g, "")
+    const city = String(fd.get("city") ?? "").trim()
+    const message = String(fd.get("message") ?? "").trim()
+    if (!name || mobile.length !== 10) {
+      setError("Enter name and a 10-digit mobile.")
+      return
+    }
+    if (preview) {
+      setSent(true)
+      return
+    }
+    setBusy(true)
+    setError(null)
+    try {
+      const res = await fetch("/api/leads", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ name, mobile, city, message, source: "form" }),
+      })
+      if (!res.ok) {
+        setError("Could not send. Try again.")
+        return
+      }
+      setSent(true)
+    } catch {
+      setError("Could not send. Try again.")
+    } finally {
+      setBusy(false)
+    }
   }
+
   return (
     <S.Section id="contact">
       <S.Wrap>
@@ -380,36 +384,43 @@ function ContactSection({ ctx }: { ctx: Ctx }) {
               <a href={`mailto:${d.email}`}>{d.email}</a>
             </S.Bio>
           </div>
-          <S.Form onSubmit={onSubmit}>
-            <S.Field>
-              {t.name}
-              <S.Input name="name" required autoComplete="name" />
-            </S.Field>
-            <S.Field>
-              {t.mobile}
-              <S.PhoneField>
-                <S.PhonePrefix>+91</S.PhonePrefix>
-                <S.PhoneInput
-                  name="mobile"
-                  type="tel"
-                  required
-                  inputMode="numeric"
-                  autoComplete="tel"
-                  maxLength={10}
-                  placeholder="98765 43210"
-                />
-              </S.PhoneField>
-            </S.Field>
-            <S.Field>
-              {t.city}
-              <S.Input name="city" autoComplete="address-level2" />
-            </S.Field>
-            <S.Field>
-              {t.message}
-              <S.Area name="message" rows={3} />
-            </S.Field>
-            <S.Submit type="submit">{t.send}</S.Submit>
-          </S.Form>
+          {sent ? (
+            <S.Bio>{t.sent}</S.Bio>
+          ) : (
+            <S.Form onSubmit={(e) => void onSubmit(e)}>
+              <S.Field>
+                {t.name}
+                <S.Input name="name" required autoComplete="name" />
+              </S.Field>
+              <S.Field>
+                {t.mobile}
+                <S.PhoneField>
+                  <S.PhonePrefix>+91</S.PhonePrefix>
+                  <S.PhoneInput
+                    name="mobile"
+                    type="tel"
+                    required
+                    inputMode="numeric"
+                    autoComplete="tel"
+                    maxLength={10}
+                    placeholder="98765 43210"
+                  />
+                </S.PhoneField>
+              </S.Field>
+              <S.Field>
+                {t.city}
+                <S.Input name="city" autoComplete="address-level2" />
+              </S.Field>
+              <S.Field>
+                {t.message}
+                <S.Area name="message" rows={3} />
+              </S.Field>
+              {error ? <S.ServiceCopy>{error}</S.ServiceCopy> : null}
+              <S.Submit type="submit" disabled={busy}>
+                {busy ? "…" : t.send}
+              </S.Submit>
+            </S.Form>
+          )}
         </S.ContactGrid>
       </S.Wrap>
     </S.Section>
@@ -471,6 +482,8 @@ export function Site({ config, preview = false, embedded = false, children }: Si
     t,
     locale: resolved.template === "local" ? locale : "en",
     wa,
+    preview,
+    embedded,
   }
 
   return (

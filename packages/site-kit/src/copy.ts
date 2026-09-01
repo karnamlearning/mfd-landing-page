@@ -35,6 +35,22 @@ export type Copy = {
   toolPlaceholder: string
   backHome: string
   backTools: string
+  calculate: string
+  invested: string
+  corpus: string
+  remaining: string
+  withdrawn: string
+  leadHint: string
+  seeResult: string
+  discuss: string
+  sent: string
+  amount: string
+  target: string
+  inflation: string
+  stepup: string
+  expense: string
+  startingCorpus: string
+  withdrawal: string
 }
 
 export const copy: Record<Locale, Copy> = {
@@ -79,6 +95,22 @@ export const copy: Record<Locale, Copy> = {
     toolPlaceholder: "Enter your numbers to see an illustration.",
     backHome: "Home",
     backTools: "All calculators",
+    calculate: "Calculate",
+    invested: "Amount invested",
+    corpus: "Corpus needed",
+    remaining: "Amount remaining",
+    withdrawn: "Withdrawn",
+    leadHint: "Share your name and mobile to see the illustration.",
+    seeResult: "Show illustration",
+    discuss: "Discuss this on WhatsApp",
+    sent: "Sent. We will get back to you.",
+    amount: "Amount (₹)",
+    target: "Target amount (₹)",
+    inflation: "Inflation (% p.a.)",
+    stepup: "Annual increase (%)",
+    expense: "Monthly expense today (₹)",
+    startingCorpus: "Starting amount (₹)",
+    withdrawal: "Monthly withdrawal (₹)",
   },
   hi: {
     amfi: "AMFI पंजीकृत म्यूचुअल फंड वितरक",
@@ -120,6 +152,22 @@ export const copy: Record<Locale, Copy> = {
     toolPlaceholder: "अपनी राशि डालें और उदाहरण मूल्य देखें।",
     backHome: "होम",
     backTools: "सभी कैलकुलेटर",
+    calculate: "गणना करें",
+    invested: "निवेशित राशि",
+    corpus: "ज़रूरी कॉर्पस",
+    remaining: "शेष राशि",
+    withdrawn: "निकासी",
+    leadHint: "उदाहरण देखने के लिए नाम और मोबाइल लिखें।",
+    seeResult: "उदाहरण दिखाएँ",
+    discuss: "इस पर व्हाट्सऐप करें",
+    sent: "भेज दिया। हम आपसे संपर्क करेंगे।",
+    amount: "राशि (₹)",
+    target: "लक्ष्य राशि (₹)",
+    inflation: "महंगाई (% वार्षिक)",
+    stepup: "वार्षिक वृद्धि (%)",
+    expense: "आज का मासिक खर्च (₹)",
+    startingCorpus: "शुरुआती राशि (₹)",
+    withdrawal: "मासिक निकासी (₹)",
   },
 }
 

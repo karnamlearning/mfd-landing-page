@@ -10,7 +10,7 @@ Do not start a later phase until the previous phase’s **Done** line is true. P
 
 A **Buyer Place** where an MFD configures a site (no ARN verification), always sees a live preview with filled/sample data, rearranges sections, picks template / theme / font, toggles **Tools pack**, pays, and publishes to `{slug}.{base}`.
 
-Same `site-kit` renderer for preview and live site. styled-components + react-icons (`fi` + `FaWhatsapp`). Postgres tenant JSON. Calculators via BFF. Leads + WhatsApp CTA.
+Same `site-kit` renderer for preview and live site. styled-components + react-icons (`fi` + `FaWhatsapp`). MySQL tenant JSON. Calculators via BFF. Leads + WhatsApp CTA.
 
 **Shipped when:** an MFD can go details → template → theme → font → sections → add-on → pay → live subdomain that matches the last preview, then come back and edit.
 
@@ -78,7 +78,7 @@ Make it a real site on a subdomain.
 
 | Step | Build                                                                                                                                                         | Done                                       |
 | ---- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------ |
-| 3.1  | Postgres: `tenants`, `users`, `leads`. `config` JSONB.                                                                                                        | Migrate up locally.                        |
+| 3.1  | MySQL: `tenants`, `users`, `leads`. `config` JSON (`TenantConfig`).                                                                                           | Migrate up locally.                        |
 | 3.2  | OTP send/verify (`/api/auth/otp/*`). Session cookie. Create tenant `status=draft` + default config.                                                           | Phone in → session → config load/save.     |
 | 3.3  | `GET/PUT /api/me/config`. Debounced persist (1–2s, blur, template/theme/font).                                                                                | Refresh browser; draft survives.           |
 | 3.4  | Signed upload (`/api/me/assets`) to S3/R2; store URLs in config (logo, photo, hero).                                                                          | Images on preview and (later) public site. |

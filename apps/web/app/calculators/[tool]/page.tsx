@@ -1,16 +1,23 @@
 import { notFound } from "next/navigation"
-import { samplePracticeConfig, toolIds } from "@mfd/schema"
+import { samplePracticeConfig, visibleToolIds, type ToolId } from "@mfd/schema"
 import { Site, ToolPlaceholder } from "@mfd/site-kit"
+import { loadPublicSite } from "@/lib/public-site"
+
+export const dynamic = "force-dynamic"
 
 type Props = { params: Promise<{ tool: string }> }
 
 export default async function ToolPage({ params }: Props) {
   const { tool } = await params
-  if (!(toolIds as readonly string[]).includes(tool)) notFound()
+  const site = await loadPublicSite()
+  const config = site?.config ?? samplePracticeConfig
+  const preview = !site
+  if (!visibleToolIds(config).includes(tool as ToolId)) notFound()
+  const id = tool as ToolId
 
   return (
-    <Site config={samplePracticeConfig}>
-      <ToolPlaceholder config={samplePracticeConfig} tool={tool} />
+    <Site config={config} preview={preview}>
+      <ToolPlaceholder config={config} tool={id} />
     </Site>
   )
 }

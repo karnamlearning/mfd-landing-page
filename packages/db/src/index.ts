@@ -1,0 +1,5 @@
+export { createDb } from "./client"
+export type { Db } from "./client"
+export { tenants, users, leads, otpChallenges } from "./schema"
+export type { TenantRow, UserRow, LeadRow, OtpChallengeRow } from "./schema"
+export { eq } from "drizzle-orm"

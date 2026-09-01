@@ -3,31 +3,56 @@
 import { useRef, useState, type ChangeEvent, type FormEvent } from "react"
 import { FiUpload } from "react-icons/fi"
 import type { TenantDetails } from "@mfd/schema"
+import { saveConfig } from "./persist"
+import { PhoneNumber } from "./PhoneNumber"
 import { blank, useDraft } from "./store"
 import * as U from "./styles"
+
+type AssetKind = "logo" | "photo" | "hero"
 
 const PRESET_LANGS = ["English", "Hindi"] as const
 const BANNED = /financial planner|guaranteed|assured returns/i
 
 function AssetField({
   label,
+  kind,
   value,
   onUrl,
 }: {
   label: string
+  kind: AssetKind
   value: string | undefined
   onUrl: (url: string | undefined) => void
 }) {
   const prev = useRef<string | undefined>(value)
+  const [busy, setBusy] = useState(false)
+  const [err, setErr] = useState<string | null>(null)
 
-  function onFile(e: ChangeEvent<HTMLInputElement>) {
+  async function onFile(e: ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
     e.target.value = ""
     if (!file) return
-    if (prev.current?.startsWith("blob:")) URL.revokeObjectURL(prev.current)
-    const url = URL.createObjectURL(file)
-    prev.current = url
-    onUrl(url)
+    setErr(null)
+    setBusy(true)
+    const fd = new FormData()
+    fd.append("file", file)
+    fd.append("kind", kind)
+    try {
+      const res = await fetch("/api/me/assets", { method: "POST", body: fd })
+      const data = await res.json()
+      if (!res.ok || typeof data.url !== "string") {
+        setErr("Upload failed. Try a smaller image.")
+        return
+      }
+      if (prev.current?.startsWith("blob:")) URL.revokeObjectURL(prev.current)
+      prev.current = data.url
+      onUrl(data.url)
+      void saveConfig(true)
+    } catch {
+      setErr("Upload failed.")
+    } finally {
+      setBusy(false)
+    }
   }
 
   function clear() {
@@ -46,8 +71,8 @@ function AssetField({
       <U.FileRow>
         <U.FileBtn>
           <FiUpload size={12} aria-hidden />
-          Upload
-          <input type="file" accept="image/*" onChange={onFile} />
+          {busy ? "Uploading…" : "Upload"}
+          <input type="file" accept="image/*" onChange={(e) => void onFile(e)} disabled={busy} />
         </U.FileBtn>
         {!blank(value) ? (
           <U.ClearBtn type="button" onClick={clear}>
@@ -55,6 +80,7 @@ function AssetField({
           </U.ClearBtn>
         ) : null}
       </U.FileRow>
+      {err ? <U.Warn>{err}</U.Warn> : null}
     </U.Field>
   )
 }
@@ -89,7 +115,13 @@ export function DetailsStep() {
   const bioWarn = d.bio && BANNED.test(d.bio)
 
   return (
-    <>
+    <div
+      onBlur={(e) => {
+        const next = e.relatedTarget as Node | null
+        if (next && e.currentTarget.contains(next)) return
+        void saveConfig(true)
+      }}
+    >
       <U.StepTitle>Your details</U.StepTitle>
       <U.StepLead>Empty fields stay filled with sample data in the preview until you type.</U.StepLead>
 
@@ -106,9 +138,9 @@ export function DetailsStep() {
         />
       </U.Field>
 
-      <AssetField label="Logo" value={d.logoUrl} onUrl={(url) => set("logoUrl", url)} />
-      <AssetField label="Photo" value={d.photoUrl} onUrl={(url) => set("photoUrl", url)} />
-      <AssetField label="Hero image" value={d.heroImageUrl} onUrl={(url) => set("heroImageUrl", url)} />
+      <AssetField label="Logo" kind="logo" value={d.logoUrl} onUrl={(url) => set("logoUrl", url)} />
+      <AssetField label="Photo" kind="photo" value={d.photoUrl} onUrl={(url) => set("photoUrl", url)} />
+      <AssetField label="Hero image" kind="hero" value={d.heroImageUrl} onUrl={(url) => set("heroImageUrl", url)} />
 
       <U.Field>
         <U.LabelRow>
@@ -144,21 +176,18 @@ export function DetailsStep() {
             WhatsApp number
             {blank(d.whatsapp) ? <U.SampleTag>Sample</U.SampleTag> : null}
           </U.LabelRow>
-          <U.Input
+          <PhoneNumber
             value={d.whatsapp}
-            inputMode="tel"
-            autoComplete="tel"
-            onChange={(e) => set("whatsapp", e.target.value)}
-            placeholder="98765 43210"
+            onChange={(value) => set("whatsapp", value)}
+            aria-label="WhatsApp number"
           />
         </U.Field>
         <U.Field>
           Call number
-          <U.Input
+          <PhoneNumber
             value={d.phone ?? ""}
-            inputMode="tel"
-            onChange={(e) => set("phone", e.target.value)}
-            placeholder="Same as WhatsApp if empty"
+            onChange={(value) => set("phone", value)}
+            aria-label="Call number"
           />
           <U.Hint>Defaults to WhatsApp if you leave this blank.</U.Hint>
         </U.Field>
@@ -356,6 +385,6 @@ export function DetailsStep() {
           </U.AddLink>
         ) : null}
       </U.Group>
-    </>
+    </div>
   )
 }

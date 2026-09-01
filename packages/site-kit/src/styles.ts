@@ -412,6 +412,34 @@ export const Input = styled.input`
   padding: 0.45rem 0;
   color: ${({ theme }) => theme.text};
   outline: none;
+  font-family: inherit;
+  box-sizing: border-box;
+`
+
+export const PhoneField = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  border-bottom: 1px solid ${({ theme }) => theme.text}28;
+`
+
+export const PhonePrefix = styled.span`
+  font-size: 0.95rem;
+  font-weight: 650;
+  color: ${({ theme }) => theme.text};
+  padding: 0.45rem 0;
+  flex-shrink: 0;
+`
+
+export const PhoneInput = styled.input`
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  padding: 0.45rem 0;
+  color: ${({ theme }) => theme.text};
+  outline: none;
+  font-family: inherit;
 `
 
 export const Area = styled.textarea`

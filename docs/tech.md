@@ -66,7 +66,7 @@ packages/site-kit        Header, footer, sections, calculator UI (styled-compone
 | Fonts           | `next/font` for the five pairs          | No FOUT from runtime Google Fonts                  |
 | Preview state   | Zustand (or React context)              | Draft config; live preview                         |
 | Section reorder | dnd-kit on the section id list          | Not a general drag engine                          |
-| DB              | Postgres                                | Tenants, JSONB config, leads, billing              |
+| DB              | MySQL                                   | Match other Advisorkhoj products; JSON config, leads, billing |
 | Files           | S3-compatible (S3 / R2)                 | Logo, photo, hero                                  |
 | Auth            | Mobile OTP                              | Match how MFDs live; no ARN check now              |
 | Pay             | Razorpay subscriptions                  | ₹299/mo or ₹2,999/yr                               |
@@ -248,12 +248,14 @@ Custom domain later: CNAME to the app, `tenants.custom_domain`, SSL (Cloudflare 
 
 ---
 
-## Data model (Postgres)
+## Data model (MySQL)
+
+Same three tables as the rest of Advisorkhoj: relational rows, `TenantConfig` as a MySQL 8 `JSON` column. Validate with Zod on read/write.
 
 **tenants**
 
 - `id`, `slug` unique, `status` (`draft` \| `trial` \| `active` \| `suspended`)
-- `config` JSONB (`TenantConfig`)
+- `config` JSON (`TenantConfig`)
 - `owner_phone`, `owner_email`
 - `razorpay_sub_id`, `plan` (`monthly` \| `yearly`)
 - `created_at`, `updated_at`
@@ -263,7 +265,7 @@ Custom domain later: CNAME to the app, `tenants.custom_domain`, SSL (Cloudflare 
 - `id`, `tenant_id`
 - `name`, `mobile`, `city`, `message`
 - `source` (`form` \| `sip_calc` \| …)
-- `payload` JSONB (calculator inputs)
+- `payload` JSON (calculator inputs)
 - `created_at`
 
 **users** (MFD)
@@ -316,7 +318,7 @@ Lead gate: calculator UI withholds the full result until name + mobile; then `PO
 1. **Tokens + Practice page** - hardcoded sample, new visual system. Gate: looks better than Investbux.
 2. **Schema + renderer** - JSON drives section order, theme, font, template.
 3. **Buyer Place** - details, template, theme, font, section list (dnd), add-ons rail, always-on preview.
-4. **Postgres + OTP** - persist tenant, publish to `{slug}.{base}`.
+4. **MySQL + OTP** - persist tenant, publish to `{slug}.{base}`.
 5. **SIP BFF + home widget** - then lumpsum, goal SIP, retirement.
 6. **Tools pack flag** - extra tools when paid; preview-on, public-off until paid.
 7. **Razorpay + leads + WhatsApp notify.**

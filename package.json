@@ -8,7 +8,11 @@
   "scripts": {
     "dev": "npm run dev -w @mfd/web",
     "build": "npm run build -w @mfd/web",
-    "start": "npm run start -w @mfd/web"
+    "start": "npm run start -w @mfd/web",
+    "db:up": "docker compose up -d --wait",
+    "db:migrate": "npm run migrate -w @mfd/db",
+    "db:generate": "npm run generate -w @mfd/db",
+    "db:down": "docker compose down"
   },
   "engines": {
     "node": ">=20"

@@ -3,8 +3,8 @@ import { fontVariableClassName } from "./fonts"
 import { StyledComponentsRegistry } from "./registry"
 
 export const metadata: Metadata = {
-  title: "Rahul Sharma · Mutual Fund Distributor",
-  description: "AMFI-registered mutual fund distributor in Pune.",
+  title: "Advisorkhoj · Your MFD site",
+  description: "A branded site for your mutual fund distribution practice.",
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

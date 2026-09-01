@@ -387,7 +387,18 @@ function ContactSection({ ctx }: { ctx: Ctx }) {
             </S.Field>
             <S.Field>
               {t.mobile}
-              <S.Input name="mobile" required inputMode="tel" autoComplete="tel" />
+              <S.PhoneField>
+                <S.PhonePrefix>+91</S.PhonePrefix>
+                <S.PhoneInput
+                  name="mobile"
+                  type="tel"
+                  required
+                  inputMode="numeric"
+                  autoComplete="tel"
+                  maxLength={10}
+                  placeholder="98765 43210"
+                />
+              </S.PhoneField>
             </S.Field>
             <S.Field>
               {t.city}

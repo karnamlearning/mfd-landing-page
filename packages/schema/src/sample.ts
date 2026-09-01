@@ -99,3 +99,8 @@ export const emptyPracticeConfig: TenantConfig = {
   testimonials: [],
   faq: [],
 }
+
+/** New tenant draft — empty fields, preview fills sample until they type. */
+export function emptyDraftConfig(slug: string): TenantConfig {
+  return { ...emptyPracticeConfig, slug }
+}

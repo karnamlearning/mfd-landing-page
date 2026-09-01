@@ -32,6 +32,7 @@ export const Shell = styled.div`
 export const Top = styled.header`
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: ${({ theme }) => theme.space[2]};
   padding: 0.7rem 1rem;
   border-bottom: 1px solid ${({ theme }) => theme.text}14;
@@ -213,6 +214,8 @@ export const Later = styled.p`
 export const NextRow = styled.div`
   display: flex;
   justify-content: flex-end;
+  align-items: center;
+  gap: 0.5rem;
   margin-top: 1.25rem;
 `
 
@@ -352,12 +355,54 @@ export const SampleTag = styled.span`
 
 export const Input = styled.input`
   width: 100%;
+  box-sizing: border-box;
   border: 1px solid ${({ theme }) => theme.text}18;
   background: ${({ theme }) => theme.bg};
   color: ${({ theme }) => theme.text};
   border-radius: 10px;
   padding: 0.5rem 0.65rem;
+  font-family: inherit;
   font-size: 0.88rem;
+`
+
+export const PhoneField = styled.div`
+  display: flex;
+  align-items: center;
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid ${({ theme }) => theme.text}18;
+  background: ${({ theme }) => theme.bg};
+  border-radius: 10px;
+`
+
+export const PhonePrefix = styled.span`
+  display: flex;
+  align-items: center;
+  align-self: stretch;
+  padding: 0 0.75rem;
+  font-size: 0.88rem;
+  font-weight: 650;
+  color: ${({ theme }) => theme.text};
+  border-right: 1px solid ${({ theme }) => theme.text}14;
+  flex-shrink: 0;
+`
+
+export const PhoneInput = styled.input`
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  color: ${({ theme }) => theme.text};
+  padding: 0.55rem 0.75rem;
+  font-family: inherit;
+  font-size: 0.88rem;
+  letter-spacing: 0.02em;
+  outline: none;
+
+  &::placeholder {
+    color: ${({ theme }) => theme.muted};
+    letter-spacing: 0;
+  }
 `
 
 export const Area = styled.textarea`
@@ -805,4 +850,132 @@ export const PlanNote = styled.span`
   margin-top: 0.15rem;
   font-size: 0.72rem;
   opacity: 0.8;
+`
+
+export const SiteChrome = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-width: 0;
+  max-width: min(42vw, 28rem);
+  margin: 0 0.5rem;
+
+  @media (max-width: 760px) {
+    order: 20;
+    max-width: none;
+    flex: 1 1 100%;
+    margin: 0.15rem 0 0;
+  }
+`
+
+export const UrlText = styled.span`
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.78rem;
+  color: ${({ theme }) => theme.muted};
+`
+
+export const ChromeBtn = styled.a`
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  border: 1px solid ${({ theme }) => theme.text}18;
+  background: ${({ theme }) => theme.bg};
+  color: ${({ theme }) => theme.text};
+  border-radius: 999px;
+  padding: 0.3rem 0.65rem;
+  font-size: 0.72rem;
+  cursor: pointer;
+  text-decoration: none;
+`
+
+export const SaveBtn = styled.button<{ $err?: boolean }>`
+  flex-shrink: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  padding: 0;
+  font-size: 0.72rem;
+  font-weight: 650;
+  letter-spacing: 0.02em;
+  color: ${({ $err, theme }) => ($err ? "#b45309" : theme.primary)};
+`
+
+export const SaveHint = styled.span<{ $err?: boolean }>`
+  font-size: 0.72rem;
+  font-weight: 650;
+  letter-spacing: 0.02em;
+  color: ${({ $err, theme }) => ($err ? "#b45309" : theme.muted)};
+  flex-shrink: 0;
+`
+
+export const Marketing = styled.div`
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 2rem 1.25rem;
+  background: ${({ theme }) => theme.bg};
+  color: ${({ theme }) => theme.text};
+  font-family: var(--font-modern), system-ui, sans-serif;
+`
+
+export const MarketingLead = styled.p`
+  margin: 0;
+  max-width: 28rem;
+  text-align: center;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: ${({ theme }) => theme.muted};
+`
+
+export const OtpCard = styled.div`
+  width: min(100%, 22rem);
+  padding: 1.25rem;
+  border-radius: 16px;
+  background: ${({ theme }) => theme.surface};
+  border: 1px solid ${({ theme }) => theme.text}14;
+`
+
+export const QrBox = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
+  margin: 0.5rem 0 1rem;
+  padding: 0.85rem;
+  border-radius: 12px;
+  background: ${({ theme }) => theme.bg};
+  border: 1px solid ${({ theme }) => theme.text}12;
+`
+
+export const MissingPage = styled.div`
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 2rem;
+  font-family: system-ui, sans-serif;
+  background: #f6f4ef;
+  color: #1c1917;
+`
+
+export const MissingInner = styled.div`
+  max-width: 28rem;
+  text-align: center;
+
+  h1 {
+    margin: 0 0 0.5rem;
+    font-size: 1.4rem;
+    letter-spacing: -0.03em;
+  }
+
+  p {
+    margin: 0;
+    color: #57534e;
+    line-height: 1.5;
+  }
 `

@@ -24,6 +24,14 @@ export const STEPS = [
 
 export type StepId = (typeof STEPS)[number]["id"]
 export type Viewport = "mobile" | "desktop"
+export type TenantStatus = "draft" | "trial" | "active" | "suspended"
+
+export type ServerDraft = {
+  config: TenantConfig
+  slugLocked: boolean
+  status: TenantStatus
+  publicUrl: string
+}
 
 const LOCKED = new Set<string>(lockedSectionIds)
 
@@ -32,6 +40,13 @@ type DraftState = {
   step: StepId
   viewport: Viewport
   previewOpen: boolean
+  hydrated: boolean
+  saving: boolean
+  dirty: boolean
+  saveError: string | null
+  slugLocked: boolean
+  status: TenantStatus
+  publicUrl: string
   setStep: (step: StepId) => void
   setViewport: (viewport: Viewport) => void
   setPreviewOpen: (open: boolean) => void
@@ -46,6 +61,9 @@ type DraftState = {
   setFaq: (faq: TenantConfig["faq"]) => void
   ensureSectionOn: (id: SectionId) => void
   setToolsPack: (on: boolean) => void
+  setSlug: (slug: string) => void
+  hydrate: (payload: ServerDraft) => void
+  applyServer: (payload: ServerDraft) => void
 }
 
 export function blank(v: string | undefined) {
@@ -57,6 +75,13 @@ export const useDraft = create<DraftState>((set) => ({
   step: "details",
   viewport: "mobile",
   previewOpen: false,
+  hydrated: false,
+  saving: false,
+  dirty: false,
+  saveError: null,
+  slugLocked: false,
+  status: "draft",
+  publicUrl: "",
   setStep: (step) => set({ step }),
   setViewport: (viewport) => set({ viewport }),
   setPreviewOpen: (previewOpen) => set({ previewOpen }),
@@ -90,5 +115,25 @@ export const useDraft = create<DraftState>((set) => ({
   setToolsPack: (on) =>
     set((s) => ({
       config: { ...s.config, addons: on ? ["tools"] : [] },
+    })),
+  setSlug: (slug) =>
+    set((s) => (s.slugLocked ? s : { config: { ...s.config, slug } })),
+  hydrate: (payload) =>
+    set({
+      config: payload.config,
+      slugLocked: payload.slugLocked,
+      status: payload.status,
+      publicUrl: payload.publicUrl,
+      hydrated: true,
+      dirty: false,
+      saveError: null,
+    }),
+  applyServer: (payload) =>
+    set((s) => ({
+      config: { ...s.config, slug: payload.config.slug },
+      slugLocked: payload.slugLocked,
+      status: payload.status,
+      publicUrl: payload.publicUrl,
+      saveError: null,
     })),
 }))

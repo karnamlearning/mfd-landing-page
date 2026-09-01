@@ -16,3 +16,14 @@ export function randomOtp() {
   const n = Math.floor(Math.random() * 1_000_000)
   return n.toString().padStart(6, "0")
 }
+
+export function isOtpDev() {
+  return process.env.OTP_DEV === "1" || process.env.NODE_ENV !== "production"
+}
+
+/** Local login always uses this code. Empty in production unless OTP_DEV_CODE is set. */
+export function staticDevOtp() {
+  if (process.env.OTP_DEV_CODE) return process.env.OTP_DEV_CODE.replace(/\D/g, "").slice(0, 6)
+  if (isOtpDev()) return "000000"
+  return ""
+}

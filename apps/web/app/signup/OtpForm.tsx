@@ -68,7 +68,7 @@ export function OtpForm({ onAuthed }: { onAuthed: () => void }) {
   return (
     <U.OtpCard>
       <U.StepTitle>Sign in with mobile</U.StepTitle>
-      <U.StepLead>No ARN check. We send a one-time code and create your site draft.</U.StepLead>
+      <U.StepLead>We send a one-time code and create your site draft.</U.StepLead>
       {!sent ? (
         <form onSubmit={send}>
           <U.Field>
@@ -97,7 +97,6 @@ export function OtpForm({ onAuthed }: { onAuthed: () => void }) {
               onChange={(e) => setCode(e.target.value)}
               placeholder="000000"
             />
-            {devCode ? <U.Hint>Dev code: {devCode}</U.Hint> : null}
           </U.Field>
           {error ? <U.Warn>{error}</U.Warn> : null}
           <U.NextRow>

@@ -17,7 +17,7 @@ export function SignupApp() {
           <U.BrandSub>Your MFD site</U.BrandSub>
         </U.BrandMark>
         <U.MarketingLead>
-          A branded site for your practice. WhatsApp-first. You pick template, theme, and what to show —
+          A branded site for your practice. WhatsApp-first. You pick template, theme, and what to show -
           we host it on your own URL.
         </U.MarketingLead>
         <OtpForm onAuthed={() => router.push("/place")} />

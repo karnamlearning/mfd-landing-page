@@ -2,7 +2,7 @@ import { eq, otpChallenges, tenants, users } from "@mfd/db"
 import { emptyDraftConfig, phoneStubSlug } from "@mfd/schema"
 import { json, setSessionCookie } from "@/lib/auth"
 import { getDb } from "@/lib/db"
-import { hashOtp, normalizePhone } from "@/lib/phone"
+import { hashOtp, normalizePhone, staticDevOtp } from "@/lib/phone"
 import { uniqueSlug } from "@/lib/slug"
 
 export const runtime = "nodejs"
@@ -19,7 +19,7 @@ export async function POST(req: Request) {
   if (!phone || code.length !== 6) return json({ error: "invalid" }, 400)
 
   const db = getDb()
-  const devCode = process.env.OTP_DEV_CODE || (process.env.NODE_ENV !== "production" ? "000000" : "")
+  const devCode = staticDevOtp()
   const devOk = Boolean(devCode && code === devCode)
 
   if (!devOk) {

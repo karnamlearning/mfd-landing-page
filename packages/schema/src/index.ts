@@ -16,7 +16,7 @@ export { tenantConfigSchema, detailsSchema, credentialSchema, statSchema, sectio
 export type { TenantConfig, TenantDetails, Wording, WordingLine, ServiceWording } from "./tenant"
 
 export { sampleFill, samplePracticeConfig, emptyPracticeConfig, emptyDraftConfig, sampleTestimonials, sampleFaq } from "./sample"
-export { mergeSample } from "./merge"
+export { mergeSample, pruneEmptyContent } from "./merge"
 export { sectionsByTemplate, applyTemplate } from "./defaults"
 export { familyMeta } from "./families"
 export { visibleToolIds, readyToolIds } from "./tools"

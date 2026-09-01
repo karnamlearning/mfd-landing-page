@@ -1,5 +1,5 @@
 export { Site } from "./Site"
-export type { SiteProps } from "./Site"
+export type { SiteProps, PreviewSpotId } from "./Site"
 export { FixtureApp } from "./FixtureApp"
 export { ToolsIndex, ToolBody, ToolPlaceholder, DisclosuresBody } from "./Tools"
 export { Calculator } from "./Calculator"

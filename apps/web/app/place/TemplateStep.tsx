@@ -36,7 +36,15 @@ export function TemplateStep() {
         {VARIANTS.map((row) => {
           const on = row.id === current
           return (
-            <U.TplCard key={row.id} type="button" $on={on} onClick={() => setTemplate(row.id)}>
+            <U.TplCard
+              key={row.id}
+              type="button"
+              $on={on}
+              onClick={() => {
+                setTemplate(row.id)
+                useDraft.getState().focusPreview("top")
+              }}
+            >
               <U.TplThumb $id={row.id} />
               <U.TplName>{row.name}</U.TplName>
               <U.TplBlurb>{row.blurb}</U.TplBlurb>

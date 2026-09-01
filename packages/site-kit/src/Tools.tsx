@@ -16,7 +16,7 @@ export function ToolsIndex({ config, locale = "en" }: { config: TenantConfig; lo
   const hi = loc(locale, config) === "hi"
 
   return (
-    <S.Section>
+    <S.Section id="calculators" data-spot="calculators">
       <S.Wrap>
         <S.Kicker>{t.toolsIndex}</S.Kicker>
         <S.H2>{t.toolsIndex}</S.H2>

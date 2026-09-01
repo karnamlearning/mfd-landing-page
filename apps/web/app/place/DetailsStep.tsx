@@ -6,6 +6,7 @@ import type { TenantDetails } from "@mfd/schema"
 import { saveConfig } from "./persist"
 import { PhoneNumber } from "./PhoneNumber"
 import { blank, useDraft } from "./store"
+import { ShowOnSite, spot } from "./preview"
 import * as U from "./styles"
 
 type AssetKind = "logo" | "photo" | "hero"
@@ -27,6 +28,7 @@ function AssetField({
   const prev = useRef<string | undefined>(value)
   const [busy, setBusy] = useState(false)
   const [err, setErr] = useState<string | null>(null)
+  const previewId = kind === "logo" ? "header" : kind === "photo" ? "photo" : "top"
 
   async function onFile(e: ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
@@ -47,6 +49,7 @@ function AssetField({
       if (prev.current?.startsWith("blob:")) URL.revokeObjectURL(prev.current)
       prev.current = data.url
       onUrl(data.url)
+      useDraft.getState().focusPreview(previewId)
       void saveConfig(true)
     } catch {
       setErr("Upload failed.")
@@ -62,10 +65,13 @@ function AssetField({
   }
 
   return (
-    <U.Field>
+    <U.Field {...spot(previewId)}>
       <U.LabelRow>
-        {label}
-        {blank(value) ? <U.SampleTag>Sample</U.SampleTag> : null}
+        <U.LabelLeft>
+          {label}
+          {blank(value) ? <U.SampleTag>Preview only</U.SampleTag> : null}
+        </U.LabelLeft>
+        <ShowOnSite id={previewId} />
       </U.LabelRow>
       {!blank(value) ? <U.Thumb src={value} alt="" /> : null}
       <U.FileRow>
@@ -124,12 +130,18 @@ export function DetailsStep() {
       }}
     >
       <U.StepTitle>Your details</U.StepTitle>
-      <U.StepLead>Empty fields stay filled with sample data in the preview until you type.</U.StepLead>
+      <U.StepLead>
+        Empty fields stay filled with sample data in the preview until you type. Photos only appear on the live site
+        after you upload them. Click a field, or <strong>On site</strong>, to jump to that place on the preview.
+      </U.StepLead>
 
-      <U.Field>
+      <U.Field {...spot("header")}>
         <U.LabelRow>
-          Display name
-          {blank(d.name) ? <U.SampleTag>Sample</U.SampleTag> : null}
+          <U.LabelLeft>
+            Display name
+            {blank(d.name) ? <U.SampleTag>Sample</U.SampleTag> : null}
+          </U.LabelLeft>
+          <ShowOnSite id="header" />
         </U.LabelRow>
         <U.Input
           value={d.name}
@@ -143,10 +155,13 @@ export function DetailsStep() {
       <AssetField label="Photo" kind="photo" value={d.photoUrl} onUrl={(url) => set("photoUrl", url)} />
       <AssetField label="Hero image" kind="hero" value={d.heroImageUrl} onUrl={(url) => set("heroImageUrl", url)} />
 
-      <U.Field>
+      <U.Field {...spot("top")}>
         <U.LabelRow>
-          Hero headline
-          {blank(d.heroHeadline) ? <U.SampleTag>Sample</U.SampleTag> : null}
+          <U.LabelLeft>
+            Hero headline
+            {blank(d.heroHeadline) ? <U.SampleTag>Sample</U.SampleTag> : null}
+          </U.LabelLeft>
+          <ShowOnSite id="top" />
         </U.LabelRow>
         <U.Input
           value={d.heroHeadline ?? ""}
@@ -156,10 +171,13 @@ export function DetailsStep() {
         <U.Hint>{(d.heroHeadline ?? "").length}/90</U.Hint>
       </U.Field>
 
-      <U.Field>
+      <U.Field {...spot("top")}>
         <U.LabelRow>
-          One-line pitch
-          {blank(d.pitch) ? <U.SampleTag>Sample</U.SampleTag> : null}
+          <U.LabelLeft>
+            One-line pitch
+            {blank(d.pitch) ? <U.SampleTag>Sample</U.SampleTag> : null}
+          </U.LabelLeft>
+          <ShowOnSite id="top" />
         </U.LabelRow>
         <U.Area
           rows={2}
@@ -170,8 +188,11 @@ export function DetailsStep() {
         <U.Hint>{(d.pitch ?? "").length}/160</U.Hint>
       </U.Field>
 
-      <U.Group>
-        <U.GroupTitle>Contact</U.GroupTitle>
+      <U.Group {...spot("contact")}>
+        <U.GroupHead>
+          <U.GroupTitle>Contact</U.GroupTitle>
+          <ShowOnSite id="contact" />
+        </U.GroupHead>
         <U.Field>
           <U.LabelRow>
             WhatsApp number
@@ -222,18 +243,13 @@ export function DetailsStep() {
             placeholder="City is enough if empty"
           />
         </U.Field>
-        <U.Field>
-          Office hours
-          <U.Input
-            value={d.hours ?? ""}
-            onChange={(e) => set("hours", e.target.value)}
-            placeholder="Mon–Sat 10am–6pm"
-          />
-        </U.Field>
       </U.Group>
 
-      <U.Group>
-        <U.GroupTitle>About</U.GroupTitle>
+      <U.Group {...spot("about")}>
+        <U.GroupHead>
+          <U.GroupTitle>About</U.GroupTitle>
+          <ShowOnSite id="about" />
+        </U.GroupHead>
         <U.Field>
           Languages spoken
           <U.Chips>
@@ -258,6 +274,14 @@ export function DetailsStep() {
             />
             <U.ClearBtn type="submit">Add</U.ClearBtn>
           </U.FileRow>
+        </U.Field>
+        <U.Field>
+          Office hours
+          <U.Input
+            value={d.hours ?? ""}
+            onChange={(e) => set("hours", e.target.value)}
+            placeholder="Mon–Sat 10am–6pm"
+          />
         </U.Field>
         <U.Field>
           <U.LabelRow>
@@ -286,11 +310,14 @@ export function DetailsStep() {
         </U.Field>
       </U.Group>
 
-      <U.Group>
-        <U.LabelRow>
-          <U.GroupTitle>Credentials</U.GroupTitle>
-          {d.credentials.length === 0 ? <U.SampleTag>Sample</U.SampleTag> : null}
-        </U.LabelRow>
+      <U.Group {...spot("credentials")}>
+        <U.GroupHead>
+          <U.LabelLeft>
+            <U.GroupTitle>Credentials</U.GroupTitle>
+            {d.credentials.length === 0 ? <U.SampleTag>Sample</U.SampleTag> : null}
+          </U.LabelLeft>
+          <ShowOnSite id="credentials" />
+        </U.GroupHead>
         {d.credentials.map((row, i) => (
           <U.RowCard key={i}>
             <U.Field>
@@ -337,19 +364,24 @@ export function DetailsStep() {
         ))}
         <U.AddLink
           type="button"
-          onClick={() =>
+          onClick={() => {
+            useDraft.getState().ensureSectionOn("credentials")
+            useDraft.getState().focusPreview("credentials")
             set("credentials", [...d.credentials, { label: "AMFI ARN", name: d.name || "", number: "" }])
-          }
+          }}
         >
           + Add credential
         </U.AddLink>
       </U.Group>
 
-      <U.Group>
-        <U.LabelRow>
-          <U.GroupTitle>Stats</U.GroupTitle>
-          {d.stats.length === 0 ? <U.SampleTag>Sample</U.SampleTag> : null}
-        </U.LabelRow>
+      <U.Group {...spot("stats")}>
+        <U.GroupHead>
+          <U.LabelLeft>
+            <U.GroupTitle>Stats</U.GroupTitle>
+            {d.stats.length === 0 ? <U.SampleTag>Sample</U.SampleTag> : null}
+          </U.LabelLeft>
+          <ShowOnSite id="stats" />
+        </U.GroupHead>
         {d.stats.map((row, i) => (
           <U.RowCard key={i}>
             <U.Field>
@@ -382,7 +414,14 @@ export function DetailsStep() {
           </U.RowCard>
         ))}
         {d.stats.length < 3 ? (
-          <U.AddLink type="button" onClick={() => set("stats", [...d.stats, { value: "", label: "" }])}>
+          <U.AddLink
+            type="button"
+            onClick={() => {
+              useDraft.getState().ensureSectionOn("stats")
+              useDraft.getState().focusPreview("stats")
+              set("stats", [...d.stats, { value: "", label: "" }])
+            }}
+          >
             + Add stat
           </U.AddLink>
         ) : null}

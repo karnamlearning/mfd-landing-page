@@ -3,14 +3,14 @@ import { fontIds, themeIds } from "@mfd/tokens"
 import { addonIds, familyIds, sectionIds, serviceIds, templateIds, toolIds } from "./ids"
 
 export const credentialSchema = z.object({
-  label: z.string().min(1),
-  name: z.string().min(1),
-  number: z.string().min(1),
+  label: z.string(),
+  name: z.string(),
+  number: z.string(),
 })
 
 export const statSchema = z.object({
-  value: z.string().min(1),
-  label: z.string().min(1),
+  value: z.string(),
+  label: z.string(),
 })
 
 export const detailsSchema = z.object({
@@ -36,14 +36,14 @@ export const detailsSchema = z.object({
 })
 
 export const testimonialSchema = z.object({
-  quote: z.string().min(1),
-  name: z.string().min(1),
-  city: z.string().min(1),
+  quote: z.string(),
+  name: z.string(),
+  city: z.string(),
 })
 
 export const faqItemSchema = z.object({
-  q: z.string().min(1),
-  a: z.string().min(1),
+  q: z.string(),
+  a: z.string(),
   qHi: z.string().optional(),
   aHi: z.string().optional(),
 })

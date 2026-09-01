@@ -21,7 +21,9 @@ import {
   type WordingLine,
 } from "@mfd/schema"
 import { copy, serviceCopy } from "@mfd/site-kit"
-import { blank, useDraft } from "./store"
+import { saveConfig } from "./persist"
+import { blank, useDraft, type PreviewSpot } from "./store"
+import { spot } from "./preview"
 import * as U from "./styles"
 
 const LABELS: Record<SectionId, string> = {
@@ -49,6 +51,19 @@ const SERVICE_LABELS: Record<ServiceId, string> = {
   bonds: "Bonds",
 }
 
+const SECTION_SPOT: Record<SectionId, PreviewSpot> = {
+  hero: "top",
+  about: "about",
+  credentials: "credentials",
+  services: "services",
+  stats: "stats",
+  how: "how",
+  calculators: "calculators",
+  testimonials: "testimonials",
+  faq: "faq",
+  contact: "contact",
+  whatsapp_strip: "whatsapp",
+}
 const LOCKED = new Set<string>(lockedSectionIds)
 const EDITABLE = new Set<SectionId>([
   "hero",
@@ -91,7 +106,16 @@ function SortableRow({
         <U.Handle type="button" aria-label="Reorder" {...attributes} {...listeners}>
           <FiMenu size={15} />
         </U.Handle>
-        <U.SecName>{LABELS[id]}</U.SecName>
+        <U.SecName
+          type="button"
+          onClick={() => {
+            if (!locked) useDraft.getState().ensureSectionOn(id)
+            useDraft.getState().focusPreview(SECTION_SPOT[id])
+          }}
+          title="Show this block on the preview"
+        >
+          {LABELS[id]}
+        </U.SecName>
         {EDITABLE.has(id) ? (
           <U.IconBtn type="button" onClick={onEdit} aria-label={`Edit ${LABELS[id]}`}>
             {open ? <FiChevronDown size={16} /> : <FiChevronRight size={16} />}
@@ -108,7 +132,11 @@ function SortableRow({
           {on ? <FiEye size={16} /> : <FiEyeOff size={16} />}
         </U.IconBtn>
       </U.SecMain>
-      {open ? <NestedEditor id={id} /> : null}
+      {open ? (
+        <div {...spot(SECTION_SPOT[id])}>
+          <NestedEditor id={id} />
+        </div>
+      ) : null}
     </U.SecRow>
   )
 }
@@ -850,11 +878,17 @@ export function SectionsStep() {
   }
 
   return (
-    <>
+    <div
+      onBlur={(e) => {
+        const next = e.relatedTarget as Node | null
+        if (next && e.currentTarget.contains(next)) return
+        void saveConfig(true)
+      }}
+    >
       <U.StepTitle>Sections</U.StepTitle>
       <U.StepLead>
-        Show, hide, drag to reorder, and edit the words on each block. AMFI tagline, disclosures, and the footer
-        disclaimer stay locked.
+        Show, hide, drag to reorder, and edit the words on each block. Click a name to jump to it on the preview. AMFI
+        tagline, disclosures, and the footer disclaimer stay locked.
       </U.StepLead>
       <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
         <SortableContext items={sections.map((row) => row.id)} strategy={verticalListSortingStrategy}>
@@ -865,13 +899,21 @@ export function SectionsStep() {
                 id={row.id}
                 on={row.on}
                 open={openId === row.id}
-                onToggle={() => toggleSection(row.id)}
-                onEdit={() => setOpenId((cur) => (cur === row.id ? null : row.id))}
+                onToggle={() => {
+                  const turningOn = !row.on
+                  toggleSection(row.id)
+                  if (turningOn) useDraft.getState().focusPreview(SECTION_SPOT[row.id])
+                }}
+                onEdit={() => {
+                  setOpenId((cur) => (cur === row.id ? null : row.id))
+                  useDraft.getState().ensureSectionOn(row.id)
+                  useDraft.getState().focusPreview(SECTION_SPOT[row.id])
+                }}
               />
             ))}
           </U.SecList>
         </SortableContext>
       </DndContext>
-    </>
+    </div>
   )
 }

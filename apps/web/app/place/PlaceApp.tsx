@@ -68,9 +68,9 @@ function AddonsRail() {
 
 const ADDON_BLURB: Record<AddonId, string> = {
   tools:
-    "Extra investor calculators on the Calculators section. Preview shows them immediately. The live site only includes them after you pay.",
+    "Extra investor calculators on the Calculators section. They show in preview now, and on the live site once the site is published.",
   bilingual:
-    "English and Hindi on the site: header toggle, and Hindi fields in Details and Sections. Preview immediately; live after you pay.",
+    "English and Hindi on the site: header toggle, and Hindi fields in Details and Sections. They show in preview now, and on the live site once the site is published.",
 }
 
 const SALES_WA =
@@ -98,10 +98,19 @@ function CustomSiteBar({ dock }: { dock?: boolean }) {
 function FamilySwitch({ onBrowse }: { onBrowse: () => void }) {
   const family = useDraft((s) => s.config.family ?? "studio")
   const setFamily = useDraft((s) => s.setFamily)
+  const focusPreview = useDraft((s) => s.focusPreview)
   return (
     <U.Seg aria-label="Template">
       {familyIds.map((id) => (
-        <U.SegBtn key={id} type="button" $on={family === id} onClick={() => setFamily(id)}>
+        <U.SegBtn
+          key={id}
+          type="button"
+          $on={family === id}
+          onClick={() => {
+            setFamily(id)
+            focusPreview("top")
+          }}
+        >
           {familyMeta[id].name}
         </U.SegBtn>
       ))}
@@ -131,7 +140,7 @@ function SiteChrome() {
     <U.SiteChrome>
       {saveError ? (
         <U.SaveBtn type="button" $err onClick={() => void saveConfig(true)}>
-          Save failed — retry
+          {saveError}
         </U.SaveBtn>
       ) : saving ? (
         <U.SaveHint>Saving…</U.SaveHint>
@@ -228,8 +237,8 @@ function Editor() {
       ) : null}
       {status === "trial" ? (
         <U.TrialBanner>
-          Trial is live{trialUntil ? ` until ${trialUntil}` : ""}. Publish a plan to keep the site up and put
-          add-ons on the public URL.
+          Trial is live{trialUntil ? ` until ${trialUntil}` : ""}. Publish a plan to keep the site up after the
+          trial.
         </U.TrialBanner>
       ) : null}
       {status === "suspended" ? (
@@ -245,6 +254,7 @@ function Editor() {
                 type="button"
                 $on={s.id === step}
                 onClick={() => {
+                  void saveConfig(true)
                   setStep(s.id)
                   if (s.id === "publish") setPublishOpen(true)
                 }}
@@ -261,6 +271,7 @@ function Editor() {
                 <U.NextBtn
                   type="button"
                   onClick={() => {
+                    void saveConfig(true)
                     setStep(next)
                     if (next === "publish") setPublishOpen(true)
                   }}

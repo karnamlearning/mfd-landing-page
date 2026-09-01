@@ -17,7 +17,15 @@ export function FontStep() {
           const pair = fontPairs[id]
           const on = id === current
           return (
-            <U.FontCard key={id} type="button" $on={on} onClick={() => setFont(id)}>
+            <U.FontCard
+              key={id}
+              type="button"
+              $on={on}
+              onClick={() => {
+                setFont(id)
+                useDraft.getState().focusPreview("top")
+              }}
+            >
               <U.Aa $heading={pair.headingVar}>Aa</U.Aa>
               <U.FontMeta>
                 <U.FontName>{pair.name}</U.FontName>

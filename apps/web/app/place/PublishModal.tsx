@@ -66,6 +66,10 @@ export function PublishModal({ open, onClose }: { open: boolean; onClose: () => 
       onClose()
     } catch (err) {
       if (err instanceof Error && err.message === "dismissed") return
+      if (err instanceof Error && err.message === "save_failed") {
+        setError("Save your site first — some fields could not be stored. Fix the red save notice, then publish.")
+        return
+      }
       setError("Payment did not complete. Try again.")
     } finally {
       setBusy(false)

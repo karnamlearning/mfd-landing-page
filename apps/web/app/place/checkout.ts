@@ -53,7 +53,8 @@ async function confirm(body: Record<string, unknown>) {
 }
 
 export async function startCheckout(plan: CheckoutPlan): Promise<CheckoutOk> {
-  await saveConfig(true)
+  const saved = await saveConfig(true)
+  if (!saved) throw new Error("save_failed")
   const res = await fetch("/api/billing/checkout", {
     method: "POST",
     headers: { "content-type": "application/json" },

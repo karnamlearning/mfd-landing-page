@@ -31,8 +31,26 @@ export const STEPS = [
 export type StepId = (typeof STEPS)[number]["id"]
 export type Viewport = "mobile" | "desktop"
 export type TenantStatus = "draft" | "trial" | "active" | "suspended"
-
 export type TenantPlan = "monthly" | "yearly" | null
+
+export type PreviewSpot =
+  | "header"
+  | "top"
+  | "photo"
+  | "about"
+  | "credentials"
+  | "services"
+  | "stats"
+  | "how"
+  | "calculators"
+  | "testimonials"
+  | "faq"
+  | "contact"
+  | "whatsapp"
+
+export type PreviewFocus = { id: PreviewSpot; tick: number }
+
+let lastPreviewFocusAt = 0
 
 export type ServerDraft = {
   config: TenantConfig
@@ -61,9 +79,11 @@ type DraftState = {
   trialEndsAt: string | null
   publicUrl: string
   impersonating: boolean
+  previewFocus: PreviewFocus | null
   setStep: (step: StepId) => void
   setViewport: (viewport: Viewport) => void
   setPreviewOpen: (open: boolean) => void
+  focusPreview: (id: PreviewSpot) => void
   patchDetails: (patch: Partial<TenantDetails>) => void
   setFamily: (id: FamilyId, opts?: { look?: boolean }) => void
   setTemplate: (id: TemplateId) => void
@@ -101,9 +121,20 @@ export const useDraft = create<DraftState>((set) => ({
   trialEndsAt: null,
   publicUrl: "",
   impersonating: false,
+  previewFocus: null,
   setStep: (step) => set({ step }),
   setViewport: (viewport) => set({ viewport }),
   setPreviewOpen: (previewOpen) => set({ previewOpen }),
+  focusPreview: (id) =>
+    set((s) => {
+      const prev = s.previewFocus
+      if (prev?.id === id && Date.now() - lastPreviewFocusAt < 400) return s
+      lastPreviewFocusAt = Date.now()
+      return {
+        previewOpen: true,
+        previewFocus: { id, tick: (prev?.tick ?? 0) + 1 },
+      }
+    }),
   patchDetails: (patch) =>
     set((s) => ({
       config: { ...s.config, details: { ...s.config.details, ...patch } },

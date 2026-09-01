@@ -1,6 +1,22 @@
 import styled, { css } from "styled-components"
 import type { FamilyId, TemplateId } from "@mfd/schema"
 
+const PREVIEW_SPOTS = [
+  "header",
+  "top",
+  "photo",
+  "about",
+  "credentials",
+  "services",
+  "stats",
+  "how",
+  "calculators",
+  "testimonials",
+  "faq",
+  "contact",
+  "whatsapp",
+] as const
+
 export const Root = styled.div<{
   $heading: string
   $body: string
@@ -112,6 +128,32 @@ export const Root = styled.div<{
         border-radius: 0;
       }
     `}
+
+  [data-spot] {
+    scroll-margin-top: 4.75rem;
+    scroll-margin-bottom: 2rem;
+  }
+
+  @keyframes mfd-spot {
+    0% {
+      box-shadow: 0 0 0 0 ${({ theme }) => theme.primary}66;
+    }
+    100% {
+      box-shadow: 0 0 0 16px transparent;
+    }
+  }
+
+  ${({ theme }) =>
+    PREVIEW_SPOTS.map(
+      (id) => css`
+        &[data-preview-spot="${id}"] [data-spot="${id}"] {
+          outline: 3px solid ${theme.primary};
+          outline-offset: 6px;
+          box-shadow: 0 0 0 10px ${theme.primary}2e;
+          animation: mfd-spot 1.6s ease-out 1;
+        }
+      `,
+    )}
 `
 
 export const Wrap = styled.div`

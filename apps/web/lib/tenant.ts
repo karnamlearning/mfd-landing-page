@@ -1,6 +1,6 @@
 import "server-only"
 import { eq, tenants, type TenantRow } from "@mfd/db"
-import { isPhoneStubSlug, isReservedSlug, tenantConfigSchema, type TenantConfig } from "@mfd/schema"
+import { isPhoneStubSlug, isReservedSlug, pruneEmptyContent, tenantConfigSchema, type TenantConfig } from "@mfd/schema"
 import { getDb } from "./db"
 import { uniqueSlug } from "./slug"
 import { publicSiteUrl } from "./site-url"
@@ -76,10 +76,12 @@ export async function getTenantBySubId(subId: string) {
   return rows[0] ?? null
 }
 
-/** Unpaid Tools pack is preview-only. Public extras only when the tenant is paid-active. */
+/** Live site: strip add-ons only while the tenant is still a draft. */
 export function publicConfig(row: TenantRow): TenantConfig {
-  const config = tenantConfigSchema.parse(row.config)
-  if (row.status !== "active") return { ...config, slug: row.slug, addons: [] }
+  const config = pruneEmptyContent(tenantConfigSchema.parse(row.config))
+  if (row.status === "draft" || row.status === "suspended") {
+    return { ...config, slug: row.slug, addons: [] }
+  }
   return { ...config, slug: row.slug }
 }
 

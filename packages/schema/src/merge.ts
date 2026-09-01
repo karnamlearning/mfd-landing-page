@@ -5,6 +5,10 @@ function emptyStr(v: string | undefined) {
   return v == null || v.trim() === ""
 }
 
+function filled(v: string | undefined) {
+  return !emptyStr(v)
+}
+
 function mergeDetails(details: TenantDetails): TenantDetails {
   const s = sampleFill
   return {
@@ -27,8 +31,14 @@ function mergeDetails(details: TenantDetails): TenantDetails {
     languages: details.languages.length ? details.languages : s.languages,
     bio: emptyStr(details.bio) ? s.bio : details.bio,
     bioHi: emptyStr(details.bioHi) ? s.bioHi : details.bioHi,
-    credentials: details.credentials.length ? details.credentials : s.credentials,
-    stats: details.stats.length ? details.stats : s.stats,
+    credentials: (() => {
+      const rows = details.credentials.filter((r) => filled(r.label) && filled(r.name) && filled(r.number))
+      return rows.length ? rows : s.credentials
+    })(),
+    stats: (() => {
+      const rows = details.stats.filter((r) => filled(r.value) && filled(r.label))
+      return rows.length ? rows : s.stats
+    })(),
     hours: emptyStr(details.hours) ? s.hours : details.hours,
     arn: emptyStr(details.arn) ? s.arn : details.arn,
   }
@@ -40,7 +50,29 @@ export function mergeSample(config: TenantConfig, preview: boolean): TenantConfi
   return {
     ...config,
     details: mergeDetails(config.details),
-    testimonials: config.testimonials.length ? config.testimonials : sampleTestimonials,
-    faq: config.faq.length ? config.faq : sampleFaq,
+    testimonials: (() => {
+      const rows = config.testimonials.filter((r) => filled(r.quote) && filled(r.name))
+      return rows.length ? rows : sampleTestimonials
+    })(),
+    faq: (() => {
+      const rows = config.faq.filter((r) => filled(r.q) && filled(r.a))
+      return rows.length ? rows : sampleFaq
+    })(),
+  }
+}
+
+/** Drop unfinished editor rows so the live site never shows blank cards. */
+export function pruneEmptyContent(config: TenantConfig): TenantConfig {
+  return {
+    ...config,
+    details: {
+      ...config.details,
+      credentials: config.details.credentials.filter(
+        (r) => filled(r.label) && filled(r.name) && filled(r.number),
+      ),
+      stats: config.details.stats.filter((r) => filled(r.value) && filled(r.label)),
+    },
+    testimonials: config.testimonials.filter((r) => filled(r.quote) && filled(r.name)),
+    faq: config.faq.filter((r) => filled(r.q) && filled(r.a)),
   }
 }

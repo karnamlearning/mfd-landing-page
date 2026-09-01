@@ -289,7 +289,6 @@ export const Frame = styled.div<{ $desktop: boolean }>`
   border: 1px solid ${({ theme }) => theme.text}16;
   box-shadow: 0 18px 50px ${({ theme }) => theme.text}14;
   overscroll-behavior: contain;
-  scroll-behavior: smooth;
   ${({ $desktop }) =>
     $desktop
       ? css`
@@ -394,6 +393,36 @@ export const LabelRow = styled.div`
   align-items: center;
   justify-content: space-between;
   gap: 0.5rem;
+`
+
+export const LabelLeft = styled.span`
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-width: 0;
+`
+
+export const ShowBtn = styled.button`
+  display: inline-flex;
+  align-items: center;
+  gap: 0.28rem;
+  flex-shrink: 0;
+  border: 0;
+  cursor: pointer;
+  background: transparent;
+  color: ${({ theme }) => theme.primary};
+  font: inherit;
+  font-size: 0.68rem;
+  font-weight: 650;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 0.12rem 0.15rem;
+  border-radius: 6px;
+
+  &:hover {
+    text-decoration: underline;
+    text-underline-offset: 0.14em;
+  }
 `
 
 export const SampleTag = styled.span`
@@ -550,8 +579,16 @@ export const Group = styled.div`
   border-top: 1px solid ${({ theme }) => theme.text}10;
 `
 
+export const GroupHead = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+`
+
 export const GroupTitle = styled.h3`
-  margin: 0 0 0.75rem;
+  margin: 0;
   font-size: 0.78rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -914,12 +951,23 @@ export const Handle = styled.button`
   touch-action: none;
 `
 
-export const SecName = styled.span`
+export const SecName = styled.button`
   flex: 1;
   min-width: 0;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
   font-size: 0.84rem;
   font-weight: 550;
   color: ${({ theme }) => theme.text};
+
+  &:hover {
+    text-decoration: underline;
+    text-underline-offset: 0.16em;
+  }
 `
 
 export const IconBtn = styled.button<{ $muted?: boolean }>`

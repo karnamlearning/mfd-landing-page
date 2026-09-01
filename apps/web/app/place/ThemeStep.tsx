@@ -17,7 +17,15 @@ export function ThemeStep() {
           const theme = themes[id]
           const on = id === current
           return (
-            <U.Swatch key={id} type="button" $on={on} onClick={() => setTheme(id)}>
+            <U.Swatch
+              key={id}
+              type="button"
+              $on={on}
+              onClick={() => {
+                setTheme(id)
+                useDraft.getState().focusPreview("top")
+              }}
+            >
               <U.SwatchChips>
                 <U.SwatchChip $c={theme.bg} />
                 <U.SwatchChip $c={theme.surface} />

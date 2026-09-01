@@ -52,12 +52,29 @@ function heroLayout(family: FamilyId, tpl: TemplateId): "split" | "overlay" | "c
   return "overlay"
 }
 
+export type PreviewSpotId =
+  | "header"
+  | "top"
+  | "photo"
+  | "about"
+  | "credentials"
+  | "services"
+  | "stats"
+  | "how"
+  | "calculators"
+  | "testimonials"
+  | "faq"
+  | "contact"
+  | "whatsapp"
+
 export type SiteProps = {
   config: TenantConfig
   /** When true, empty fields are filled from sampleFill. Never true on the public host. */
   preview?: boolean
   /** Nested in Buyer Place — do not paint document `body`. */
   embedded?: boolean
+  /** Buyer Place: scroll + highlight this block when the tick changes. */
+  previewFocus?: { id: PreviewSpotId; tick: number } | null
   children?: ReactNode
 }
 
@@ -87,14 +104,14 @@ function Header({ ctx, locale, onLocale }: { ctx: Ctx; locale: Locale; onLocale:
   const links = [
     { id: "about" as const, href: "/#about", label: t.about },
     { id: "services" as const, href: "/#services", label: t.services },
-    { id: "calculators" as const, href: "/calculators", label: t.calculators },
+    { id: "calculators" as const, href: "/#calculators", label: t.calculators },
     { id: "contact" as const, href: "/#contact", label: t.contact },
   ].filter((l) => on.has(l.id))
   const menuLinks = [
     { id: "about" as const, href: "/#about", label: t.about },
     { id: "services" as const, href: "/#services", label: t.services },
     { id: "how" as const, href: "/#how", label: t.howNav },
-    { id: "calculators" as const, href: "/calculators", label: t.calculators },
+    { id: "calculators" as const, href: "/#calculators", label: t.calculators },
     { id: "testimonials" as const, href: "/#testimonials", label: t.quotesNav },
     { id: "faq" as const, href: "/#faq", label: t.faqNav },
     { id: "contact" as const, href: "/#contact", label: t.contact },
@@ -105,7 +122,7 @@ function Header({ ctx, locale, onLocale }: { ctx: Ctx; locale: Locale; onLocale:
   }, [previewPath])
 
   return (
-    <S.HeaderBar>
+    <S.HeaderBar data-spot="header">
       <S.HeaderInner>
         <S.MenuBtn type="button" aria-label={t.menu} aria-expanded={menu} onClick={() => setMenu((v) => !v)}>
           {menu ? <FiX size={18} /> : <FiMenu size={18} />}
@@ -171,9 +188,11 @@ function HeroSection({ ctx }: { ctx: Ctx }) {
   const layout = heroLayout(family, tpl)
   const src = tpl === "solo" || family === "folio" ? d.photoUrl || d.heroImageUrl : d.heroImageUrl || d.photoUrl
 
+  const photoInHero = tpl === "solo" || family === "folio"
+
   return (
-    <S.Hero id="top" $template={tpl} $layout={layout}>
-      {src ? <S.HeroImg src={src} alt="" $layout={layout} /> : null}
+    <S.Hero id="top" data-spot="top" $template={tpl} $layout={layout}>
+      {src ? <S.HeroImg src={src} alt="" $layout={layout} data-spot={photoInHero ? "photo" : undefined} /> : null}
       {layout !== "split" ? <S.HeroShade /> : null}
       <S.HeroCopy $layout={layout}>
         <S.Eyebrow>{d.city}</S.Eyebrow>
@@ -199,7 +218,7 @@ function AboutSection({ ctx }: { ctx: Ctx }) {
   const bio = locale === "hi" && d.bioHi ? d.bioHi : d.bio
   const langs = d.languages.filter(Boolean).join(" · ")
   return (
-    <S.Section id="about">
+    <S.Section id="about" data-spot="about">
       <S.Wrap>
         <S.AboutGrid>
           <div>
@@ -215,7 +234,7 @@ function AboutSection({ ctx }: { ctx: Ctx }) {
             ) : null}
           </div>
           {config.template !== "solo" && config.family !== "folio" && d.photoUrl ? (
-            <S.Portrait src={d.photoUrl} alt={d.name} />
+            <S.Portrait src={d.photoUrl} alt={d.name} data-spot="photo" />
           ) : null}
         </S.AboutGrid>
         <S.Kicker style={{ marginTop: "2rem" }}>{t.about}</S.Kicker>
@@ -237,7 +256,7 @@ function CredentialsSection({ ctx }: { ctx: Ctx }) {
   const { config, t } = ctx
   if (!config.details.credentials.length) return null
   return (
-    <S.Section id="credentials">
+    <S.Section id="credentials" data-spot="credentials">
       <S.Wrap>
         <S.Kicker>{t.registration}</S.Kicker>
         <S.H2>{ctx.b.recordTitle}</S.H2>
@@ -265,7 +284,7 @@ function ServicesSection({ ctx }: { ctx: Ctx }) {
   const { config, t, b, locale } = ctx
   const list = (config.family ?? "studio") === "folio"
   return (
-    <S.Section id="services">
+    <S.Section id="services" data-spot="services">
       <S.Wrap>
         <S.Kicker>{t.services}</S.Kicker>
         <S.H2>{b.servicesTitle}</S.H2>
@@ -297,7 +316,7 @@ function StatsSection({ ctx }: { ctx: Ctx }) {
   const stats = ctx.config.details.stats
   if (!stats.length) return null
   return (
-    <S.Section id="stats">
+    <S.Section id="stats" data-spot="stats">
       <S.Wrap>
         <S.StatRow>
           {stats.map((s) => (
@@ -315,7 +334,7 @@ function StatsSection({ ctx }: { ctx: Ctx }) {
 function HowSection({ ctx }: { ctx: Ctx }) {
   const { t, b } = ctx
   return (
-    <S.Section id="how">
+    <S.Section id="how" data-spot="how">
       <S.Wrap>
         <S.Kicker>{t.howKicker}</S.Kicker>
         <S.H2>{b.howTitle}</S.H2>
@@ -342,7 +361,7 @@ function CalculatorsSection({ ctx }: { ctx: Ctx }) {
   const showSip = visible.includes("sip")
 
   return (
-    <S.Section id="calculators">
+    <S.Section id="calculators" data-spot="calculators">
       <S.Wrap>
         <S.Kicker>{t.planning}</S.Kicker>
         <S.H2>{ctx.b.calcTitle}</S.H2>
@@ -377,7 +396,7 @@ function TestimonialsSection({ ctx }: { ctx: Ctx }) {
   const t = ctx.t
   if (!items.length) return null
   return (
-    <S.Section id="testimonials">
+    <S.Section id="testimonials" data-spot="testimonials">
       <S.Wrap>
         <S.Kicker>{t.quotesKicker}</S.Kicker>
         <S.H2>{ctx.b.quotesTitle}</S.H2>
@@ -400,7 +419,7 @@ function FaqSection({ ctx }: { ctx: Ctx }) {
   const { config, locale, t } = ctx
   if (!config.faq.length) return null
   return (
-    <S.Section id="faq">
+    <S.Section id="faq" data-spot="faq">
       <S.Wrap>
         <S.Kicker>{t.faqKicker}</S.Kicker>
         <S.H2>{ctx.b.faqTitle}</S.H2>
@@ -460,7 +479,7 @@ function ContactSection({ ctx }: { ctx: Ctx }) {
   }
 
   return (
-    <S.Section id="contact">
+    <S.Section id="contact" data-spot="contact">
       <S.Wrap>
         <S.ContactGrid>
           <div>
@@ -536,7 +555,7 @@ function ContactSection({ ctx }: { ctx: Ctx }) {
 
 function WhatsappStrip({ ctx }: { ctx: Ctx }) {
   return (
-    <S.Strip href={ctx.wa} target="_blank" rel="noreferrer">
+    <S.Strip id="whatsapp" data-spot="whatsapp" href={ctx.wa} target="_blank" rel="noreferrer">
       <FaWhatsapp size={18} aria-hidden />
       {ctx.t.wa} {ctx.config.details.name}
     </S.Strip>
@@ -613,10 +632,11 @@ function PreviewInner({ path, ctx }: { path: string; ctx: Ctx }) {
   return null
 }
 
-export function Site({ config, preview = false, embedded = false, children }: SiteProps) {
+export function Site({ config, preview = false, embedded = false, previewFocus = null, children }: SiteProps) {
   const resolved = mergeSample(config, preview)
   const [locale, setLocale] = useState<Locale>("en")
   const [nav, setNav] = useState({ path: "/", hash: "top", tick: 0 })
+  const [spot, setSpot] = useState<PreviewSpotId | null>(null)
   const rootRef = useRef<HTMLDivElement>(null)
   const theme = getTheme(resolved.theme)
   const font = fontPairs[resolved.font]
@@ -638,8 +658,38 @@ export function Site({ config, preview = false, embedded = false, children }: Si
     if (!embedded) return
     const root = rootRef.current
     if (!root) return
-    scrollSiteTo(root, nav.hash || "top")
+    const id =
+      nav.hash ||
+      (nav.path.startsWith("/calculators") ? "calculators" : nav.path === "/" ? "top" : "")
+    if (!id) return
+    scrollSiteTo(root, id)
   }, [embedded, nav.hash, nav.path, nav.tick])
+
+  useLayoutEffect(() => {
+    if (!embedded || !previewFocus) return
+    if (nav.path !== "/") {
+      setSpot(previewFocus.id)
+      setNav({
+        path: "/",
+        hash: previewFocus.id === "header" ? "top" : previewFocus.id,
+        tick: previewFocus.tick,
+      })
+      return
+    }
+    const root = rootRef.current
+    if (!root) return
+    setSpot(previewFocus.id)
+    const run = () => scrollSiteTo(root, previewFocus.id)
+    run()
+    const raf = requestAnimationFrame(run)
+    const later = window.setTimeout(run, 80)
+    const t = window.setTimeout(() => setSpot(null), 3200)
+    return () => {
+      cancelAnimationFrame(raf)
+      window.clearTimeout(later)
+      window.clearTimeout(t)
+    }
+  }, [embedded, previewFocus, nav.path])
 
   function onPreviewClick(e: MouseEvent<HTMLDivElement>) {
     if (!embedded) return
@@ -651,7 +701,9 @@ export function Site({ config, preview = false, embedded = false, children }: Si
     e.preventDefault()
     e.stopPropagation()
     const path = parsed.path
-    const hash = parsed.hash || (path === "/" ? "top" : "top")
+    const hash =
+      parsed.hash ||
+      (path === "/" ? "top" : path.startsWith("/calculators") ? "calculators" : "")
     setNav((s) => ({ path, hash, tick: s.tick + 1 }))
   }
 
@@ -683,6 +735,7 @@ export function Site({ config, preview = false, embedded = false, children }: Si
         $template={resolved.template}
         $family={resolved.family ?? "studio"}
         $embedded={embedded}
+        data-preview-spot={spot ?? undefined}
         onClickCapture={onPreviewClick}
       >
         <GlobalStyle $embedded={embedded} />

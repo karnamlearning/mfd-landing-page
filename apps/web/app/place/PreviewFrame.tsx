@@ -9,6 +9,7 @@ export function PreviewFrame() {
   const config = useDraft((s) => s.config)
   const viewport = useDraft((s) => s.viewport)
   const previewOpen = useDraft((s) => s.previewOpen)
+  const previewFocus = useDraft((s) => s.previewFocus)
 
   function onClick(e: MouseEvent) {
     const a = (e.target as HTMLElement).closest("a")
@@ -20,8 +21,8 @@ export function PreviewFrame() {
 
   return (
     <U.Stage $open={previewOpen}>
-      <U.Frame $desktop={viewport === "desktop"} onClick={onClick}>
-        <Site config={config} preview embedded />
+      <U.Frame data-preview-frame $desktop={viewport === "desktop"} onClick={onClick}>
+        <Site config={config} preview embedded previewFocus={previewFocus} />
       </U.Frame>
     </U.Stage>
   )

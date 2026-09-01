@@ -34,40 +34,54 @@ export function parseInternalHref(href: string): { path: string; hash: string } 
   }
 }
 
+function canScroll(node: HTMLElement) {
+  const { overflowY } = getComputedStyle(node)
+  return (overflowY === "auto" || overflowY === "scroll" || overflowY === "overlay") && node.scrollHeight > node.clientHeight + 1
+}
+
 function nearestScroller(start: Element): HTMLElement | null {
-  let node: HTMLElement | null = start.parentElement
+  let node: HTMLElement | null = start instanceof HTMLElement ? start : start.parentElement
   while (node) {
-    const { overflowY } = getComputedStyle(node)
-    if ((overflowY === "auto" || overflowY === "scroll" || overflowY === "overlay") && node.scrollHeight > node.clientHeight + 1) {
-      return node
-    }
+    if (canScroll(node)) return node
     node = node.parentElement
   }
   return null
 }
 
+function pickScroller(from: Element, root: Element): HTMLElement | null {
+  const frame = from.closest("[data-preview-frame]")
+  if (frame instanceof HTMLElement && canScroll(frame)) return frame
+  if (root instanceof HTMLElement && canScroll(root)) return root
+  return nearestScroller(from)
+}
+
 /** Scroll to a section inside the site — works in Buyer Place’s overflow frame and on the public page. */
 export function scrollSiteTo(from: Element, id: string) {
-  const root = from.closest("[data-site-root]") ?? document
-  const header = root.querySelector("header")
-  const offset = header instanceof HTMLElement ? header.getBoundingClientRect().height + 10 : 10
-  const scroller = nearestScroller(from)
+  const root = from.closest("[data-site-root]") ?? from
+  const scroller = pickScroller(from, root)
+  const behavior: ScrollBehavior = from.closest("[data-preview-frame]") ? "auto" : "smooth"
 
-  if (id === "top") {
-    if (scroller) scroller.scrollTo({ top: 0, behavior: "smooth" })
-    else window.scrollTo({ top: 0, behavior: "smooth" })
+  if (id === "header") {
+    if (scroller) scroller.scrollTo({ top: 0, behavior })
+    else window.scrollTo({ top: 0, behavior })
     return
   }
 
-  const el = root.querySelector(`#${CSS.escape(id)}`)
-  if (!(el instanceof HTMLElement)) return
+  const el =
+    root.querySelector(`[data-spot="${CSS.escape(id)}"]`) ??
+    (id === "top" || id === "photo" ? null : root.querySelector(`#${CSS.escape(id)}`))
 
-  if (scroller) {
-    const top = el.getBoundingClientRect().top - scroller.getBoundingClientRect().top + scroller.scrollTop - offset
-    scroller.scrollTo({ top: Math.max(0, top), behavior: "smooth" })
+  if (!(el instanceof HTMLElement)) {
+    if (id === "top" || id === "photo") {
+      if (scroller) scroller.scrollTo({ top: 0, behavior })
+      else window.scrollTo({ top: 0, behavior })
+    }
     return
   }
 
-  const top = el.getBoundingClientRect().top + window.scrollY - offset
-  window.scrollTo({ top: Math.max(0, top), behavior: "smooth" })
+  el.scrollIntoView({
+    behavior,
+    block: "start",
+    inline: "nearest",
+  })
 }

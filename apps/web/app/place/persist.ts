@@ -56,7 +56,12 @@ export async function saveConfig(immediate = false) {
 export function usePersistDraft() {
   const hydrated = useDraft((s) => s.hydrated)
   const config = useDraft((s) => s.config)
-  const prevLook = useRef({ template: config.template, theme: config.theme, font: config.font })
+  const prevLook = useRef({
+    template: config.template,
+    theme: config.theme,
+    font: config.font,
+    addons: config.addons.join(","),
+  })
   const skip = useRef(true)
 
   useEffect(() => {
@@ -64,16 +69,28 @@ export function usePersistDraft() {
     if (skip.current) {
       skip.current = false
       lastSaved = snapshot(config)
-      prevLook.current = { template: config.template, theme: config.theme, font: config.font }
+      prevLook.current = {
+        template: config.template,
+        theme: config.theme,
+        font: config.font,
+        addons: config.addons.join(","),
+      }
       return
     }
     if (snapshot(config) === lastSaved) return
     useDraft.setState({ dirty: true })
+    const key = config.addons.join(",")
     const instant =
       prevLook.current.template !== config.template ||
       prevLook.current.theme !== config.theme ||
-      prevLook.current.font !== config.font
-    prevLook.current = { template: config.template, theme: config.theme, font: config.font }
+      prevLook.current.font !== config.font ||
+      prevLook.current.addons !== key
+    prevLook.current = {
+      template: config.template,
+      theme: config.theme,
+      font: config.font,
+      addons: key,
+    }
     void saveConfig(instant)
   }, [hydrated, config])
 }

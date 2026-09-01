@@ -3,7 +3,8 @@
 import { useEffect, useState } from "react"
 import { ThemeProvider } from "styled-components"
 import { FiCopy, FiEye, FiExternalLink, FiMonitor, FiSmartphone } from "react-icons/fi"
-import { isPhoneStubSlug } from "@mfd/schema"
+import { FaWhatsapp } from "react-icons/fa6"
+import { ADDON_LABEL, ADDON_PRICE, addonIds, formatInr, isPhoneStubSlug, type AddonId } from "@mfd/schema"
 import { themes } from "@mfd/tokens"
 import { DetailsStep } from "./DetailsStep"
 import { FontStep } from "./FontStep"
@@ -40,22 +41,56 @@ function StepBody({ onOpenPublish }: { onOpenPublish: () => void }) {
 }
 
 function AddonsRail() {
-  const on = useDraft((s) => s.config.addons.includes("tools"))
-  const setToolsPack = useDraft((s) => s.setToolsPack)
+  const addons = useDraft((s) => s.config.addons)
+  const setAddon = useDraft((s) => s.setAddon)
   return (
     <U.Rail>
       <U.RailKicker>Add-ons</U.RailKicker>
-      <U.AddonCard $on={on}>
-        <U.AddonName>Tools pack</U.AddonName>
-        <U.AddonCopy>
-          Extra investor calculators on the Calculators section. Preview shows them immediately.
-          The live site only includes them after you pay.
-        </U.AddonCopy>
-        <U.AddonBtn type="button" $on={on} onClick={() => setToolsPack(!on)}>
-          {on ? "Remove" : "Add"}
-        </U.AddonBtn>
-      </U.AddonCard>
+      {addonIds.map((id) => {
+        const on = addons.includes(id)
+        return (
+          <U.AddonCard key={id} $on={on}>
+            <U.AddonName>{ADDON_LABEL[id]}</U.AddonName>
+            <U.AddonCopy>{ADDON_BLURB[id]}</U.AddonCopy>
+            <U.AddonPrice>
+              +{formatInr(ADDON_PRICE[id].monthly)} / month · +{formatInr(ADDON_PRICE[id].yearly)} / year
+            </U.AddonPrice>
+            <U.AddonBtn type="button" $on={on} onClick={() => setAddon(id, !on)}>
+              {on ? "Remove" : "Add"}
+            </U.AddonBtn>
+          </U.AddonCard>
+        )
+      })}
     </U.Rail>
+  )
+}
+
+const ADDON_BLURB: Record<AddonId, string> = {
+  tools:
+    "Extra investor calculators on the Calculators section. Preview shows them immediately. The live site only includes them after you pay.",
+  bilingual:
+    "English and Hindi on the site: header toggle, and Hindi fields in Details and Sections. Preview immediately; live after you pay.",
+}
+
+const SALES_WA =
+  "https://wa.me/919611235245?text=" +
+  encodeURIComponent("Hi Advisorkhoj — I need a custom MFD site beyond Buyer Place.")
+
+function CustomSiteBar() {
+  return (
+    <U.CustomBar>
+      <U.CustomCopy>
+        <strong>Want a custom site?</strong>
+        <U.CustomMore>
+          {" "}
+          Extra pages, a unique layout, or work this builder doesn’t cover — we’ll build it for you.
+        </U.CustomMore>
+      </U.CustomCopy>
+      <U.CustomCta href={SALES_WA} target="_blank" rel="noreferrer">
+        <FaWhatsapp size={14} aria-hidden />
+        Talk to us
+      </U.CustomCta>
+    </U.CustomBar>
   )
 }
 
@@ -164,7 +199,7 @@ function Editor() {
       {status === "trial" ? (
         <U.TrialBanner>
           Trial is live{trialUntil ? ` until ${trialUntil}` : ""}. Publish a plan to keep the site up and put
-          Tools pack on the public URL.
+          add-ons on the public URL.
         </U.TrialBanner>
       ) : null}
       {status === "suspended" ? (
@@ -209,6 +244,7 @@ function Editor() {
         <PreviewFrame />
         <AddonsRail />
       </U.Body>
+      <CustomSiteBar />
       <PublishModal open={publishOpen} onClose={() => setPublishOpen(false)} />
     </U.Shell>
   )

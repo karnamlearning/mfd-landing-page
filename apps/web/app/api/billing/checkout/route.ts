@@ -1,4 +1,5 @@
 import { eq, tenants } from "@mfd/db"
+import { planTotal } from "@mfd/schema"
 import { json, requireSession } from "@/lib/auth"
 import { billingDev, type PlanId } from "@/lib/billing"
 import { getDb } from "@/lib/db"
@@ -37,7 +38,7 @@ export async function POST(req: Request) {
   if (billingDev()) {
     const subId = `sub_dev_${row.id}_${plan}`
     await db.update(tenants).set({ plan: plan as PlanId, razorpaySubId: subId }).where(eq(tenants.id, row.id))
-    console.info(`[billing] tenant=${row.id} checkout dev plan=${plan}`)
+    console.info(`[billing] tenant=${row.id} checkout dev plan=${plan} addons=${locked.config.addons.join(",") || "none"} amount=${planTotal(plan, locked.config.addons)}`)
     return json({ mode: "dev" as const, plan, subscriptionId: subId })
   }
 
@@ -46,9 +47,10 @@ export async function POST(req: Request) {
       plan,
       tenantId: row.id,
       email: row.ownerEmail,
+      addons: locked.config.addons,
     })
     await db.update(tenants).set({ plan, razorpaySubId: sub.id }).where(eq(tenants.id, row.id))
-    console.info(`[billing] tenant=${row.id} checkout sub=${sub.id} plan=${plan}`)
+    console.info(`[billing] tenant=${row.id} checkout sub=${sub.id} plan=${plan} addons=${locked.config.addons.join(",") || "none"} amount=${planTotal(plan, locked.config.addons)}`)
     return json({
       mode: "razorpay" as const,
       plan,

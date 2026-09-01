@@ -151,6 +151,8 @@ export const Body = styled.div`
     flex-direction: column;
     overflow: auto;
   }
+
+  padding-bottom: 4.5rem;
 `
 
 export const Left = styled.aside`
@@ -330,6 +332,10 @@ export const AddonCard = styled.article<{ $on: boolean }>`
   border-radius: 14px;
   border: 1px solid ${({ $on, theme }) => ($on ? theme.primary : `${theme.text}16`)};
   background: ${({ theme }) => theme.bg};
+
+  & + & {
+    margin-top: 0.75rem;
+  }
 `
 
 export const AddonName = styled.h3`
@@ -339,10 +345,18 @@ export const AddonName = styled.h3`
 `
 
 export const AddonCopy = styled.p`
-  margin: 0 0 0.85rem;
+  margin: 0 0 0.45rem;
   font-size: 0.78rem;
   line-height: 1.45;
   color: ${({ theme }) => theme.muted};
+`
+
+export const AddonPrice = styled.p`
+  margin: 0 0 0.85rem;
+  font-size: 0.72rem;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+  color: ${({ theme }) => theme.text};
 `
 
 export const AddonBtn = styled.button<{ $on: boolean }>`
@@ -811,6 +825,11 @@ export const IconBtn = styled.button<{ $muted?: boolean }>`
 export const Nested = styled.div`
   padding: 0 0.65rem 0.7rem;
   border-top: 1px solid ${({ theme }) => theme.text}0d;
+
+  > ${Hint} {
+    display: block;
+    margin: 0.55rem 0 0.7rem;
+  }
 `
 
 export const Tick = styled.button<{ $on: boolean }>`
@@ -1043,6 +1062,32 @@ export const PlanIncludes = styled.p`
   }
 `
 
+export const PlanBreak = styled.dl`
+  margin: 0.85rem 0 0;
+  padding: 0.75rem 0.8rem;
+  border-radius: 12px;
+  background: ${({ theme }) => theme.bg};
+  border: 1px solid ${({ theme }) => theme.text}12;
+`
+
+export const PlanBreakRow = styled.div<{ $total?: boolean }>`
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+  font-size: ${({ $total }) => ($total ? "0.88rem" : "0.78rem")};
+  font-weight: ${({ $total }) => ($total ? 650 : 500)};
+  color: ${({ $total, theme }) => ($total ? theme.text : theme.muted)};
+  padding-top: ${({ $total }) => ($total ? "0.55rem" : "0")};
+  margin-top: ${({ $total }) => ($total ? "0.55rem" : "0.35rem")};
+  border-top: ${({ $total, theme }) => ($total ? `1px solid ${theme.text}12` : "none")};
+
+  &:first-child {
+    margin-top: 0;
+    padding-top: 0;
+  }
+`
+
 export const ModalGst = styled.div`
   margin-top: 0.95rem;
   display: flex;
@@ -1249,4 +1294,66 @@ export const LeadTable = styled.table`
   td:last-child {
     white-space: nowrap;
   }
+`
+
+export const CustomBar = styled.div`
+  position: fixed;
+  left: 50%;
+  bottom: max(0.85rem, env(safe-area-inset-bottom));
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: min(40rem, calc(100vw - 1.5rem));
+  transform: translateX(-50%);
+  padding: 0.65rem 0.7rem 0.65rem 1rem;
+  border-radius: 16px;
+  background: ${({ theme }) => theme.surface};
+  color: ${({ theme }) => theme.text};
+  border: 1px solid ${({ theme }) => theme.text}16;
+  box-shadow:
+    0 1px 0 ${({ theme }) => theme.text}0a,
+    0 16px 40px ${({ theme }) => theme.text}24;
+
+  @media (max-width: 560px) {
+    width: calc(100vw - 1rem);
+    padding: 0.6rem 0.65rem 0.6rem 0.85rem;
+  }
+`
+
+export const CustomCopy = styled.p`
+  margin: 0;
+  flex: 1;
+  min-width: 0;
+  font-size: 0.8rem;
+  line-height: 1.4;
+
+  strong {
+    font-weight: 650;
+    letter-spacing: -0.02em;
+  }
+`
+
+export const CustomMore = styled.span`
+  color: ${({ theme }) => theme.muted};
+
+  @media (max-width: 640px) {
+    display: none;
+  }
+`
+
+export const CustomCta = styled.a`
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex-shrink: 0;
+  border: 0;
+  border-radius: 999px;
+  padding: 0.45rem 0.85rem;
+  font-size: 0.78rem;
+  font-weight: 650;
+  background: ${({ theme }) => theme.primary};
+  color: ${({ theme }) => theme.btnText};
+  text-decoration: none;
+  white-space: nowrap;
 `

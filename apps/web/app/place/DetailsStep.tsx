@@ -87,7 +87,7 @@ function AssetField({
 
 export function DetailsStep() {
   const details = useDraft((s) => s.config.details)
-  const local = useDraft((s) => s.config.template === "local")
+  const bilingual = useDraft((s) => s.config.addons.includes("bilingual"))
   const patch = useDraft((s) => s.patchDetails)
   const [langDraft, setLangDraft] = useState("")
   const d = details
@@ -273,7 +273,7 @@ export function DetailsStep() {
           <U.Hint>Do not use “financial planner”, “financial planning”, “guaranteed”, or “assured returns”.</U.Hint>
           {bioWarn ? <U.Warn>That phrase is risky under AMFI rules — consider rephrasing.</U.Warn> : null}
         </U.Field>
-        {local ? (
+        {bilingual ? (
           <U.Field>
             Bio (Hindi)
             <U.Area rows={3} maxLength={400} value={d.bioHi ?? ""} onChange={(e) => set("bioHi", e.target.value)} />

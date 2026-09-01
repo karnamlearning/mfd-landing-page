@@ -2,41 +2,34 @@
 
 import { useEffect, useState } from "react"
 import { FiCheck, FiX } from "react-icons/fi"
+import {
+  ADDON_LABEL,
+  BASE_PRICE,
+  addonDelta,
+  formatInr,
+  planTotal,
+  type AddonId,
+} from "@mfd/schema"
 import { startCheckout, type CheckoutPlan } from "./checkout"
 import { saveConfig } from "./persist"
 import { useDraft } from "./store"
 import * as U from "./styles"
 
-const PLANS: {
-  id: CheckoutPlan
-  name: string
-  price: string
-  period: string
-  note: string
-  tag?: string
-}[] = [
-  {
-    id: "yearly",
-    name: "Yearly",
-    price: "₹2,999",
-    period: "per year",
-    note: "₹250 / month · two months free",
-    tag: "Best value",
-  },
-  {
-    id: "monthly",
-    name: "Monthly",
-    price: "₹299",
-    period: "per month",
-    note: "About ₹10 a day",
-  },
-]
+function planNote(id: CheckoutPlan, total: number, addons: readonly string[]) {
+  if (id === "yearly") {
+    return addons.length
+      ? `${formatInr(Math.round(total / 12))} / month billed yearly`
+      : "₹250 / month · two months free"
+  }
+  return addons.length ? "Billed each month" : "About ₹10 a day"
+}
 
 export function PublishModal({ open, onClose }: { open: boolean; onClose: () => void }) {
   const status = useDraft((s) => s.status)
   const currentPlan = useDraft((s) => s.plan)
   const publicUrl = useDraft((s) => s.publicUrl)
   const gstin = useDraft((s) => s.config.details.gstin ?? "")
+  const addons = useDraft((s) => s.config.addons)
   const patchDetails = useDraft((s) => s.patchDetails)
   const applyServer = useDraft((s) => s.applyServer)
   const [plan, setPlan] = useState<CheckoutPlan>(currentPlan ?? "yearly")
@@ -45,6 +38,8 @@ export function PublishModal({ open, onClose }: { open: boolean; onClose: () => 
   const [gstOpen, setGstOpen] = useState(Boolean(gstin))
   const live = status === "active"
   const host = publicUrl.replace(/^https?:\/\//, "")
+  const extras = addons.filter((id): id is AddonId => id === "tools" || id === "bilingual")
+  const total = planTotal(plan, extras)
 
   useEffect(() => {
     if (!open) return
@@ -79,8 +74,6 @@ export function PublishModal({ open, onClose }: { open: boolean; onClose: () => 
 
   if (!open) return null
 
-  const selected = PLANS.find((p) => p.id === plan) ?? PLANS[0]
-
   return (
     <U.ModalScrim
       onClick={() => {
@@ -111,24 +104,25 @@ export function PublishModal({ open, onClose }: { open: boolean; onClose: () => 
         </U.ModalLead>
 
         <U.PlanGrid>
-          {PLANS.map((item) => {
-            const on = plan === item.id
+          {(["yearly", "monthly"] as const).map((id) => {
+            const on = plan === id
+            const amount = planTotal(id, extras)
             return (
               <U.PlanCard
-                key={item.id}
+                key={id}
                 type="button"
                 $on={on}
                 disabled={live}
                 aria-pressed={on}
-                onClick={() => setPlan(item.id)}
+                onClick={() => setPlan(id)}
               >
                 <U.PlanHead>
-                  <U.PlanName>{item.name}</U.PlanName>
-                  {item.tag ? <U.PlanTag $on={on}>{item.tag}</U.PlanTag> : null}
+                  <U.PlanName>{id === "yearly" ? "Yearly" : "Monthly"}</U.PlanName>
+                  {id === "yearly" ? <U.PlanTag $on={on}>Best value</U.PlanTag> : null}
                 </U.PlanHead>
-                <U.PlanPrice>{item.price}</U.PlanPrice>
-                <U.PlanPeriod>{item.period}</U.PlanPeriod>
-                <U.PlanNote>{item.note}</U.PlanNote>
+                <U.PlanPrice>{formatInr(amount)}</U.PlanPrice>
+                <U.PlanPeriod>{id === "yearly" ? "per year" : "per month"}</U.PlanPeriod>
+                <U.PlanNote>{planNote(id, amount, extras)}</U.PlanNote>
                 <U.PlanMark $on={on} aria-hidden>
                   {on ? <FiCheck size={14} /> : null}
                 </U.PlanMark>
@@ -139,8 +133,27 @@ export function PublishModal({ open, onClose }: { open: boolean; onClose: () => 
 
         <U.PlanIncludes>
           <FiCheck size={14} aria-hidden />
-          Branded site, lead inbox, and calculators on both plans.
+          Branded site, lead inbox, and base calculators on both plans.
         </U.PlanIncludes>
+
+        <U.PlanBreak>
+          <U.PlanBreakRow>
+            <span>Site</span>
+            <span>{formatInr(BASE_PRICE[plan])}</span>
+          </U.PlanBreakRow>
+          {extras.map((id) => (
+            <U.PlanBreakRow key={id}>
+              <span>{ADDON_LABEL[id]}</span>
+              <span>+{formatInr(addonDelta(id, plan))}</span>
+            </U.PlanBreakRow>
+          ))}
+          <U.PlanBreakRow $total>
+            <span>Total</span>
+            <span>
+              {formatInr(total)} {plan === "yearly" ? "/ year" : "/ month"}
+            </span>
+          </U.PlanBreakRow>
+        </U.PlanBreak>
 
         {gstOpen ? (
           <U.ModalGst>
@@ -169,7 +182,9 @@ export function PublishModal({ open, onClose }: { open: boolean; onClose: () => 
         ) : (
           <>
             <U.ModalCta type="button" disabled={busy} onClick={() => void pay()}>
-              {busy ? "Opening checkout…" : `Publish · ${selected.price} ${selected.period}`}
+              {busy
+                ? "Opening checkout…"
+                : `Publish · ${formatInr(total)} ${plan === "yearly" ? "per year" : "per month"}`}
             </U.ModalCta>
             <U.ModalHint>Checkout opens next. The site goes live as soon as payment succeeds.</U.ModalHint>
           </>

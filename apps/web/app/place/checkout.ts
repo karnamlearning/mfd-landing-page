@@ -1,7 +1,8 @@
 "use client"
 
 import { saveConfig } from "./persist"
-import { type ServerDraft, type TenantPlan } from "./store"
+import { type ServerDraft, type TenantPlan, useDraft } from "./store"
+import { formatInr, planTotal } from "@mfd/schema"
 
 export type CheckoutPlan = NonNullable<TenantPlan>
 
@@ -79,7 +80,7 @@ export async function startCheckout(plan: CheckoutPlan): Promise<CheckoutOk> {
       key: data.keyId,
       subscription_id: data.subscriptionId,
       name: "Advisorkhoj",
-      description: plan === "yearly" ? "₹2,999 / year" : "₹299 / month",
+      description: `${formatInr(planTotal(plan, useDraft.getState().config.addons))} / ${plan === "yearly" ? "year" : "month"}`,
       handler: (payload) => {
         void confirm(payload).then(resolve).catch(reject)
       },

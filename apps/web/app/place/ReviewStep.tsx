@@ -1,8 +1,8 @@
 "use client"
 
 import { QRCodeSVG } from "qrcode.react"
+import { ADDON_LABEL, slugifyName } from "@mfd/schema"
 import { fontPairs, themes } from "@mfd/tokens"
-import { slugifyName } from "@mfd/schema"
 import { saveConfig } from "./persist"
 import { useDraft } from "./store"
 import * as U from "./styles"
@@ -10,7 +10,7 @@ import * as U from "./styles"
 const TEMPLATE_NAME = {
   solo: "Solo Advisor",
   practice: "Practice / Office",
-  local: "Local / Bilingual",
+  local: "Local",
 } as const
 
 const SECTION_NAME: Record<string, string> = {
@@ -33,7 +33,7 @@ export function ReviewStep({ onPublish }: { onPublish: () => void }) {
   const publicUrl = useDraft((s) => s.publicUrl)
   const setSlug = useDraft((s) => s.setSlug)
   const visible = config.sections.filter((row) => row.on)
-  const tools = config.addons.includes("tools")
+  const addons = config.addons.filter((id): id is keyof typeof ADDON_LABEL => id in ADDON_LABEL)
 
   return (
     <>
@@ -81,7 +81,7 @@ export function ReviewStep({ onPublish }: { onPublish: () => void }) {
         <dt>Sections</dt>
         <dd>{visible.map((row) => SECTION_NAME[row.id] ?? row.id).join(" → ")}</dd>
         <dt>Add-ons</dt>
-        <dd>{tools ? "Tools pack" : "None"}</dd>
+        <dd>{addons.length ? addons.map((id) => ADDON_LABEL[id]).join(", ") : "None"}</dd>
         <dt>WhatsApp</dt>
         <dd>{config.details.whatsapp.trim() || "Sample until you type"}</dd>
         <dt>City</dt>

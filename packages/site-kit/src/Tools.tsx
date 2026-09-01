@@ -7,7 +7,7 @@ import { Calculator } from "./Calculator"
 import * as S from "./styles"
 
 function loc(locale: Locale, config: TenantConfig) {
-  return config.template === "local" ? locale : "en"
+  return config.addons.includes("bilingual") ? locale : "en"
 }
 
 export function ToolsIndex({ config, locale = "en" }: { config: TenantConfig; locale?: Locale }) {

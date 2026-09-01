@@ -17,13 +17,26 @@ function authHeader() {
   return `Basic ${Buffer.from(`${id}:${secret}`).toString("base64")}`
 }
 
-function planId(plan: PlanId) {
+function planId(plan: PlanId, addons: string[] = []) {
+  const tags = [
+    plan === "yearly" ? "YEARLY" : "MONTHLY",
+    addons.includes("tools") ? "TOOLS" : "",
+    addons.includes("bilingual") ? "BILINGUAL" : "",
+  ].filter(Boolean)
+  const specific = process.env[`RAZORPAY_PLAN_${tags.join("_")}`]
+  if (specific) return specific
   const id = plan === "yearly" ? process.env.RAZORPAY_PLAN_YEARLY : process.env.RAZORPAY_PLAN_MONTHLY
   if (!id) throw new Error("razorpay_plan_missing")
   return id
 }
 
-export async function createSubscription(input: { plan: PlanId; tenantId: number; email?: string | null }) {
+export async function createSubscription(input: {
+  plan: PlanId
+  tenantId: number
+  email?: string | null
+  addons?: string[]
+}) {
+  const addons = input.addons ?? []
   const res = await fetch(`${API}/subscriptions`, {
     method: "POST",
     headers: {
@@ -31,11 +44,14 @@ export async function createSubscription(input: { plan: PlanId; tenantId: number
       "content-type": "application/json",
     },
     body: JSON.stringify({
-      plan_id: planId(input.plan),
+      plan_id: planId(input.plan, addons),
       total_count: input.plan === "yearly" ? 10 : 120,
       quantity: 1,
       customer_notify: 1,
-      notes: { tenantId: String(input.tenantId) },
+      notes: {
+        tenantId: String(input.tenantId),
+        addons: addons.join(",") || "none",
+      },
     }),
   })
   const data = (await res.json()) as RazorpaySubscription & { error?: { description?: string } }

@@ -44,3 +44,6 @@ export const addonToolIds = [
 ] as const
 export const toolIds = [...baseToolIds, ...addonToolIds] as const
 export type ToolId = (typeof toolIds)[number]
+
+export const addonIds = ["tools", "bilingual"] as const
+export type AddonId = (typeof addonIds)[number]

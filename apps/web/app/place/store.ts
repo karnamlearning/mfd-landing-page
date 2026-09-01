@@ -5,11 +5,13 @@ import {
   applyTemplate,
   emptyPracticeConfig,
   lockedSectionIds,
+  type AddonId,
   type SectionId,
   type ServiceId,
   type TemplateId,
   type TenantConfig,
   type TenantDetails,
+  type Wording,
 } from "@mfd/schema"
 import type { FontId, ThemeId } from "@mfd/tokens"
 
@@ -69,8 +71,9 @@ type DraftState = {
   setServices: (services: ServiceId[]) => void
   setTestimonials: (testimonials: TenantConfig["testimonials"]) => void
   setFaq: (faq: TenantConfig["faq"]) => void
+  patchWording: (patch: Partial<Wording>) => void
   ensureSectionOn: (id: SectionId) => void
-  setToolsPack: (on: boolean) => void
+  setAddon: (id: AddonId, on: boolean) => void
   setSlug: (slug: string) => void
   hydrate: (payload: ServerDraft) => void
   applyServer: (payload: ServerDraft) => void
@@ -118,6 +121,10 @@ export const useDraft = create<DraftState>((set) => ({
   setServices: (services) => set((s) => ({ config: { ...s.config, services } })),
   setTestimonials: (testimonials) => set((s) => ({ config: { ...s.config, testimonials } })),
   setFaq: (faq) => set((s) => ({ config: { ...s.config, faq } })),
+  patchWording: (patch) =>
+    set((s) => ({
+      config: { ...s.config, wording: { ...s.config.wording, ...patch } },
+    })),
   ensureSectionOn: (id) =>
     set((s) => ({
       config: {
@@ -125,10 +132,17 @@ export const useDraft = create<DraftState>((set) => ({
         sections: s.config.sections.map((row) => (row.id === id ? { ...row, on: true } : row)),
       },
     })),
-  setToolsPack: (on) =>
-    set((s) => ({
-      config: { ...s.config, addons: on ? ["tools"] : [] },
-    })),
+  setAddon: (id, on) =>
+    set((s) => {
+      const has = s.config.addons.includes(id)
+      if (on === has) return s
+      return {
+        config: {
+          ...s.config,
+          addons: on ? [...s.config.addons, id] : s.config.addons.filter((x) => x !== id),
+        },
+      }
+    }),
   setSlug: (slug) =>
     set((s) => (s.slugLocked ? s : { config: { ...s.config, slug } })),
   hydrate: (payload) =>

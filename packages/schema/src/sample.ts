@@ -111,6 +111,7 @@ export const samplePracticeConfig: TenantConfig = {
   sections: sectionsByTemplate.practice,
   testimonials: sampleTestimonials,
   faq: sampleFaq,
+  wording: {},
   calculatorHidden: [],
 }
 

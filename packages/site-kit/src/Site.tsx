@@ -17,13 +17,14 @@ import {
 import { FaWhatsapp } from "react-icons/fa6"
 import { mergeSample, visibleToolIds, type SectionId, type TenantConfig, type ToolId } from "@mfd/schema"
 import { fontPairs, getTheme } from "@mfd/tokens"
-import { copy, serviceCopy, toolCopy, type Copy, type Locale } from "./copy"
+import { brandCopy, brandService, type BrandCopy } from "./brand"
+import { copy, toolCopy, type Copy, type Locale } from "./copy"
 import { ChromeContext } from "./chrome-context"
 import { Calculator } from "./Calculator"
 import { DisclosuresBody, ToolBody, ToolsIndex } from "./Tools"
 import { GlobalStyle } from "./GlobalStyle"
 import * as S from "./styles"
-import { firstName, parseInternalHref, scrollSiteTo, waHref } from "./utils"
+import { parseInternalHref, scrollSiteTo, waHref } from "./utils"
 
 function onHashNav(e: MouseEvent<HTMLAnchorElement>) {
   if (e.currentTarget.closest("[data-preview-nav]")) return
@@ -65,6 +66,7 @@ function activeSections(config: TenantConfig) {
 type Ctx = {
   config: TenantConfig
   t: Copy
+  b: BrandCopy
   locale: Locale
   wa: string
   preview: boolean
@@ -118,7 +120,7 @@ function Header({ ctx, locale, onLocale }: { ctx: Ctx; locale: Locale; onLocale:
               </a>
           ))}
         </S.Nav>
-        {config.template === "local" ? (
+        {config.addons.includes("bilingual") ? (
           <S.LangToggle>
             <S.LangBtn type="button" $on={locale === "en"} onClick={() => onLocale("en")}>
               EN
@@ -172,7 +174,7 @@ function HeroSection({ ctx }: { ctx: Ctx }) {
         <S.HeroActions>
           <S.WaBtn href={wa} target="_blank" rel="noreferrer">
             <FaWhatsapp size={16} aria-hidden />
-            {t.talkTo(firstName(d.name))}
+            {ctx.b.cta}
           </S.WaBtn>
           {ctx.config.sections.some((s) => s.id === "calculators" && s.on) ? (
             <S.GhostBtn href="/#calculators" onClick={onHashNav}>{t.seeCalcs}</S.GhostBtn>
@@ -184,7 +186,7 @@ function HeroSection({ ctx }: { ctx: Ctx }) {
 }
 
 function AboutSection({ ctx }: { ctx: Ctx }) {
-  const { config, t, locale } = ctx
+  const { config, t, b, locale } = ctx
   const d = config.details
   const bio = locale === "hi" && d.bioHi ? d.bioHi : d.bio
   const langs = d.languages.filter(Boolean).join(" · ")
@@ -194,7 +196,7 @@ function AboutSection({ ctx }: { ctx: Ctx }) {
         <S.AboutGrid>
           <div>
             <S.Kicker>{t.welcome}</S.Kicker>
-            <S.H2>{t.aboutTitle(d.city)}</S.H2>
+            <S.H2>{b.aboutTitle}</S.H2>
             <S.Bio>{bio}</S.Bio>
             {langs || d.hours ? (
               <S.MetaRow>
@@ -209,9 +211,9 @@ function AboutSection({ ctx }: { ctx: Ctx }) {
           ) : null}
         </S.AboutGrid>
         <S.Kicker style={{ marginTop: "2rem" }}>{t.about}</S.Kicker>
-        <S.H2>{t.whyTitle}</S.H2>
+        <S.H2>{b.whyTitle}</S.H2>
         <S.WhyGrid>
-          {t.why.map((item) => (
+          {b.why.map((item) => (
             <S.WhyCard key={item.title}>
               <S.ServiceTitle>{item.title}</S.ServiceTitle>
               <S.ServiceCopy>{item.body}</S.ServiceCopy>
@@ -230,7 +232,7 @@ function CredentialsSection({ ctx }: { ctx: Ctx }) {
     <S.Section id="credentials">
       <S.Wrap>
         <S.Kicker>{t.registration}</S.Kicker>
-        <S.H2>{t.recordTitle}</S.H2>
+        <S.H2>{ctx.b.recordTitle}</S.H2>
         <S.CredGrid>
           {config.details.credentials.map((c) => (
             <S.CredCard key={c.number}>
@@ -252,16 +254,16 @@ function CredentialsSection({ ctx }: { ctx: Ctx }) {
 }
 
 function ServicesSection({ ctx }: { ctx: Ctx }) {
-  const { config, t, locale } = ctx
+  const { config, t, b, locale } = ctx
   return (
     <S.Section id="services">
       <S.Wrap>
         <S.Kicker>{t.services}</S.Kicker>
-        <S.H2>{t.servicesTitle}</S.H2>
-        <S.SectionLead>{t.servicesLead}</S.SectionLead>
+        <S.H2>{b.servicesTitle}</S.H2>
+        <S.SectionLead>{b.servicesLead}</S.SectionLead>
         <S.ServiceGrid>
           {config.services.map((id) => {
-            const item = serviceCopy[id]
+            const item = brandService(id, config.wording, locale)
             if (!item) return null
             const Icon = ICONS[id as keyof typeof ICONS] ?? FiPieChart
             return (
@@ -269,8 +271,8 @@ function ServicesSection({ ctx }: { ctx: Ctx }) {
                 <S.IconWrap>
                   <Icon size={18} aria-hidden />
                 </S.IconWrap>
-                <S.ServiceTitle>{locale === "hi" ? item.titleHi : item.title}</S.ServiceTitle>
-                <S.ServiceCopy>{locale === "hi" ? item.bodyHi : item.body}</S.ServiceCopy>
+                <S.ServiceTitle>{item.title}</S.ServiceTitle>
+                <S.ServiceCopy>{item.body}</S.ServiceCopy>
               </S.ServiceCard>
             )
           })}
@@ -300,16 +302,16 @@ function StatsSection({ ctx }: { ctx: Ctx }) {
 }
 
 function HowSection({ ctx }: { ctx: Ctx }) {
-  const { t } = ctx
+  const { t, b } = ctx
   return (
     <S.Section id="how">
       <S.Wrap>
         <S.Kicker>{t.howKicker}</S.Kicker>
-        <S.H2>{t.howTitle}</S.H2>
-        <S.SectionLead>{t.howLead}</S.SectionLead>
+        <S.H2>{b.howTitle}</S.H2>
+        <S.SectionLead>{b.howLead}</S.SectionLead>
         <S.StepGrid>
-          {t.how.map((step, i) => (
-            <S.Step key={step.title}>
+          {b.how.map((step, i) => (
+            <S.Step key={`${step.title}-${i}`}>
               <S.StepN>0{i + 1}</S.StepN>
               <S.ServiceTitle>{step.title}</S.ServiceTitle>
               <S.ServiceCopy>{step.body}</S.ServiceCopy>
@@ -332,8 +334,8 @@ function CalculatorsSection({ ctx }: { ctx: Ctx }) {
     <S.Section id="calculators">
       <S.Wrap>
         <S.Kicker>{t.planning}</S.Kicker>
-        <S.H2>{t.calcTitle}</S.H2>
-        <S.SectionLead>{t.calcLead}</S.SectionLead>
+        <S.H2>{ctx.b.calcTitle}</S.H2>
+        <S.SectionLead>{ctx.b.calcLead}</S.SectionLead>
         {showSip ? <Calculator tool="sip" config={config} t={t} preview={preview} compact /> : null}
         {rest.length ? (
           <S.ServiceGrid style={{ marginTop: "2rem" }}>
@@ -367,7 +369,7 @@ function TestimonialsSection({ ctx }: { ctx: Ctx }) {
     <S.Section id="testimonials">
       <S.Wrap>
         <S.Kicker>{t.quotesKicker}</S.Kicker>
-        <S.H2>{t.quotesTitle}</S.H2>
+        <S.H2>{ctx.b.quotesTitle}</S.H2>
         <S.QuoteGrid>
           {items.map((item) => (
             <S.Quote key={item.name}>
@@ -390,7 +392,7 @@ function FaqSection({ ctx }: { ctx: Ctx }) {
     <S.Section id="faq">
       <S.Wrap>
         <S.Kicker>{t.faqKicker}</S.Kicker>
-        <S.H2>{t.faqTitle}</S.H2>
+        <S.H2>{ctx.b.faqTitle}</S.H2>
         <S.FaqList>
           {config.faq.map((item) => (
             <div key={item.q}>
@@ -452,7 +454,7 @@ function ContactSection({ ctx }: { ctx: Ctx }) {
         <S.ContactGrid>
           <div>
             <S.Kicker>{t.contact}</S.Kicker>
-            <S.H2>{t.contactTitle}</S.H2>
+            <S.H2>{ctx.b.contactTitle}</S.H2>
             <S.Bio>
               {d.address}
               {d.city && (!d.address || !d.address.toLowerCase().includes(d.city.toLowerCase()))
@@ -607,12 +609,14 @@ export function Site({ config, preview = false, embedded = false, children }: Si
   const rootRef = useRef<HTMLDivElement>(null)
   const theme = getTheme(resolved.theme)
   const font = fontPairs[resolved.font]
-  const t = copy[resolved.template === "local" ? locale : "en"]
+  const bilingual = resolved.addons.includes("bilingual")
+  const t = copy[bilingual ? locale : "en"]
   const wa = waHref(resolved.details.whatsapp)
   const ctx: Ctx = {
     config: resolved,
     t,
-    locale: resolved.template === "local" ? locale : "en",
+    b: brandCopy(resolved, t, bilingual ? locale : "en"),
+    locale: bilingual ? locale : "en",
     wa,
     preview,
     embedded,

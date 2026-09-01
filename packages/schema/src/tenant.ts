@@ -1,6 +1,6 @@
 import { z } from "zod"
 import { fontIds, themeIds } from "@mfd/tokens"
-import { sectionIds, serviceIds, templateIds, toolIds } from "./ids"
+import { addonIds, sectionIds, serviceIds, templateIds, toolIds } from "./ids"
 
 export const credentialSchema = z.object({
   label: z.string().min(1),
@@ -48,6 +48,55 @@ export const faqItemSchema = z.object({
   aHi: z.string().optional(),
 })
 
+export const wordingLineSchema = z.object({
+  title: z.string(),
+  body: z.string(),
+  titleHi: z.string().optional(),
+  bodyHi: z.string().optional(),
+})
+
+export const serviceWordingSchema = z.object({
+  title: z.string().optional(),
+  body: z.string().optional(),
+  titleHi: z.string().optional(),
+  bodyHi: z.string().optional(),
+})
+
+/** Practice-facing words. Empty means use the canned default. AMFI / disclosures stay locked. */
+export const wordingSchema = z
+  .object({
+    aboutTitle: z.string().optional(),
+    aboutTitleHi: z.string().optional(),
+    whyTitle: z.string().optional(),
+    whyTitleHi: z.string().optional(),
+    why: z.array(wordingLineSchema).max(4).optional(),
+    servicesTitle: z.string().optional(),
+    servicesTitleHi: z.string().optional(),
+    servicesLead: z.string().optional(),
+    servicesLeadHi: z.string().optional(),
+    howTitle: z.string().optional(),
+    howTitleHi: z.string().optional(),
+    howLead: z.string().optional(),
+    howLeadHi: z.string().optional(),
+    how: z.array(wordingLineSchema).max(6).optional(),
+    calcTitle: z.string().optional(),
+    calcTitleHi: z.string().optional(),
+    calcLead: z.string().optional(),
+    calcLeadHi: z.string().optional(),
+    contactTitle: z.string().optional(),
+    contactTitleHi: z.string().optional(),
+    quotesTitle: z.string().optional(),
+    quotesTitleHi: z.string().optional(),
+    faqTitle: z.string().optional(),
+    faqTitleHi: z.string().optional(),
+    recordTitle: z.string().optional(),
+    recordTitleHi: z.string().optional(),
+    cta: z.string().optional(),
+    ctaHi: z.string().optional(),
+    services: z.record(serviceWordingSchema).optional(),
+  })
+  .default({})
+
 export const sectionSchema = z.object({
   id: z.enum(sectionIds),
   on: z.boolean(),
@@ -59,12 +108,13 @@ export const tenantConfigSchema = z
     template: z.enum(templateIds),
     theme: z.enum(themeIds),
     font: z.enum(fontIds),
-    addons: z.array(z.literal("tools")),
+    addons: z.array(z.enum(addonIds)),
     details: detailsSchema,
     services: z.array(z.enum(serviceIds)),
     sections: z.array(sectionSchema),
     testimonials: z.array(testimonialSchema).default([]),
     faq: z.array(faqItemSchema).default([]),
+    wording: wordingSchema,
     calculatorHidden: z.array(z.enum(toolIds)),
   })
   .superRefine((config, ctx) => {
@@ -88,3 +138,6 @@ export const tenantConfigSchema = z
 
 export type TenantConfig = z.infer<typeof tenantConfigSchema>
 export type TenantDetails = z.infer<typeof detailsSchema>
+export type Wording = z.infer<typeof wordingSchema>
+export type WordingLine = z.infer<typeof wordingLineSchema>
+export type ServiceWording = z.infer<typeof serviceWordingSchema>

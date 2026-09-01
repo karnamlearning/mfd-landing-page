@@ -17,8 +17,8 @@ const TEMPLATES: Array<{ id: TemplateId; name: string; blurb: string }> = [
   },
   {
     id: "local",
-    name: "Local / Bilingual",
-    blurb: "English + Hindi toggle in the header. Larger type, simpler nav.",
+    name: "Local",
+    blurb: "Larger type, simpler nav, city-first. Hindi is a paid add-on on the right.",
   },
 ]
 

@@ -68,6 +68,19 @@ export async function setSessionCookie(session: Session) {
   })
 }
 
+export async function clearSessionCookie() {
+  const jar = await cookies()
+  const domain = process.env.COOKIE_DOMAIN || undefined
+  jar.set(SESSION_COOKIE, "", {
+    httpOnly: true,
+    sameSite: "lax",
+    secure: process.env.NODE_ENV === "production",
+    path: "/",
+    maxAge: 0,
+    domain,
+  })
+}
+
 export function json(data: unknown, status = 200) {
   return Response.json(data, { status })
 }

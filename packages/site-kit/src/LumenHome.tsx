@@ -4,7 +4,7 @@ import { useEffect, useState } from "react"
 import styled, { keyframes } from "styled-components"
 import { FiMenu, FiX } from "react-icons/fi"
 import { FaWhatsapp } from "react-icons/fa6"
-import { visibleToolIds } from "@mfd/schema"
+import { templateOf, visibleToolIds } from "@mfd/schema"
 import { brandService } from "./brand"
 import { Calculator } from "./Calculator"
 import { LeadForm } from "./LeadForm"
@@ -45,12 +45,18 @@ const Bar = styled.header`
   margin: 0.7rem auto 0;
   display: flex;
   align-items: center;
-  gap: 0.7rem;
-  padding: 0.55rem 0.75rem;
+  gap: 0.5rem;
+  padding: 0.5rem 0.65rem;
   border-radius: 999px;
   background: ${({ theme }) => theme.surface}cc;
   border: 1px solid ${({ theme }) => theme.text}18;
   backdrop-filter: blur(16px);
+  min-width: 0;
+
+  @container site (min-width: 760px) {
+    gap: 0.7rem;
+    padding: 0.55rem 0.75rem;
+  }
 `
 
 const Brand = styled.a`
@@ -59,6 +65,8 @@ const Brand = styled.a`
   font-weight: 650;
   letter-spacing: -0.03em;
   min-width: 0;
+  flex: 1;
+  overflow: hidden;
 `
 
 const Tag = styled.span`
@@ -68,6 +76,9 @@ const Tag = styled.span`
   text-transform: uppercase;
   color: ${({ theme }) => theme.muted};
   font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 `
 
 const Nav = styled.nav`
@@ -75,12 +86,13 @@ const Nav = styled.nav`
   gap: 0.85rem;
   margin-left: auto;
   font-size: 0.8rem;
+  flex-shrink: 0;
   a {
     color: inherit;
     text-decoration: none;
     opacity: 0.8;
   }
-  @media (min-width: 760px) {
+  @container site (min-width: 760px) {
     display: flex;
   }
 `
@@ -89,25 +101,42 @@ const Pill = styled.a`
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
+  flex-shrink: 0;
   margin-left: auto;
-  @media (min-width: 760px) {
+  @container site (min-width: 760px) {
     margin-left: 0;
   }
-  padding: 0.4rem 0.75rem;
+  padding: 0.4rem 0.55rem;
   border-radius: 999px;
   background: ${({ theme }) => theme.primary};
   color: ${({ theme }) => theme.btnText};
   text-decoration: none;
   font-size: 0.78rem;
   font-weight: 650;
+
+  @container site (min-width: 480px) {
+    padding: 0.4rem 0.75rem;
+  }
+`
+
+const PillLabel = styled.span`
+  display: none;
+  @container site (min-width: 480px) {
+    display: inline;
+  }
 `
 
 const MenuBtn = styled.button`
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 2.2rem;
+  height: 2.2rem;
   border: 0;
   background: transparent;
   color: inherit;
   cursor: pointer;
-  @media (min-width: 760px) {
+  @container site (min-width: 760px) {
     display: none;
   }
 `
@@ -119,12 +148,12 @@ const Stage = styled.div`
   margin: 0 auto;
 `
 
-const Hero = styled.section`
+const Hero = styled.section<{ $solo?: boolean }>`
   display: grid;
   gap: 1.5rem;
   padding: 2.4rem 0 2rem;
-  @media (min-width: 860px) {
-    grid-template-columns: 1.15fr 0.85fr;
+  @container site (min-width: 860px) {
+    grid-template-columns: ${({ $solo }) => ($solo ? "0.85fr 1.15fr" : "1.15fr 0.85fr")};
     align-items: center;
     min-height: 72vh;
   }
@@ -175,7 +204,7 @@ const Glass = styled.section`
 const Bento = styled.div`
   display: grid;
   gap: 0.75rem;
-  @media (min-width: 720px) {
+  @container site (min-width: 720px) {
     grid-template-columns: 1.2fr 1fr;
   }
 `
@@ -226,6 +255,7 @@ export function LumenHome({ ctx, locale, onLocale, body }: SkinHomeProps) {
   const bilingual = config.addons.includes("bilingual")
   const on = new Set(activeSections(config).map((s) => s.id))
   const photo = d.photoUrl || d.heroImageUrl
+  const solo = templateOf(config) === "solo"
   const links = (
     [
       { href: "/#about", label: t.about, id: "about" },
@@ -263,10 +293,10 @@ export function LumenHome({ ctx, locale, onLocale, body }: SkinHomeProps) {
         ) : null}
         <Pill href={wa} target="_blank" rel="noreferrer">
           <FaWhatsapp size={14} aria-hidden />
-          {b.cta}
+          <PillLabel>{b.cta}</PillLabel>
         </Pill>
-        <MenuBtn type="button" aria-label={t.menu} onClick={() => setMenu((v) => !v)}>
-          {menu ? <FiX /> : <FiMenu />}
+        <MenuBtn type="button" aria-label={t.menu} aria-expanded={menu} onClick={() => setMenu((v) => !v)}>
+          {menu ? <FiX size={18} /> : <FiMenu size={18} />}
         </MenuBtn>
       </Bar>
       {menu ? (
@@ -287,13 +317,14 @@ export function LumenHome({ ctx, locale, onLocale, body }: SkinHomeProps) {
         <Stage>{body}</Stage>
       ) : (
         <Stage>
-          <Hero id="top" data-spot="top">
+          <Hero id="top" data-spot="top" $solo={solo}>
+            {solo && photo ? <Photo src={photo} alt="" data-spot="photo" /> : null}
             <div>
               <GlowName>{d.city}</GlowName>
               <H1>{d.heroHeadline}</H1>
               <Lead>{d.pitch}</Lead>
             </div>
-            {photo ? <Photo src={photo} alt="" data-spot="photo" /> : null}
+            {!solo && photo ? <Photo src={photo} alt="" data-spot="photo" /> : null}
           </Hero>
 
           {isOn(config, "stats") && d.stats.length ? (

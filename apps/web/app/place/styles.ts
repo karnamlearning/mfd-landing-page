@@ -94,7 +94,7 @@ export const SegBtn = styled.button<{ $on: boolean }>`
   color: ${({ $on, theme }) => ($on ? theme.btnText : theme.muted)};
 `
 
-export const GhostBtn = styled.button`
+export const GhostBtn = styled.button<{ $always?: boolean }>`
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
@@ -107,7 +107,7 @@ export const GhostBtn = styled.button`
   cursor: pointer;
 
   @media (min-width: 761px) {
-    display: none;
+    display: ${({ $always }) => ($always ? "inline-flex" : "none")};
   }
 `
 
@@ -750,6 +750,13 @@ export const GalleryBrand = styled.div`
   justify-content: space-between;
   gap: 1rem;
   width: 100%;
+`
+
+export const GalleryActions = styled.div`
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.55rem;
 `
 
 export const GalleryLogo = styled.div`

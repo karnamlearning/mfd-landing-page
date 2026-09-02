@@ -7,6 +7,10 @@ export type LookId = (typeof lookIds)[number]
 export const templateIds = ["solo", "practice", "local"] as const
 export type TemplateId = (typeof templateIds)[number]
 
+/** Editor choices. `local` is kept in the schema for older drafts. */
+export const variantIds = ["practice", "solo"] as const
+export type VariantId = (typeof variantIds)[number]
+
 export const sectionIds = [
   "hero",
   "about",

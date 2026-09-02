@@ -7,9 +7,25 @@ export function familyOf(config: { family?: FamilyId | string | null }): FamilyI
   return "classic"
 }
 
-/** Looks were removed. Classic always uses the original layout. */
+/** Looks were removed as editor choices. Classic always uses the original layout. */
 export function lookOf(_config?: { look?: LookId | string | null; family?: string | null }): LookId {
   return "studio"
+}
+
+/** Solo or Practice. Older `local` drafts count as Practice. */
+export function templateOf(config?: { template?: string | null }): "practice" | "solo" {
+  return config?.template === "solo" ? "solo" : "practice"
+}
+
+export const templateMeta: Record<"practice" | "solo", { name: string; blurb: string }> = {
+  practice: {
+    name: "Practice",
+    blurb: "The full site: wide hero, credentials, stats, and quotes on by default.",
+  },
+  solo: {
+    name: "Solo",
+    blurb: "A leaner page. Portrait in the hero, fewer blocks on until you add them.",
+  },
 }
 
 export const familyMeta: Record<

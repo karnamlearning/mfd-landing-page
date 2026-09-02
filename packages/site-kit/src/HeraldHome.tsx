@@ -7,7 +7,7 @@ import { brandService } from "./brand"
 import { Calculator } from "./Calculator"
 import { LeadForm } from "./LeadForm"
 import { activeSections, isOn, onHashNav, type SkinHomeProps } from "./skin-shared"
-import { visibleToolIds } from "@mfd/schema"
+import { templateOf, visibleToolIds } from "@mfd/schema"
 import { useEffect, useState } from "react"
 
 const Page = styled.div`
@@ -127,12 +127,12 @@ const Rule = styled.hr`
   margin: 0;
 `
 
-const Lead = styled.section`
+const Lead = styled.section<{ $solo?: boolean }>`
   padding: 1.4rem 0 1.6rem;
   display: grid;
   gap: 1.1rem;
   @media (min-width: 800px) {
-    grid-template-columns: 1.3fr 0.9fr;
+    grid-template-columns: ${({ $solo }) => ($solo ? "0.9fr 1.3fr" : "1.3fr 0.9fr")};
     align-items: end;
   }
 `
@@ -254,6 +254,7 @@ export function HeraldHome({ ctx, locale, onLocale, body }: SkinHomeProps) {
   const bilingual = config.addons.includes("bilingual")
   const on = new Set(activeSections(config).map((s) => s.id))
   const photo = d.photoUrl || d.heroImageUrl
+  const solo = templateOf(config) === "solo"
   const links = (
     [
       { href: "/#about", label: t.about, id: "about" },
@@ -320,13 +321,19 @@ export function HeraldHome({ ctx, locale, onLocale, body }: SkinHomeProps) {
 
       {body ?? (
         <Sheet>
-          <Lead id="top" data-spot="top">
+          <Lead id="top" data-spot="top" $solo={solo}>
+            {solo && photo ? (
+              <Fig data-spot="photo">
+                <img src={photo} alt="" />
+                <figcaption>{d.city} · {d.name}</figcaption>
+              </Fig>
+            ) : null}
             <div>
               <Eyebrow>{d.city}</Eyebrow>
               <H1>{d.heroHeadline}</H1>
               <Deck>{d.pitch}</Deck>
             </div>
-            {photo ? (
+            {!solo && photo ? (
               <Fig data-spot="photo">
                 <img src={photo} alt="" />
                 <figcaption>{d.city} · {d.name}</figcaption>

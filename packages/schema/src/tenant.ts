@@ -122,7 +122,7 @@ export const tenantConfigSchema = z.preprocess(
     family: z.enum(familyIds).default("classic"),
     look: z.enum(lookIds).default("studio"),
     pickedFamily: z.boolean().optional(),
-    template: z.enum(templateIds),
+    template: z.enum(templateIds).default("practice"),
     theme: z.enum(themeIds),
     font: z.enum(fontIds),
     addons: z.array(z.enum(addonIds)),

@@ -137,7 +137,7 @@ export function VerifyOtp() {
       <A.Page>
         <A.Card>
           <A.LogoWrap>
-            <BrandLogo src={VERIFY_LOGO} size="lg" />
+            <BrandLogo src={VERIFY_LOGO} size="sm" />
           </A.LogoWrap>
           <form onSubmit={verify}>
             <A.Kicker>Verify</A.Kicker>

@@ -2,6 +2,7 @@ export {
   templateIds,
   familyIds,
   lookIds,
+  variantIds,
   sectionIds,
   lockedSectionIds,
   serviceIds,
@@ -11,7 +12,7 @@ export {
   toolIds,
   addonIds,
 } from "./ids"
-export type { TemplateId, FamilyId, LookId, SectionId, ServiceId, ToolId, AddonId } from "./ids"
+export type { TemplateId, FamilyId, LookId, VariantId, SectionId, ServiceId, ToolId, AddonId } from "./ids"
 
 export { tenantConfigSchema, detailsSchema, credentialSchema, statSchema, sectionSchema, testimonialSchema, faqItemSchema, wordingSchema, wordingLineSchema, serviceWordingSchema } from "./tenant"
 export type { TenantConfig, TenantDetails, Wording, WordingLine, ServiceWording } from "./tenant"
@@ -19,7 +20,7 @@ export type { TenantConfig, TenantDetails, Wording, WordingLine, ServiceWording 
 export { sampleFill, samplePracticeConfig, emptyPracticeConfig, emptyDraftConfig, sampleTestimonials, sampleFaq } from "./sample"
 export { mergeSample, pruneEmptyContent } from "./merge"
 export { sectionsByTemplate, applyTemplate } from "./defaults"
-export { familyMeta, lookMeta, familyOf, lookOf } from "./families"
+export { familyMeta, lookMeta, templateMeta, familyOf, lookOf, templateOf } from "./families"
 export { visibleToolIds, readyToolIds } from "./tools"
 export type { ReadyToolId } from "./tools"
 export { reservedSlugs, slugifyName, isPhoneStubSlug, isReservedSlug, phoneStubSlug } from "./slug"

@@ -1,9 +1,11 @@
 "use client"
 
 import { FaWhatsapp } from "react-icons/fa6"
+import { FiLogOut } from "react-icons/fi"
 import { familyIds, familyMeta, type FamilyId } from "@mfd/schema"
 import { BrandLogo } from "../BrandLogo"
 import { TEMPLATES_LOGO } from "../brand"
+import { logoutBuyer } from "./logout"
 import { saveConfig } from "./persist"
 import { useDraft } from "./store"
 import * as U from "./styles"
@@ -76,11 +78,17 @@ export function TemplateGallery({
           <U.GalleryLogo>
             <BrandLogo src={TEMPLATES_LOGO} size="md" />
           </U.GalleryLogo>
-          {browsing ? (
-            <U.NextBtn type="button" onClick={() => onPicked?.()}>
-              Back to editor
-            </U.NextBtn>
-          ) : null}
+          <U.GalleryActions>
+            {browsing ? (
+              <U.NextBtn type="button" onClick={() => onPicked?.()}>
+                Back to editor
+              </U.NextBtn>
+            ) : null}
+            <U.GhostBtn $always type="button" onClick={() => void logoutBuyer()}>
+              <FiLogOut size={14} aria-hidden />
+              Log out
+            </U.GhostBtn>
+          </U.GalleryActions>
         </U.GalleryBrand>
         <U.GalleryCopy>
           <U.GalleryKicker>Buyer Place</U.GalleryKicker>

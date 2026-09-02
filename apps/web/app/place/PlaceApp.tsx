@@ -3,12 +3,13 @@
 import { useEffect, useState } from "react"
 import { ThemeProvider } from "styled-components"
 import { useRouter } from "next/navigation"
-import { FiCopy, FiEye, FiExternalLink, FiMonitor, FiSmartphone } from "react-icons/fi"
+import { FiCopy, FiEye, FiExternalLink, FiLogOut, FiMonitor, FiSmartphone } from "react-icons/fi"
 import { ADDON_LABEL, ADDON_PRICE, addonIds, familyIds, familyMeta, formatInr, isPhoneStubSlug, type AddonId } from "@mfd/schema"
 import { themes } from "@mfd/tokens"
 import { BrandLogo } from "../BrandLogo"
 import { PLACE_LOGO } from "../brand"
 import { CustomSiteBar } from "./CustomSiteBar"
+import { logoutBuyer } from "./logout"
 import { DetailsStep } from "./DetailsStep"
 import { FontStep } from "./FontStep"
 import { LeadsStep } from "./LeadsStep"
@@ -20,9 +21,11 @@ import { SectionsStep } from "./SectionsStep"
 import { STEPS, useDraft, type ServerDraft, type StepId } from "./store"
 import * as U from "./styles"
 import { ThemeStep } from "./ThemeStep"
+import { VariantStep } from "./VariantStep"
 
 const NEXT: Partial<Record<StepId, StepId>> = {
-  details: "theme",
+  details: "variant",
+  variant: "theme",
   theme: "font",
   font: "sections",
   sections: "review",
@@ -31,6 +34,7 @@ const NEXT: Partial<Record<StepId, StepId>> = {
 function StepBody({ onOpenPublish }: { onOpenPublish: () => void }) {
   const step = useDraft((s) => s.step)
   if (step === "details") return <DetailsStep />
+  if (step === "variant") return <VariantStep />
   if (step === "theme") return <ThemeStep />
   if (step === "font") return <FontStep />
   if (step === "sections") return <SectionsStep />
@@ -194,6 +198,10 @@ function Editor() {
           <U.PayBtn type="button" onClick={openPublish}>
             Publish
           </U.PayBtn>
+          <U.GhostBtn $always type="button" onClick={() => void logoutBuyer()}>
+            <FiLogOut size={14} aria-hidden />
+            Log out
+          </U.GhostBtn>
         </U.Top>
         {impersonating ? (
           <U.TrialBanner $warn>
@@ -292,7 +300,6 @@ export function PlaceApp() {
         <Editor />
       ) : (
         <U.Marketing>
-          <BrandLogo src={PLACE_LOGO} size="md" />
           <U.StepLead>Loading your draft…</U.StepLead>
         </U.Marketing>
       )}

@@ -19,12 +19,13 @@ import type { FontId, ThemeId } from "@mfd/tokens"
 
 export const STEPS = [
   { id: "details", n: 1, label: "Details" },
-  { id: "theme", n: 2, label: "Theme" },
-  { id: "font", n: 3, label: "Font" },
-  { id: "sections", n: 4, label: "Sections" },
-  { id: "review", n: 5, label: "Review" },
-  { id: "leads", n: 6, label: "Leads" },
-  { id: "publish", n: 7, label: "Publish" },
+  { id: "variant", n: 2, label: "Variant" },
+  { id: "theme", n: 3, label: "Theme" },
+  { id: "font", n: 4, label: "Font" },
+  { id: "sections", n: 5, label: "Sections" },
+  { id: "review", n: 6, label: "Review" },
+  { id: "leads", n: 7, label: "Leads" },
+  { id: "publish", n: 8, label: "Publish" },
 ] as const
 
 export type StepId = (typeof STEPS)[number]["id"]

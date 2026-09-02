@@ -50,7 +50,7 @@ export function SendOtp() {
       <A.Page>
         <A.Card>
           <A.LogoWrap>
-            <BrandLogo src={SIGNUP_LOGO} size="lg" />
+            <BrandLogo src={SIGNUP_LOGO} size="sm" />
           </A.LogoWrap>
           <form onSubmit={send}>
             <A.Kicker>Buyer Place</A.Kicker>

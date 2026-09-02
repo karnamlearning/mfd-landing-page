@@ -1,5 +1,5 @@
 import styled, { css } from "styled-components"
-import type { FamilyId, TemplateId } from "@mfd/schema"
+import type { FamilyId, LookId, TemplateId } from "@mfd/schema"
 
 const PREVIEW_SPOTS = [
   "header",
@@ -22,6 +22,7 @@ export const Root = styled.div<{
   $body: string
   $template: TemplateId
   $family: FamilyId
+  $look: LookId
   $embedded?: boolean
 }>`
   --heading: ${({ $heading }) => $heading};
@@ -30,8 +31,8 @@ export const Root = styled.div<{
   color: ${({ theme }) => theme.text};
   background: ${({ theme }) => theme.bg};
   min-height: ${({ $embedded }) => ($embedded ? "100%" : "100vh")};
-  font-size: ${({ $template, $family }) =>
-    $family === "folio" || $template === "local" ? "1.08rem" : $family === "counter" ? "0.97rem" : "1rem"};
+  font-size: ${({ $template, $look }) =>
+    $look === "folio" || $template === "local" ? "1.08rem" : $look === "counter" ? "0.97rem" : "1rem"};
   width: 100%;
   overflow-x: clip;
   padding-bottom: env(safe-area-inset-bottom, 0px);
@@ -42,12 +43,15 @@ export const Root = styled.div<{
   h2,
   h3 {
     font-family: var(--heading), Georgia, serif;
-    font-weight: ${({ $family }) => ($family === "counter" ? 600 : 500)};
-    letter-spacing: ${({ $family }) => ($family === "folio" ? "-0.035em" : "-0.02em")};
+    font-weight: ${({ $family, $look }) =>
+      $family === "classic" && $look === "counter" ? 600 : $family === "herald" ? 700 : 500};
+    letter-spacing: ${({ $family, $look }) =>
+      $family === "herald" ? "-0.01em" : $look === "folio" ? "-0.035em" : "-0.02em"};
   }
 
-  ${({ $family, theme }) =>
-    $family === "folio" &&
+  ${({ $family, $look, theme }) =>
+    $family === "classic" &&
+    $look === "folio" &&
     css`
       header {
         background: ${theme.surface};
@@ -90,8 +94,9 @@ export const Root = styled.div<{
       }
     `}
 
-  ${({ $family, theme }) =>
-    $family === "counter" &&
+  ${({ $family, $look, theme }) =>
+    $family === "classic" &&
+    $look === "counter" &&
     css`
       header {
         background: ${theme.primary};

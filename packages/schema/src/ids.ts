@@ -1,5 +1,8 @@
-export const familyIds = ["studio", "folio", "counter"] as const
+export const familyIds = ["classic", "herald", "lumen"] as const
 export type FamilyId = (typeof familyIds)[number]
+
+export const lookIds = ["studio", "folio", "counter"] as const
+export type LookId = (typeof lookIds)[number]
 
 export const templateIds = ["solo", "practice", "local"] as const
 export type TemplateId = (typeof templateIds)[number]

@@ -2,22 +2,11 @@
 
 import { Fragment, useEffect, useLayoutEffect, useRef, useState, type FormEvent, type MouseEvent, type ReactNode } from "react"
 import { ThemeProvider } from "styled-components"
-import {
-  FiHeart,
-  FiLayers,
-  FiMenu,
-  FiPieChart,
-  FiRefreshCw,
-  FiRepeat,
-  FiShield,
-  FiSunrise,
-  FiTarget,
-  FiX,
-} from "react-icons/fi"
+import { FiMenu, FiShield, FiX } from "react-icons/fi"
 import { FaWhatsapp } from "react-icons/fa6"
-import { lockedSectionIds, mergeSample, visibleToolIds, type FamilyId, type SectionId, type TenantConfig, type TemplateId, type ToolId } from "@mfd/schema"
-import { fontPairs, getTheme } from "@mfd/tokens"
-import { brandCopy, brandService, type BrandCopy } from "./brand"
+import { familyOf, lockedSectionIds, lookOf, mergeSample, visibleToolIds, type SectionId, type TenantConfig, type ToolId } from "@mfd/schema"
+import { coerceTheme, fontPairs, getTheme } from "@mfd/tokens"
+import { brandCopy, brandService } from "./brand"
 import { copy, toolCopy, type Copy, type Locale } from "./copy"
 import { ChromeContext } from "./chrome-context"
 import { Calculator } from "./Calculator"
@@ -25,32 +14,11 @@ import { DisclosuresBody, ToolBody, ToolsIndex } from "./Tools"
 import { GlobalStyle } from "./GlobalStyle"
 import * as S from "./styles"
 import { parseInternalHref, scrollSiteTo, waHref } from "./utils"
+import { HeraldHome } from "./HeraldHome"
+import { LumenHome } from "./LumenHome"
+import { heroLayout, onHashNav, SERVICE_ICONS, type SkinCtx } from "./skin-shared"
 
-function onHashNav(e: MouseEvent<HTMLAnchorElement>) {
-  if (e.currentTarget.closest("[data-preview-nav]")) return
-  const href = e.currentTarget.getAttribute("href") ?? ""
-  if (!href.includes("#")) return
-  e.preventDefault()
-  const id = href.slice(href.indexOf("#") + 1).split("?")[0] || "top"
-  scrollSiteTo(e.currentTarget, id)
-}
-
-const ICONS = {
-  mutual_funds: FiPieChart,
-  sip: FiRepeat,
-  goals: FiTarget,
-  stp_swp: FiRefreshCw,
-  retirement: FiSunrise,
-  life_insurance: FiHeart,
-  health_insurance: FiHeart,
-  bonds: FiLayers,
-} as const
-
-function heroLayout(family: FamilyId, tpl: TemplateId): "split" | "overlay" | "center" {
-  if (family === "counter") return "center"
-  if (family === "folio" || tpl === "solo") return "split"
-  return "overlay"
-}
+const ICONS = SERVICE_ICONS
 
 export type PreviewSpotId =
   | "header"
@@ -86,16 +54,7 @@ function activeSections(config: TenantConfig) {
     .filter((row) => row.on)
 }
 
-type Ctx = {
-  config: TenantConfig
-  t: Copy
-  b: BrandCopy
-  locale: Locale
-  wa: string
-  preview: boolean
-  embedded: boolean
-  previewPath: string
-}
+type Ctx = SkinCtx
 
 function Header({ ctx, locale, onLocale }: { ctx: Ctx; locale: Locale; onLocale: (l: Locale) => void }) {
   const { config, t, wa, previewPath } = ctx
@@ -184,11 +143,11 @@ function HeroSection({ ctx }: { ctx: Ctx }) {
   const { config, t, wa } = ctx
   const d = config.details
   const tpl = config.template
-  const family = config.family ?? "studio"
-  const layout = heroLayout(family, tpl)
-  const src = tpl === "solo" || family === "folio" ? d.photoUrl || d.heroImageUrl : d.heroImageUrl || d.photoUrl
+  const look = lookOf(config)
+  const layout = heroLayout(look, tpl)
+  const src = tpl === "solo" || look === "folio" ? d.photoUrl || d.heroImageUrl : d.heroImageUrl || d.photoUrl
 
-  const photoInHero = tpl === "solo" || family === "folio"
+  const photoInHero = tpl === "solo" || look === "folio"
 
   return (
     <S.Hero id="top" data-spot="top" $template={tpl} $layout={layout}>
@@ -233,7 +192,7 @@ function AboutSection({ ctx }: { ctx: Ctx }) {
               </S.MetaRow>
             ) : null}
           </div>
-          {config.template !== "solo" && config.family !== "folio" && d.photoUrl ? (
+          {config.template !== "solo" && lookOf(config) !== "folio" && d.photoUrl ? (
             <S.Portrait src={d.photoUrl} alt={d.name} data-spot="photo" />
           ) : null}
         </S.AboutGrid>
@@ -282,7 +241,7 @@ function CredentialsSection({ ctx }: { ctx: Ctx }) {
 
 function ServicesSection({ ctx }: { ctx: Ctx }) {
   const { config, t, b, locale } = ctx
-  const list = (config.family ?? "studio") === "folio"
+  const list = lookOf(config) === "folio"
   return (
     <S.Section id="services" data-spot="services">
       <S.Wrap>
@@ -293,7 +252,7 @@ function ServicesSection({ ctx }: { ctx: Ctx }) {
           {config.services.map((id) => {
             const item = brandService(id, config.wording, locale)
             if (!item) return null
-            const Icon = ICONS[id as keyof typeof ICONS] ?? FiPieChart
+            const Icon = ICONS[id as keyof typeof ICONS] ?? ICONS.mutual_funds
             return (
               <S.ServiceCard key={id} $list={list}>
                 {list ? null : (
@@ -634,11 +593,13 @@ function PreviewInner({ path, ctx }: { path: string; ctx: Ctx }) {
 
 export function Site({ config, preview = false, embedded = false, previewFocus = null, children }: SiteProps) {
   const resolved = mergeSample(config, preview)
+  const family = familyOf(resolved)
+  const look = lookOf(resolved)
   const [locale, setLocale] = useState<Locale>("en")
   const [nav, setNav] = useState({ path: "/", hash: "top", tick: 0 })
   const [spot, setSpot] = useState<PreviewSpotId | null>(null)
   const rootRef = useRef<HTMLDivElement>(null)
-  const theme = getTheme(resolved.theme)
+  const theme = getTheme(coerceTheme(family, resolved.theme))
   const font = fontPairs[resolved.font]
   const bilingual = resolved.addons.includes("bilingual")
   const t = copy[bilingual ? locale : "en"]
@@ -733,15 +694,24 @@ export function Site({ config, preview = false, embedded = false, previewFocus =
         $heading={font.headingVar}
         $body={font.bodyVar}
         $template={resolved.template}
-        $family={resolved.family ?? "studio"}
+        $family={family}
+        $look={look}
         $embedded={embedded}
         data-preview-spot={spot ?? undefined}
         onClickCapture={onPreviewClick}
       >
         <GlobalStyle $embedded={embedded} />
-        <Header ctx={ctx} locale={locale} onLocale={setLocale} />
-        {body}
-        <Footer ctx={ctx} />
+        {family === "herald" ? (
+          <HeraldHome ctx={ctx} locale={locale} onLocale={setLocale} body={embedded && nav.path !== "/" ? body : children} />
+        ) : family === "lumen" ? (
+          <LumenHome ctx={ctx} locale={locale} onLocale={setLocale} body={embedded && nav.path !== "/" ? body : children} />
+        ) : (
+          <>
+            <Header ctx={ctx} locale={locale} onLocale={setLocale} />
+            {body}
+            <Footer ctx={ctx} />
+          </>
+        )}
       </S.Root>
       </ChromeContext.Provider>
     </ThemeProvider>

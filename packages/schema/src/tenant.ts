@@ -1,6 +1,6 @@
 import { z } from "zod"
 import { fontIds, themeIds } from "@mfd/tokens"
-import { addonIds, familyIds, sectionIds, serviceIds, templateIds, toolIds } from "./ids"
+import { addonIds, familyIds, lookIds, sectionIds, serviceIds, templateIds, toolIds } from "./ids"
 
 export const credentialSchema = z.object({
   label: z.string(),
@@ -102,10 +102,25 @@ export const sectionSchema = z.object({
   on: z.boolean(),
 })
 
-export const tenantConfigSchema = z
-  .object({
+const LEGACY_LOOK = new Set(["studio", "folio", "counter"])
+
+/** Older drafts stored Studio / Folio / Counter as `family`. Those now map to Practice. */
+function liftLegacyFamily(input: unknown) {
+  if (!input || typeof input !== "object") return input
+  const next = { ...(input as Record<string, unknown>) }
+  if (typeof next.family === "string" && LEGACY_LOOK.has(next.family)) {
+    if (next.look == null) next.look = next.family
+    next.family = "classic"
+  }
+  return next
+}
+
+export const tenantConfigSchema = z.preprocess(
+  liftLegacyFamily,
+  z.object({
     slug: z.string().min(1),
-    family: z.enum(familyIds).default("studio"),
+    family: z.enum(familyIds).default("classic"),
+    look: z.enum(lookIds).default("studio"),
     pickedFamily: z.boolean().optional(),
     template: z.enum(templateIds),
     theme: z.enum(themeIds),
@@ -118,8 +133,7 @@ export const tenantConfigSchema = z
     faq: z.array(faqItemSchema).default([]),
     wording: wordingSchema,
     calculatorHidden: z.array(z.enum(toolIds)),
-  })
-  .superRefine((config, ctx) => {
+  }).superRefine((config, ctx) => {
     for (const locked of ["hero", "contact"] as const) {
       const row = config.sections.find((s) => s.id === locked)
       if (!row) {
@@ -136,7 +150,8 @@ export const tenantConfigSchema = z
         })
       }
     }
-  })
+  }),
+)
 
 export type TenantConfig = z.infer<typeof tenantConfigSchema>
 export type TenantDetails = z.infer<typeof detailsSchema>

@@ -10,7 +10,7 @@ export const space = {
 
 export type Space = typeof space
 
-export const themeIds = [
+export const classicThemeIds = [
   "navy",
   "forest",
   "maroon",
@@ -20,6 +20,11 @@ export const themeIds = [
   "ink",
   "saffron",
 ] as const
+
+export const heraldThemeIds = ["newsprint", "indigo", "brick"] as const
+export const lumenThemeIds = ["dusk", "aurora", "ember"] as const
+
+export const themeIds = [...classicThemeIds, ...heraldThemeIds, ...lumenThemeIds] as const
 
 export type ThemeId = (typeof themeIds)[number]
 
@@ -135,8 +140,95 @@ export const themes: Record<ThemeId, Theme> = {
     accent: "#ea580c",
     btnText: "#ffffff",
   },
+  newsprint: {
+    ...shared,
+    id: "newsprint",
+    name: "Broadsheet",
+    bg: "#e4e4e4",
+    surface: "#f3f3f3",
+    text: "#111111",
+    muted: "#555555",
+    primary: "#111111",
+    accent: "#c4101a",
+    btnText: "#ffffff",
+  },
+  indigo: {
+    ...shared,
+    id: "indigo",
+    name: "Evening edition",
+    bg: "#0d0d0d",
+    surface: "#1a1a1a",
+    text: "#f5f5f5",
+    muted: "#9a9a9a",
+    primary: "#f5f5f5",
+    accent: "#d01224",
+    btnText: "#0d0d0d",
+  },
+  brick: {
+    ...shared,
+    id: "brick",
+    name: "Press red",
+    bg: "#f4f4f4",
+    surface: "#ffffff",
+    text: "#111111",
+    muted: "#5c5c5c",
+    primary: "#c4101a",
+    accent: "#111111",
+    btnText: "#ffffff",
+  },
+  dusk: {
+    ...shared,
+    id: "dusk",
+    name: "Dusk",
+    bg: "#0b1020",
+    surface: "#151c32",
+    text: "#eef1ff",
+    muted: "#9aa3c2",
+    primary: "#8aa4ff",
+    accent: "#c4b5fd",
+    btnText: "#0b1020",
+  },
+  aurora: {
+    ...shared,
+    id: "aurora",
+    name: "Aurora",
+    bg: "#071614",
+    surface: "#0f2622",
+    text: "#e8fff6",
+    muted: "#8fb8ad",
+    primary: "#3dcfb6",
+    accent: "#7ee0c8",
+    btnText: "#06201a",
+  },
+  ember: {
+    ...shared,
+    id: "ember",
+    name: "Ember",
+    bg: "#140c0a",
+    surface: "#221611",
+    text: "#fff3ea",
+    muted: "#c4a494",
+    primary: "#e08a4b",
+    accent: "#f0c29e",
+    btnText: "#1a0e08",
+  },
 }
 
+export const themesByFamily = {
+  classic: classicThemeIds,
+  herald: heraldThemeIds,
+  lumen: lumenThemeIds,
+} as const
+
 export function getTheme(id: ThemeId): Theme {
-  return themes[id]
+  return themes[id] ?? themes.forest
+}
+
+export function themesForFamily(family: keyof typeof themesByFamily): readonly ThemeId[] {
+  return themesByFamily[family] ?? classicThemeIds
+}
+
+export function coerceTheme(family: keyof typeof themesByFamily, theme: ThemeId): ThemeId {
+  const allowed = themesByFamily[family]
+  return (allowed as readonly string[]).includes(theme) ? theme : allowed[0]
 }

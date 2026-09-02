@@ -96,7 +96,8 @@ export const sampleFaq = [
 /** Hardcoded Practice demo — sample content, forest + formal. */
 export const samplePracticeConfig: TenantConfig = {
   slug: "rahul-sharma",
-  family: "studio",
+  family: "classic",
+  look: "studio",
   pickedFamily: true,
   template: "practice",
   theme: "forest",

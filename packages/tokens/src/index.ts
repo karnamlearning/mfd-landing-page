@@ -1,4 +1,15 @@
-export { space, themeIds, themes, getTheme } from "./theme"
+export {
+  space,
+  themeIds,
+  classicThemeIds,
+  heraldThemeIds,
+  lumenThemeIds,
+  themes,
+  themesByFamily,
+  getTheme,
+  themesForFamily,
+  coerceTheme,
+} from "./theme"
 export type { Space, ThemeId, Theme } from "./theme"
 
 export { fontIds, fontPairs, defaultFontByTemplate } from "./fonts"

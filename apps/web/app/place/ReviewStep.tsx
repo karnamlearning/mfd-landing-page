@@ -7,12 +7,6 @@ import { saveConfig } from "./persist"
 import { useDraft } from "./store"
 import * as U from "./styles"
 
-const TEMPLATE_NAME = {
-  solo: "Solo Advisor",
-  practice: "Practice / Office",
-  local: "Local",
-} as const
-
 const SECTION_NAME: Record<string, string> = {
   hero: "Hero",
   about: "About",
@@ -73,9 +67,7 @@ export function ReviewStep({ onPublish }: { onPublish: () => void }) {
 
       <U.Summary>
         <dt>Template</dt>
-        <dd>{familyMeta[config.family ?? "studio"].name}</dd>
-        <dt>Variant</dt>
-        <dd>{TEMPLATE_NAME[config.template]}</dd>
+        <dd>{familyMeta[config.family ?? "classic"].name}</dd>
         <dt>Theme</dt>
         <dd>{themes[config.theme].name}</dd>
         <dt>Font</dt>

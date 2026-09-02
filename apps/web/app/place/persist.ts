@@ -83,6 +83,7 @@ export function usePersistDraft() {
   const config = useDraft((s) => s.config)
   const prevLook = useRef({
     family: config.family,
+    look: config.look,
     pickedFamily: config.pickedFamily,
     template: config.template,
     theme: config.theme,
@@ -110,6 +111,7 @@ export function usePersistDraft() {
       lastSaved = snapshot(config)
       prevLook.current = {
         family: config.family,
+        look: config.look,
         pickedFamily: config.pickedFamily,
         template: config.template,
         theme: config.theme,
@@ -123,6 +125,7 @@ export function usePersistDraft() {
     const key = config.addons.join(",")
     const instant =
       prevLook.current.family !== config.family ||
+      prevLook.current.look !== config.look ||
       prevLook.current.pickedFamily !== config.pickedFamily ||
       prevLook.current.template !== config.template ||
       prevLook.current.theme !== config.theme ||
@@ -130,6 +133,7 @@ export function usePersistDraft() {
       prevLook.current.addons !== key
     prevLook.current = {
       family: config.family,
+      look: config.look,
       pickedFamily: config.pickedFamily,
       template: config.template,
       theme: config.theme,

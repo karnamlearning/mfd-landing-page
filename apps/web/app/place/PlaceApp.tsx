@@ -17,13 +17,11 @@ import { SectionsStep } from "./SectionsStep"
 import { STEPS, useDraft, type ServerDraft, type StepId } from "./store"
 import * as U from "./styles"
 import { TemplateGallery } from "./TemplateGallery"
-import { TemplateStep } from "./TemplateStep"
 import { ThemeStep } from "./ThemeStep"
 import { OtpForm } from "../signup/OtpForm"
 
 const NEXT: Partial<Record<StepId, StepId>> = {
-  details: "template",
-  template: "theme",
+  details: "theme",
   theme: "font",
   font: "sections",
   sections: "review",
@@ -32,7 +30,6 @@ const NEXT: Partial<Record<StepId, StepId>> = {
 function StepBody({ onOpenPublish }: { onOpenPublish: () => void }) {
   const step = useDraft((s) => s.step)
   if (step === "details") return <DetailsStep />
-  if (step === "template") return <TemplateStep />
   if (step === "theme") return <ThemeStep />
   if (step === "font") return <FontStep />
   if (step === "sections") return <SectionsStep />
@@ -96,7 +93,7 @@ function CustomSiteBar({ dock }: { dock?: boolean }) {
 }
 
 function FamilySwitch({ onBrowse }: { onBrowse: () => void }) {
-  const family = useDraft((s) => s.config.family ?? "studio")
+  const family = useDraft((s) => s.config.family ?? "classic")
   const setFamily = useDraft((s) => s.setFamily)
   const focusPreview = useDraft((s) => s.focusPreview)
   return (
@@ -203,47 +200,47 @@ function Editor() {
   return (
     <U.Shell>
       <U.Chrome>
-      <U.Top>
-        <U.BrandMark>
-          <U.BrandName>Advisorkhoj</U.BrandName>
-          <U.BrandSub>{yours ? "Your site" : "Buyer Place"}</U.BrandSub>
-        </U.BrandMark>
-        <FamilySwitch onBrowse={() => setBrowse(true)} />
-        <SiteChrome />
-        <U.TopGrow />
-        <U.GhostBtn type="button" onClick={() => setPreviewOpen(!previewOpen)}>
-          <FiEye size={14} aria-hidden />
-          {previewOpen ? "Hide preview" : "Show preview"}
-        </U.GhostBtn>
-        <U.Seg>
-          <U.SegBtn type="button" $on={viewport === "mobile"} onClick={() => setViewport("mobile")}>
-            <FiSmartphone size={14} aria-hidden />
-            Mobile
-          </U.SegBtn>
-          <U.SegBtn type="button" $on={viewport === "desktop"} onClick={() => setViewport("desktop")}>
-            <FiMonitor size={14} aria-hidden />
-            Desktop
-          </U.SegBtn>
-        </U.Seg>
-        <U.PayBtn type="button" onClick={openPublish}>
-          Publish
-        </U.PayBtn>
-      </U.Top>
-      {impersonating ? (
-        <U.TrialBanner $warn>
-          Ops impersonation — you are editing this distributor’s site.{" "}
-          <a href="/admin">Back to ops</a>
-        </U.TrialBanner>
-      ) : null}
-      {status === "trial" ? (
-        <U.TrialBanner>
-          Trial is live{trialUntil ? ` until ${trialUntil}` : ""}. Publish a plan to keep the site up after the
-          trial.
-        </U.TrialBanner>
-      ) : null}
-      {status === "suspended" ? (
-        <U.TrialBanner $warn>Public site is down. Publish a plan to restore it. Your pages are kept.</U.TrialBanner>
-      ) : null}
+        <U.Top>
+          <U.BrandMark>
+            <U.BrandName>Advisorkhoj</U.BrandName>
+            <U.BrandSub>{yours ? "Your site" : "Buyer Place"}</U.BrandSub>
+          </U.BrandMark>
+          <FamilySwitch onBrowse={() => setBrowse(true)} />
+          <SiteChrome />
+          <U.TopGrow />
+          <U.GhostBtn type="button" onClick={() => setPreviewOpen(!previewOpen)}>
+            <FiEye size={14} aria-hidden />
+            {previewOpen ? "Hide preview" : "Show preview"}
+          </U.GhostBtn>
+          <U.Seg>
+            <U.SegBtn type="button" $on={viewport === "mobile"} onClick={() => setViewport("mobile")}>
+              <FiSmartphone size={14} aria-hidden />
+              Mobile
+            </U.SegBtn>
+            <U.SegBtn type="button" $on={viewport === "desktop"} onClick={() => setViewport("desktop")}>
+              <FiMonitor size={14} aria-hidden />
+              Desktop
+            </U.SegBtn>
+          </U.Seg>
+          <U.PayBtn type="button" onClick={openPublish}>
+            Publish
+          </U.PayBtn>
+        </U.Top>
+        {impersonating ? (
+          <U.TrialBanner $warn>
+            Ops impersonation — you are editing this distributor’s site.{" "}
+            <a href="/admin">Back to ops</a>
+          </U.TrialBanner>
+        ) : null}
+        {status === "trial" ? (
+          <U.TrialBanner>
+            Trial is live{trialUntil ? ` until ${trialUntil}` : ""}. Publish a plan to keep the site up after the
+            trial.
+          </U.TrialBanner>
+        ) : null}
+        {status === "suspended" ? (
+          <U.TrialBanner $warn>Public site is down. Publish a plan to restore it. Your pages are kept.</U.TrialBanner>
+        ) : null}
       </U.Chrome>
       <U.Body>
         <U.Left>
@@ -285,7 +282,7 @@ function Editor() {
         <PreviewFrame />
         <AddonsRail />
       </U.Body>
-      <CustomSiteBar dock />
+      <CustomSiteBar />
       <PublishModal open={publishOpen} onClose={() => setPublishOpen(false)} />
     </U.Shell>
   )

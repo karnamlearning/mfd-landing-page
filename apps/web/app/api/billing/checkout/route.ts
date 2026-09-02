@@ -13,7 +13,7 @@ export async function POST(req: Request) {
   if (error || !session) return error!
   const row = await getTenant(session.tenantId)
   if (!row) return json({ error: "missing_tenant" }, 404)
-  if (row.status === "active") return json({ error: "already_active", ...toMePayload(row) }, 409)
+  if (row.status === "active") return json({ error: "already_active", ...(await toMePayload(row)) }, 409)
 
   let body: { plan?: string }
   try {

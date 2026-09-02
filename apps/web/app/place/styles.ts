@@ -887,14 +887,14 @@ export const GalleryThumb = styled.div<{ $id: string }>`
 const galleryPan = css`
   @keyframes mfd-gallery-pan {
     0%,
-    12% {
+    22% {
       transform: scale(var(--s, 0.45)) translateY(0);
     }
-    46%,
-    58% {
+    48%,
+    62% {
       transform: scale(var(--s, 0.45)) translateY(var(--pan, 0px));
     }
-    92%,
+    88%,
     100% {
       transform: scale(var(--s, 0.45)) translateY(0);
     }
@@ -938,7 +938,7 @@ export const LiveStage = styled.div`
   width: 920px;
   transform-origin: top left;
   transform: scale(var(--s, 0.45));
-  animation: mfd-gallery-pan 22s ease-in-out infinite;
+  animation: mfd-gallery-pan 56s linear infinite;
   animation-delay: var(--delay, 0s);
   animation-play-state: running;
   will-change: transform;

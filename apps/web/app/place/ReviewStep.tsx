@@ -5,6 +5,7 @@ import { ADDON_LABEL, familyMeta, slugifyName } from "@mfd/schema"
 import { fontPairs, themes } from "@mfd/tokens"
 import { saveConfig } from "./persist"
 import { useDraft } from "./store"
+import { liveHref } from "@/lib/site-url"
 import * as U from "./styles"
 
 const SECTION_NAME: Record<string, string> = {
@@ -24,7 +25,7 @@ const SECTION_NAME: Record<string, string> = {
 export function ReviewStep({ onPublish }: { onPublish: () => void }) {
   const config = useDraft((s) => s.config)
   const slugLocked = useDraft((s) => s.slugLocked)
-  const publicUrl = useDraft((s) => s.publicUrl)
+  const publicUrl = liveHref(useDraft((s) => s.publicUrl))
   const setSlug = useDraft((s) => s.setSlug)
   const visible = config.sections.filter((row) => row.on)
   const addons = config.addons.filter((id): id is keyof typeof ADDON_LABEL => id in ADDON_LABEL)

@@ -8,6 +8,7 @@ import { ADDON_LABEL, ADDON_PRICE, addonIds, familyIds, familyMeta, formatInr, i
 import { themes } from "@mfd/tokens"
 import { BrandLogo } from "../BrandLogo"
 import { PLACE_LOGO } from "../brand"
+import { liveHref } from "@/lib/site-url"
 import { CustomSiteBar } from "./CustomSiteBar"
 import { logoutBuyer } from "./logout"
 import { DetailsStep } from "./DetailsStep"
@@ -108,9 +109,11 @@ function SiteChrome() {
   const saveError = useDraft((s) => s.saveError)
   const [copied, setCopied] = useState(false)
 
+  const href = liveHref(publicUrl)
+
   async function copy() {
-    if (!publicUrl) return
-    await navigator.clipboard.writeText(publicUrl)
+    if (!href) return
+    await navigator.clipboard.writeText(href)
     setCopied(true)
     setTimeout(() => setCopied(false), 1500)
   }
@@ -131,12 +134,12 @@ function SiteChrome() {
       ) : (
         <U.SaveHint>Saved</U.SaveHint>
       )}
-      <U.UrlText title={publicUrl}>{publicUrl.replace(/^https?:\/\//, "")}</U.UrlText>
+      <U.UrlText title={href}>{href.replace(/^https?:\/\//, "")}</U.UrlText>
       <U.ChromeBtn as="button" type="button" onClick={() => void copy()} aria-label="Copy URL">
         <FiCopy size={14} />
         {copied ? "Copied" : "Copy"}
       </U.ChromeBtn>
-      <U.ChromeBtn href={publicUrl} target="_blank" rel="noreferrer">
+      <U.ChromeBtn href={href} target="_blank" rel="noreferrer">
         <FiExternalLink size={14} />
         Open
       </U.ChromeBtn>

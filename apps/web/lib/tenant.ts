@@ -4,6 +4,7 @@ import { isPhoneStubSlug, isReservedSlug, pruneEmptyContent, tenantConfigSchema,
 import { getDb } from "./db"
 import { uniqueSlug } from "./slug"
 import { publicSiteUrl } from "./site-url"
+import { headers } from "next/headers"
 
 export const TRIAL_DAYS = 14
 
@@ -46,7 +47,9 @@ export type MeConfigPayload = {
   impersonating?: boolean
 }
 
-export function toMePayload(row: TenantRow): MeConfigPayload {
+export async function toMePayload(row: TenantRow): Promise<MeConfigPayload> {
+  const h = await headers()
+  const host = h.get("x-forwarded-host") || h.get("host")
   const config = tenantConfigSchema.parse(row.config)
   return {
     config: { ...config, slug: row.slug },
@@ -54,7 +57,7 @@ export function toMePayload(row: TenantRow): MeConfigPayload {
     status: row.status,
     plan: row.plan,
     trialEndsAt: trialEndsAt(row)?.toISOString() ?? null,
-    publicUrl: publicSiteUrl(row.slug),
+    publicUrl: publicSiteUrl(row.slug, host),
   }
 }
 

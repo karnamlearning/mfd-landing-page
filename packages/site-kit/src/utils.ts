@@ -79,6 +79,11 @@ export function scrollSiteTo(from: Element, id: string) {
     return
   }
 
+  if (scroller) {
+    const offset = el.getBoundingClientRect().top - scroller.getBoundingClientRect().top + scroller.scrollTop
+    scroller.scrollTo({ top: Math.max(0, offset - 12), behavior })
+    return
+  }
   el.scrollIntoView({
     behavior,
     block: "start",

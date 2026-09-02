@@ -3,7 +3,7 @@ import { FiHeart, FiLayers, FiPieChart, FiRefreshCw, FiRepeat, FiSunrise, FiTarg
 import { lockedSectionIds, lookOf, type LookId, type SectionId, type TenantConfig, type TemplateId } from "@mfd/schema"
 import type { BrandCopy } from "./brand"
 import type { Copy, Locale } from "./copy"
-import { scrollSiteTo } from "./utils"
+import { parseInternalHref, scrollSiteTo } from "./utils"
 
 export type SkinCtx = {
   config: TenantConfig
@@ -19,10 +19,12 @@ export type SkinCtx = {
 export function onHashNav(e: MouseEvent<HTMLAnchorElement>) {
   if (e.currentTarget.closest("[data-preview-nav]")) return
   const href = e.currentTarget.getAttribute("href") ?? ""
-  if (!href.includes("#")) return
+  const parsed = parseInternalHref(href)
+  if (!parsed?.hash) return
+  const here = typeof window !== "undefined" ? window.location.pathname : "/"
+  if (parsed.path !== here) return
   e.preventDefault()
-  const id = href.slice(href.indexOf("#") + 1).split("?")[0] || "top"
-  scrollSiteTo(e.currentTarget, id)
+  scrollSiteTo(e.currentTarget, parsed.hash)
 }
 
 export const SERVICE_ICONS = {

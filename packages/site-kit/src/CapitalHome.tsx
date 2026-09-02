@@ -9,6 +9,7 @@ import { brandService } from "./brand"
 import { Calculator } from "./Calculator"
 import { LeadForm } from "./LeadForm"
 import { isOn, onHashNav, type SkinHomeProps } from "./skin-shared"
+import { isHomePath, showSection } from "./site-pages"
 
 const Page = styled.div`
   min-height: 100%;
@@ -102,7 +103,7 @@ const Drop = styled.div`
   position: relative;
 `
 
-const DropBtn = styled.button`
+const DropBtn = styled.a`
   display: inline-flex;
   align-items: center;
   gap: 0.2rem;
@@ -113,6 +114,7 @@ const DropBtn = styled.button`
   cursor: pointer;
   font: inherit;
   padding: 0;
+  text-decoration: none;
 `
 
 const DropMenu = styled.div`
@@ -438,6 +440,8 @@ export function CapitalHome({ ctx, locale, onLocale, body }: SkinHomeProps) {
   const bilingual = config.addons.includes("bilingual")
   const photo = d.photoUrl || d.heroImageUrl
   const solo = templateOf(config) === "solo"
+  const path = ctx.previewPath
+  const home = isHomePath(path)
   const serviceItems = config.services
     .map((id) => {
       const item = brandService(id, config.wording, locale)
@@ -462,42 +466,37 @@ export function CapitalHome({ ctx, locale, onLocale, body }: SkinHomeProps) {
             </BrandCopy>
           </Brand>
           <Nav>
-            <a href="/" onClick={onHashNav}>
+            <a href="/" onClick={onHashNav} aria-current={home ? "page" : undefined}>
               {t.home}
             </a>
             <Drop
               onMouseEnter={() => setServicesOpen(true)}
               onMouseLeave={() => setServicesOpen(false)}
             >
-              <DropBtn
-                type="button"
-                aria-expanded={servicesOpen}
-                aria-haspopup="true"
-                onClick={() => setServicesOpen((v) => !v)}
-              >
+              <DropBtn href="/services" onClick={onHashNav} aria-current={path === "/services" ? "page" : undefined}>
                 {n.services}
                 <FiChevronDown size={14} aria-hidden />
               </DropBtn>
               {servicesOpen ? (
                 <DropMenu>
                   {serviceItems.map((s) => (
-                    <a key={s.id} href={`/#${s.id}`} onClick={onHashNav}>
+                    <a key={s.id} href={`/services#${s.id}`} onClick={onHashNav}>
                       {s.title}
                     </a>
                   ))}
                 </DropMenu>
               ) : null}
             </Drop>
-            <a href="/calculators" onClick={onHashNav}>
+            <a href="/calculators" onClick={onHashNav} aria-current={path === "/calculators" ? "page" : undefined}>
               {n.calc}
             </a>
-            <a href="/#about" onClick={onHashNav}>
+            <a href="/about" onClick={onHashNav} aria-current={path === "/about" ? "page" : undefined}>
               {n.about}
             </a>
-            <a href="/#insights" onClick={onHashNav}>
+            <a href="/insights" onClick={onHashNav} aria-current={path === "/insights" ? "page" : undefined}>
               {n.insights}
             </a>
-            <a href="/#blog" onClick={onHashNav}>
+            <a href="/blog" onClick={onHashNav} aria-current={path === "/blog" ? "page" : undefined}>
               {n.blog}
             </a>
           </Nav>
@@ -510,7 +509,7 @@ export function CapitalHome({ ctx, locale, onLocale, body }: SkinHomeProps) {
               {locale === "en" ? "हिं" : "EN"}
             </button>
           ) : null}
-          <Consult href="/#contact" onClick={onHashNav}>
+          <Consult href="/contact" onClick={onHashNav}>
             {b.cta}
           </Consult>
           <MenuBtn type="button" aria-label={t.menu} aria-expanded={menu} onClick={() => setMenu((v) => !v)}>
@@ -530,14 +529,21 @@ export function CapitalHome({ ctx, locale, onLocale, body }: SkinHomeProps) {
             >
               {t.home}
             </a>
-            <p style={{ margin: "0.7rem 0 0.15rem", opacity: 0.55, fontSize: "0.72rem", letterSpacing: "0.08em" }}>
+            <a
+              href="/services"
+              onClick={(e) => {
+                setMenu(false)
+                onHashNav(e)
+              }}
+              style={{ margin: "0.7rem 0 0.15rem", opacity: 0.55, fontSize: "0.72rem", letterSpacing: "0.08em" }}
+            >
               {n.services}
-            </p>
+            </a>
             <Sub>
               {serviceItems.map((s) => (
                 <a
                   key={s.id}
-                  href={`/#${s.id}`}
+                  href={`/services#${s.id}`}
                   onClick={(e) => {
                     setMenu(false)
                     onHashNav(e)
@@ -557,7 +563,7 @@ export function CapitalHome({ ctx, locale, onLocale, body }: SkinHomeProps) {
               {n.calc}
             </a>
             <a
-              href="/#about"
+              href="/about"
               onClick={(e) => {
                 setMenu(false)
                 onHashNav(e)
@@ -566,7 +572,7 @@ export function CapitalHome({ ctx, locale, onLocale, body }: SkinHomeProps) {
               {n.about}
             </a>
             <a
-              href="/#insights"
+              href="/insights"
               onClick={(e) => {
                 setMenu(false)
                 onHashNav(e)
@@ -575,13 +581,22 @@ export function CapitalHome({ ctx, locale, onLocale, body }: SkinHomeProps) {
               {n.insights}
             </a>
             <a
-              href="/#blog"
+              href="/blog"
               onClick={(e) => {
                 setMenu(false)
                 onHashNav(e)
               }}
             >
               {n.blog}
+            </a>
+            <a
+              href="/contact"
+              onClick={(e) => {
+                setMenu(false)
+                onHashNav(e)
+              }}
+            >
+              {t.contact}
             </a>
           </Sheet>
         </Shell>
@@ -591,6 +606,7 @@ export function CapitalHome({ ctx, locale, onLocale, body }: SkinHomeProps) {
         <Shell>{body}</Shell>
       ) : (
         <Shell>
+          {home ? (
           <Hero id="top" data-spot="top">
             <div>
               {solo && photo ? <Photo src={photo} alt="" data-spot="photo" /> : null}
@@ -613,8 +629,9 @@ export function CapitalHome({ ctx, locale, onLocale, body }: SkinHomeProps) {
               <LeadForm ctx={ctx} />
             </Card>
           </Hero>
+          ) : null}
 
-          {isOn(config, "stats") && d.stats.length ? (
+          {home && isOn(config, "stats") && d.stats.length ? (
             <Stats id="stats" data-spot="stats">
               {d.stats.map((s) => (
                 <Stat key={s.label}>
@@ -625,7 +642,7 @@ export function CapitalHome({ ctx, locale, onLocale, body }: SkinHomeProps) {
             </Stats>
           ) : null}
 
-          {isOn(config, "services") ? (
+          {showSection(path, "/services") && isOn(config, "services") ? (
             <Block id="services" data-spot="services">
               <Kicker>{n.services}</Kicker>
               <H2>{b.servicesTitle}</H2>
@@ -637,7 +654,7 @@ export function CapitalHome({ ctx, locale, onLocale, body }: SkinHomeProps) {
                   const item = brandService(id, config.wording, locale)
                   if (!item) return null
                   return (
-                    <Mandate key={id} id={id} href="/#contact" onClick={onHashNav}>
+                    <Mandate key={id} id={id} href="/contact" onClick={onHashNav}>
                       <div>
                         <strong>{item.title}</strong>
                         <p>{item.body}</p>
@@ -650,7 +667,7 @@ export function CapitalHome({ ctx, locale, onLocale, body }: SkinHomeProps) {
             </Block>
           ) : null}
 
-          {isOn(config, "calculators") ? (
+          {home && isOn(config, "calculators") ? (
             <Block id="calculators" data-spot="calculators">
               <Kicker>{n.calc}</Kicker>
               <H2>{b.calcTitle}</H2>
@@ -664,7 +681,7 @@ export function CapitalHome({ ctx, locale, onLocale, body }: SkinHomeProps) {
             </Block>
           ) : null}
 
-          {isOn(config, "about") ? (
+          {showSection(path, "/about") && isOn(config, "about") ? (
             <Block id="about" data-spot="about">
               <Kicker>{n.about}</Kicker>
               <H2>{b.aboutTitle}</H2>
@@ -682,7 +699,7 @@ export function CapitalHome({ ctx, locale, onLocale, body }: SkinHomeProps) {
             </Block>
           ) : null}
 
-          {isOn(config, "testimonials") && config.testimonials.length ? (
+          {showSection(path, "/insights") && isOn(config, "testimonials") && config.testimonials.length ? (
             <Block id="insights" data-spot="testimonials">
               <Kicker>{n.insights}</Kicker>
               <H2>{b.quotesTitle}</H2>
@@ -697,7 +714,7 @@ export function CapitalHome({ ctx, locale, onLocale, body }: SkinHomeProps) {
             </Block>
           ) : null}
 
-          {isOn(config, "faq") && config.faq.length ? (
+          {showSection(path, "/blog") && isOn(config, "faq") && config.faq.length ? (
             <Block id="blog" data-spot="faq">
               <Kicker>{n.blog}</Kicker>
               <H2>{b.faqTitle}</H2>
@@ -711,7 +728,7 @@ export function CapitalHome({ ctx, locale, onLocale, body }: SkinHomeProps) {
             </Block>
           ) : null}
 
-          {isOn(config, "credentials") && d.credentials.length ? (
+          {home && isOn(config, "credentials") && d.credentials.length ? (
             <Block id="credentials" data-spot="credentials">
               <Kicker>{t.registration}</Kicker>
               <H2>{b.recordTitle}</H2>
@@ -723,7 +740,7 @@ export function CapitalHome({ ctx, locale, onLocale, body }: SkinHomeProps) {
             </Block>
           ) : null}
 
-          {isOn(config, "how") ? (
+          {showSection(path, "/how") && isOn(config, "how") ? (
             <Block id="how" data-spot="how">
               <Kicker>{t.howNav}</Kicker>
               <H2>{b.howTitle}</H2>
@@ -739,7 +756,7 @@ export function CapitalHome({ ctx, locale, onLocale, body }: SkinHomeProps) {
             </Block>
           ) : null}
 
-          {isOn(config, "contact") ? (
+          {showSection(path, "/contact") && isOn(config, "contact") ? (
             <Block id="contact" data-spot="contact">
               <Kicker>{t.contact}</Kicker>
               <H2>{b.contactTitle}</H2>
@@ -752,7 +769,7 @@ export function CapitalHome({ ctx, locale, onLocale, body }: SkinHomeProps) {
             </Block>
           ) : null}
 
-          {isOn(config, "whatsapp_strip") ? (
+          {home && isOn(config, "whatsapp_strip") ? (
             <Wa id="whatsapp" data-spot="whatsapp" href={wa} target="_blank" rel="noreferrer">
               <FaWhatsapp size={14} aria-hidden /> {t.wa} {d.name}
             </Wa>

@@ -18,6 +18,7 @@ const nextConfig: NextConfig = {
     HOST_PROTOCOL: process.env.HOST_PROTOCOL || "http",
     HOST_PORT: process.env.HOST_PORT || "3000",
   },
+  allowedDevOrigins: ["*.localhost"],
 }
 
 export default nextConfig

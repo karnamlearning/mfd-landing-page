@@ -18,6 +18,7 @@ import { HeraldHome } from "./HeraldHome"
 import { LumenHome } from "./LumenHome"
 import { CapitalHome } from "./CapitalHome"
 import { heroLayout, onHashNav, SERVICE_ICONS, type SkinCtx } from "./skin-shared"
+import { isKitPage, sitePath } from "./site-pages"
 
 const ICONS = SERVICE_ICONS
 
@@ -44,6 +45,8 @@ export type SiteProps = {
   embedded?: boolean
   /** Buyer Place: scroll + highlight this block when the tick changes. */
   previewFocus?: { id: PreviewSpotId; tick: number } | null
+  /** Live inner route (`/about`, `/calculators`, …). Ignored when `embedded`. */
+  page?: string
   children?: ReactNode
 }
 
@@ -62,19 +65,19 @@ function Header({ ctx, locale, onLocale }: { ctx: Ctx; locale: Locale; onLocale:
   const [menu, setMenu] = useState(false)
   const on = new Set(activeSections(config).map((s) => s.id))
   const links = [
-    { id: "about" as const, href: "/#about", label: t.about },
-    { id: "services" as const, href: "/#services", label: t.services },
-    { id: "calculators" as const, href: "/#calculators", label: t.calculators },
-    { id: "contact" as const, href: "/#contact", label: t.contact },
+    { id: "about" as const, href: "/about", label: t.about },
+    { id: "services" as const, href: "/services", label: t.services },
+    { id: "calculators" as const, href: "/calculators", label: t.calculators },
+    { id: "contact" as const, href: "/contact", label: t.contact },
   ].filter((l) => on.has(l.id))
   const menuLinks = [
-    { id: "about" as const, href: "/#about", label: t.about },
-    { id: "services" as const, href: "/#services", label: t.services },
-    { id: "how" as const, href: "/#how", label: t.howNav },
-    { id: "calculators" as const, href: "/#calculators", label: t.calculators },
-    { id: "testimonials" as const, href: "/#testimonials", label: t.quotesNav },
-    { id: "faq" as const, href: "/#faq", label: t.faqNav },
-    { id: "contact" as const, href: "/#contact", label: t.contact },
+    { id: "about" as const, href: "/about", label: t.about },
+    { id: "services" as const, href: "/services", label: t.services },
+    { id: "how" as const, href: "/how", label: t.howNav },
+    { id: "calculators" as const, href: "/calculators", label: t.calculators },
+    { id: "testimonials" as const, href: "/insights", label: t.quotesNav },
+    { id: "faq" as const, href: "/blog", label: t.faqNav },
+    { id: "contact" as const, href: "/contact", label: t.contact },
   ].filter((l) => on.has(l.id))
 
   useEffect(() => {
@@ -98,7 +101,7 @@ function Header({ ctx, locale, onLocale }: { ctx: Ctx; locale: Locale; onLocale:
         </S.Brand>
         <S.Nav>
           {links.map((l) => (
-            <a key={l.id} href={l.href} onClick={onHashNav}>
+            <a key={l.id} href={l.href} onClick={onHashNav} aria-current={previewPath === l.href ? "page" : undefined}>
                 {l.label}
               </a>
           ))}
@@ -164,7 +167,7 @@ function HeroSection({ ctx }: { ctx: Ctx }) {
             {ctx.b.cta}
           </S.WaBtn>
           {ctx.config.sections.some((s) => s.id === "calculators" && s.on) ? (
-            <S.GhostBtn href="/#calculators" onClick={onHashNav}>{t.seeCalcs}</S.GhostBtn>
+            <S.GhostBtn href="/calculators" onClick={onHashNav}>{t.seeCalcs}</S.GhostBtn>
           ) : null}
         </S.HeroActions>
       </S.HeroCopy>
@@ -547,7 +550,7 @@ function Footer({ ctx }: { ctx: Ctx }) {
             <a href="/" onClick={onHashNav}>
               {t.home}
             </a>
-            <a href="/#services" onClick={onHashNav}>
+            <a href="/services" onClick={onHashNav}>
               {t.services}
             </a>
             <a href="/calculators" onClick={onHashNav}>
@@ -580,24 +583,31 @@ const registry: Record<SectionId, (ctx: Ctx) => ReactNode> = {
 
 function PreviewInner({ path, ctx }: { path: string; ctx: Ctx }) {
   const { config, locale, preview } = ctx
-  if (path === "/calculators") return <ToolsIndex config={config} locale={locale} />
-  if (path.startsWith("/calculators/")) {
-    const tool = path.slice("/calculators/".length)
+  const p = sitePath(path)
+  if (p === "/calculators") return <ToolsIndex config={config} locale={locale} />
+  if (p.startsWith("/calculators/")) {
+    const tool = p.slice("/calculators/".length)
     if (!visibleToolIds(config).includes(tool as ToolId)) return <ToolsIndex config={config} locale={locale} />
     return <ToolBody config={config} tool={tool} locale={locale} preview={preview} />
   }
-  if (path === "/disclosures") {
+  if (p === "/disclosures") {
     return <DisclosuresBody name={config.details.name} arn={config.details.arn ?? ""} />
   }
+  if (p === "/about") return <AboutSection ctx={ctx} />
+  if (p === "/services") return <ServicesSection ctx={ctx} />
+  if (p === "/how") return <HowSection ctx={ctx} />
+  if (p === "/insights") return <TestimonialsSection ctx={ctx} />
+  if (p === "/blog") return <FaqSection ctx={ctx} />
+  if (p === "/contact") return <ContactSection ctx={ctx} />
   return null
 }
 
-export function Site({ config, preview = false, embedded = false, previewFocus = null, children }: SiteProps) {
+export function Site({ config, preview = false, embedded = false, previewFocus = null, page, children }: SiteProps) {
   const resolved = mergeSample(config, preview)
   const family = familyOf(resolved)
   const look = lookOf(resolved)
   const [locale, setLocale] = useState<Locale>("en")
-  const [nav, setNav] = useState({ path: "/", hash: "top", tick: 0 })
+  const [nav, setNav] = useState({ path: sitePath(page ?? "/"), hash: "top", tick: 0 })
   const [spot, setSpot] = useState<PreviewSpotId | null>(null)
   const rootRef = useRef<HTMLDivElement>(null)
   const lastFocusTick = useRef(0)
@@ -606,6 +616,7 @@ export function Site({ config, preview = false, embedded = false, previewFocus =
   const bilingual = resolved.addons.includes("bilingual")
   const t = copy[bilingual ? locale : "en"]
   const wa = waHref(resolved.details.whatsapp)
+  const activePath = embedded ? sitePath(nav.path) : sitePath(page ?? "/")
   const ctx: Ctx = {
     config: resolved,
     t,
@@ -614,15 +625,19 @@ export function Site({ config, preview = false, embedded = false, previewFocus =
     wa,
     preview,
     embedded,
-    previewPath: nav.path,
+    previewPath: activePath,
   }
 
   useLayoutEffect(() => {
-    if (!embedded || nav.path !== "/") return
+    if (!embedded) return
     const root = rootRef.current
     if (!root) return
-    const id = nav.hash || "top"
-    if (!id) return
+    const id = nav.hash
+    if (!id || id === "top") {
+      const frame = root.closest("[data-preview-frame]")
+      if (frame instanceof HTMLElement) frame.scrollTo({ top: 0, behavior: "auto" })
+      return
+    }
     scrollSiteTo(root, id)
   }, [embedded, nav.hash, nav.path, nav.tick])
 
@@ -664,21 +679,21 @@ export function Site({ config, preview = false, embedded = false, previewFocus =
     if (!parsed) return
     e.preventDefault()
     e.stopPropagation()
-    const path = parsed.path
-    const hash =
-      parsed.hash ||
-      (path === "/" ? "top" : path.startsWith("/calculators") ? "calculators" : "")
+    const path = sitePath(parsed.path)
+    const hash = parsed.hash || (path === "/" ? "top" : "")
     setNav((s) => ({ path, hash, tick: s.tick + 1 }))
   }
 
-  const previewPage = embedded ? <PreviewInner path={nav.path} ctx={ctx} /> : null
-  const body =
-    (embedded && nav.path !== "/" ? previewPage : null) ??
+  const inner = activePath !== "/" ? <PreviewInner path={activePath} ctx={ctx} /> : null
+  const kitBody = isKitPage(activePath) ? inner : null
+  const classicBody =
+    inner ??
     children ??
     activeSections(resolved).map((row) => {
       const render = registry[row.id]
       return render ? <Fragment key={row.id}>{render(ctx)}</Fragment> : null
     })
+  const skinBody = kitBody ?? (activePath !== "/" ? null : children)
 
   return (
     <ThemeProvider theme={theme}>
@@ -705,15 +720,15 @@ export function Site({ config, preview = false, embedded = false, previewFocus =
       >
         <GlobalStyle $embedded={embedded} />
         {family === "herald" ? (
-          <HeraldHome ctx={ctx} locale={locale} onLocale={setLocale} body={embedded && nav.path !== "/" ? body : children} />
+          <HeraldHome ctx={ctx} locale={locale} onLocale={setLocale} body={skinBody} />
         ) : family === "lumen" ? (
-          <LumenHome ctx={ctx} locale={locale} onLocale={setLocale} body={embedded && nav.path !== "/" ? body : children} />
+          <LumenHome ctx={ctx} locale={locale} onLocale={setLocale} body={skinBody} />
         ) : family === "capital" ? (
-          <CapitalHome ctx={ctx} locale={locale} onLocale={setLocale} body={embedded && nav.path !== "/" ? body : children} />
+          <CapitalHome ctx={ctx} locale={locale} onLocale={setLocale} body={skinBody} />
         ) : (
           <>
             <Header ctx={ctx} locale={locale} onLocale={setLocale} />
-            {body}
+            {classicBody}
             <Footer ctx={ctx} />
           </>
         )}

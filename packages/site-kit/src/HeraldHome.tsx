@@ -7,6 +7,7 @@ import { brandService } from "./brand"
 import { Calculator } from "./Calculator"
 import { LeadForm } from "./LeadForm"
 import { activeSections, isOn, onHashNav, type SkinHomeProps } from "./skin-shared"
+import { isHomePath, showSection } from "./site-pages"
 import { templateOf, visibleToolIds } from "@mfd/schema"
 import { useEffect, useState } from "react"
 
@@ -255,12 +256,14 @@ export function HeraldHome({ ctx, locale, onLocale, body }: SkinHomeProps) {
   const on = new Set(activeSections(config).map((s) => s.id))
   const photo = d.photoUrl || d.heroImageUrl
   const solo = templateOf(config) === "solo"
+  const path = ctx.previewPath
+  const home = isHomePath(path)
   const links = (
     [
-      { href: "/#about", label: t.about, id: "about" },
-      { href: "/#services", label: t.services, id: "services" },
-      { href: "/#calculators", label: t.calculators, id: "calculators" },
-      { href: "/#contact", label: t.contact, id: "contact" },
+      { href: "/about", label: t.about, id: "about" },
+      { href: "/services", label: t.services, id: "services" },
+      { href: "/calculators", label: t.calculators, id: "calculators" },
+      { href: "/contact", label: t.contact, id: "contact" },
     ] as const
   ).filter((l) => on.has(l.id))
 
@@ -285,7 +288,7 @@ export function HeraldHome({ ctx, locale, onLocale, body }: SkinHomeProps) {
             </MenuBtn>
             <DeskNav>
               {links.map((l) => (
-                <a key={l.id} href={l.href} onClick={onHashNav}>
+                <a key={l.id} href={l.href} onClick={onHashNav} aria-current={path === l.href ? "page" : undefined}>
                   {l.label}
                 </a>
               ))}
@@ -319,8 +322,12 @@ export function HeraldHome({ ctx, locale, onLocale, body }: SkinHomeProps) {
         </MastInner>
       </Mast>
 
-      {body ?? (
+      {body ? (
+        body
+      ) : (
         <Sheet>
+          {home ? (
+            <>
           <Lead id="top" data-spot="top" $solo={solo}>
             {solo && photo ? (
               <Fig data-spot="photo">
@@ -341,8 +348,10 @@ export function HeraldHome({ ctx, locale, onLocale, body }: SkinHomeProps) {
             ) : null}
           </Lead>
           <Rule />
+            </>
+          ) : null}
 
-          {isOn(config, "about") ? (
+          {showSection(path, "/about") && isOn(config, "about") ? (
             <Block id="about" data-spot="about">
               <Kicker>{t.welcome}</Kicker>
               <H2>{b.aboutTitle}</H2>
@@ -359,7 +368,7 @@ export function HeraldHome({ ctx, locale, onLocale, body }: SkinHomeProps) {
             </Block>
           ) : null}
 
-          {isOn(config, "stats") && d.stats.length ? (
+          {home && isOn(config, "stats") && d.stats.length ? (
             <Tape id="stats" data-spot="stats">
               {d.stats.map((s) => (
                 <span key={s.label}>
@@ -369,7 +378,7 @@ export function HeraldHome({ ctx, locale, onLocale, body }: SkinHomeProps) {
             </Tape>
           ) : null}
 
-          {isOn(config, "services") ? (
+          {showSection(path, "/services") && isOn(config, "services") ? (
             <Block id="services" data-spot="services">
               <Kicker>{t.services}</Kicker>
               <H2>{b.servicesTitle}</H2>
@@ -391,7 +400,7 @@ export function HeraldHome({ ctx, locale, onLocale, body }: SkinHomeProps) {
             </Block>
           ) : null}
 
-          {isOn(config, "credentials") && d.credentials.length ? (
+          {home && isOn(config, "credentials") && d.credentials.length ? (
             <Block id="credentials" data-spot="credentials">
               <Kicker>{t.registration}</Kicker>
               <H2>{b.recordTitle}</H2>
@@ -403,7 +412,7 @@ export function HeraldHome({ ctx, locale, onLocale, body }: SkinHomeProps) {
             </Block>
           ) : null}
 
-          {isOn(config, "how") ? (
+          {showSection(path, "/how") && isOn(config, "how") ? (
             <Block id="how" data-spot="how">
               <Kicker>{t.howNav}</Kicker>
               <H2>{b.howTitle}</H2>
@@ -421,7 +430,7 @@ export function HeraldHome({ ctx, locale, onLocale, body }: SkinHomeProps) {
             </Block>
           ) : null}
 
-          {isOn(config, "calculators") ? (
+          {home && isOn(config, "calculators") ? (
             <Block id="calculators" data-spot="calculators">
               <Kicker>{t.planning}</Kicker>
               <H2>{b.calcTitle}</H2>
@@ -433,7 +442,7 @@ export function HeraldHome({ ctx, locale, onLocale, body }: SkinHomeProps) {
             </Block>
           ) : null}
 
-          {isOn(config, "testimonials") && config.testimonials.length ? (
+          {showSection(path, "/insights") && isOn(config, "testimonials") && config.testimonials.length ? (
             <Block id="testimonials" data-spot="testimonials">
               <Kicker>{t.quotesNav}</Kicker>
               <H2>{b.quotesTitle}</H2>
@@ -445,7 +454,7 @@ export function HeraldHome({ ctx, locale, onLocale, body }: SkinHomeProps) {
             </Block>
           ) : null}
 
-          {isOn(config, "faq") && config.faq.length ? (
+          {showSection(path, "/blog") && isOn(config, "faq") && config.faq.length ? (
             <Block id="faq" data-spot="faq">
               <Kicker>{t.faqNav}</Kicker>
               <H2>{b.faqTitle}</H2>
@@ -459,7 +468,7 @@ export function HeraldHome({ ctx, locale, onLocale, body }: SkinHomeProps) {
             </Block>
           ) : null}
 
-          {isOn(config, "contact") ? (
+          {showSection(path, "/contact") && isOn(config, "contact") ? (
             <Block id="contact" data-spot="contact">
               <Kicker>{t.contact}</Kicker>
               <H2>{b.contactTitle}</H2>
@@ -471,7 +480,7 @@ export function HeraldHome({ ctx, locale, onLocale, body }: SkinHomeProps) {
             </Block>
           ) : null}
 
-          {isOn(config, "whatsapp_strip") ? (
+          {home && isOn(config, "whatsapp_strip") ? (
             <a id="whatsapp" data-spot="whatsapp" href={wa} target="_blank" rel="noreferrer">
               <FaWhatsapp size={14} aria-hidden /> {t.wa} {d.name}
             </a>

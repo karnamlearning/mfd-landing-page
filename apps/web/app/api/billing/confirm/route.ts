@@ -29,7 +29,7 @@ export async function POST(req: Request) {
     const subId = row.razorpaySubId || `sub_dev_${row.id}_${plan}`
     const next = await activateTenant(row, { subId, plan })
     if (!next) return json({ error: "missing_tenant" }, 404)
-    return json(toMePayload(next))
+    return json(await toMePayload(next))
   }
 
   const paymentId = body.razorpay_payment_id ?? ""
@@ -44,5 +44,5 @@ export async function POST(req: Request) {
 
   const next = await activateTenant(row, { subId, plan })
   if (!next) return json({ error: "missing_tenant" }, 404)
-  return json(toMePayload(next))
+  return json(await toMePayload(next))
 }

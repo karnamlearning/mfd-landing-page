@@ -5,6 +5,7 @@ import { ThemeProvider } from "styled-components"
 import { themes } from "@mfd/tokens"
 import { BrandLogo } from "../BrandLogo"
 import { ADMIN_LOGO } from "../brand"
+import { liveHref } from "@/lib/site-url"
 import * as A from "./styles"
 
 type TenantRow = {
@@ -186,7 +187,7 @@ export function AdminApp() {
                     {rows.map((row) => (
                       <tr key={row.id}>
                         <td>
-                          <A.Link href={row.publicUrl} target="_blank" rel="noreferrer">
+                          <A.Link href={liveHref(row.publicUrl)} target="_blank" rel="noreferrer">
                             {row.slug}
                           </A.Link>
                         </td>

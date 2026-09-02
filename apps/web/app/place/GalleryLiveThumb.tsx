@@ -29,8 +29,10 @@ export function GalleryLiveThumb({ id }: { id: FamilyId }) {
     const measure = () => {
       const s = clip.clientWidth / GALLERY_SITE_WIDTH
       const visible = clip.clientHeight / Math.max(s, 0.01)
+      const pageH = page.offsetHeight
+      const maxTravel = visible * 2.2
       clip.style.setProperty("--s", String(s))
-      clip.style.setProperty("--pan", `${Math.min(0, visible - page.offsetHeight)}px`)
+      clip.style.setProperty("--pan", `${Math.min(0, Math.max(visible - pageH, -maxTravel))}px`)
     }
 
     const ro = new ResizeObserver(measure)

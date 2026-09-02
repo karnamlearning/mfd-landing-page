@@ -13,6 +13,7 @@ import {
 import { startCheckout, type CheckoutPlan } from "./checkout"
 import { saveConfig } from "./persist"
 import { useDraft } from "./store"
+import { liveHref } from "@/lib/site-url"
 import * as U from "./styles"
 
 function planNote(id: CheckoutPlan, total: number, addons: readonly string[]) {
@@ -27,7 +28,7 @@ function planNote(id: CheckoutPlan, total: number, addons: readonly string[]) {
 export function PublishModal({ open, onClose }: { open: boolean; onClose: () => void }) {
   const status = useDraft((s) => s.status)
   const currentPlan = useDraft((s) => s.plan)
-  const publicUrl = useDraft((s) => s.publicUrl)
+  const publicUrl = liveHref(useDraft((s) => s.publicUrl))
   const gstin = useDraft((s) => s.config.details.gstin ?? "")
   const addons = useDraft((s) => s.config.addons)
   const patchDetails = useDraft((s) => s.patchDetails)
@@ -200,7 +201,7 @@ export function PublishModal({ open, onClose }: { open: boolean; onClose: () => 
 
 export function PublishStep({ onOpen }: { onOpen: () => void }) {
   const status = useDraft((s) => s.status)
-  const publicUrl = useDraft((s) => s.publicUrl)
+  const publicUrl = liveHref(useDraft((s) => s.publicUrl))
   const host = publicUrl.replace(/^https?:\/\//, "")
   return (
     <>

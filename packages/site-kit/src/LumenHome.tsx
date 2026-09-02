@@ -9,6 +9,7 @@ import { brandService } from "./brand"
 import { Calculator } from "./Calculator"
 import { LeadForm } from "./LeadForm"
 import { activeSections, isOn, onHashNav, type SkinHomeProps } from "./skin-shared"
+import { isHomePath, showSection } from "./site-pages"
 
 const drift = keyframes`
   0% { transform: translate3d(0, 0, 0) scale(1); }
@@ -256,12 +257,14 @@ export function LumenHome({ ctx, locale, onLocale, body }: SkinHomeProps) {
   const on = new Set(activeSections(config).map((s) => s.id))
   const photo = d.photoUrl || d.heroImageUrl
   const solo = templateOf(config) === "solo"
+  const path = ctx.previewPath
+  const home = isHomePath(path)
   const links = (
     [
-      { href: "/#about", label: t.about, id: "about" },
-      { href: "/#services", label: t.services, id: "services" },
-      { href: "/#calculators", label: t.calculators, id: "calculators" },
-      { href: "/#contact", label: t.contact, id: "contact" },
+      { href: "/about", label: t.about, id: "about" },
+      { href: "/services", label: t.services, id: "services" },
+      { href: "/calculators", label: t.calculators, id: "calculators" },
+      { href: "/contact", label: t.contact, id: "contact" },
     ] as const
   ).filter((l) => on.has(l.id))
 
@@ -281,7 +284,7 @@ export function LumenHome({ ctx, locale, onLocale, body }: SkinHomeProps) {
         </Brand>
         <Nav>
           {links.map((l) => (
-            <a key={l.id} href={l.href} onClick={onHashNav}>
+            <a key={l.id} href={l.href} onClick={onHashNav} aria-current={path === l.href ? "page" : undefined}>
               {l.label}
             </a>
           ))}
@@ -317,6 +320,7 @@ export function LumenHome({ ctx, locale, onLocale, body }: SkinHomeProps) {
         <Stage>{body}</Stage>
       ) : (
         <Stage>
+          {home ? (
           <Hero id="top" data-spot="top" $solo={solo}>
             {solo && photo ? <Photo src={photo} alt="" data-spot="photo" /> : null}
             <div>
@@ -326,8 +330,9 @@ export function LumenHome({ ctx, locale, onLocale, body }: SkinHomeProps) {
             </div>
             {!solo && photo ? <Photo src={photo} alt="" data-spot="photo" /> : null}
           </Hero>
+          ) : null}
 
-          {isOn(config, "stats") && d.stats.length ? (
+          {home && isOn(config, "stats") && d.stats.length ? (
             <Glass id="stats" data-spot="stats">
               <StatRow>
                 {d.stats.map((s) => (
@@ -340,7 +345,7 @@ export function LumenHome({ ctx, locale, onLocale, body }: SkinHomeProps) {
             </Glass>
           ) : null}
 
-          {isOn(config, "about") ? (
+          {showSection(path, "/about") && isOn(config, "about") ? (
             <Glass id="about" data-spot="about">
               <GlowName>{t.welcome}</GlowName>
               <h2 style={{ margin: "0 0 0.6rem" }}>{b.aboutTitle}</h2>
@@ -350,7 +355,7 @@ export function LumenHome({ ctx, locale, onLocale, body }: SkinHomeProps) {
             </Glass>
           ) : null}
 
-          {isOn(config, "services") ? (
+          {showSection(path, "/services") && isOn(config, "services") ? (
             <Glass id="services" data-spot="services">
               <GlowName>{t.services}</GlowName>
               <h2 style={{ margin: "0 0 0.85rem" }}>{b.servicesTitle}</h2>
@@ -369,7 +374,7 @@ export function LumenHome({ ctx, locale, onLocale, body }: SkinHomeProps) {
             </Glass>
           ) : null}
 
-          {isOn(config, "credentials") && d.credentials.length ? (
+          {home && isOn(config, "credentials") && d.credentials.length ? (
             <Glass id="credentials" data-spot="credentials">
               <GlowName>{t.registration}</GlowName>
               <h2 style={{ margin: "0 0 0.6rem" }}>{b.recordTitle}</h2>
@@ -381,7 +386,7 @@ export function LumenHome({ ctx, locale, onLocale, body }: SkinHomeProps) {
             </Glass>
           ) : null}
 
-          {isOn(config, "how") ? (
+          {showSection(path, "/how") && isOn(config, "how") ? (
             <Glass id="how" data-spot="how">
               <GlowName>{t.howNav}</GlowName>
               <h2 style={{ margin: "0 0 0.6rem" }}>{b.howTitle}</h2>
@@ -393,7 +398,7 @@ export function LumenHome({ ctx, locale, onLocale, body }: SkinHomeProps) {
             </Glass>
           ) : null}
 
-          {isOn(config, "calculators") ? (
+          {home && isOn(config, "calculators") ? (
             <Glass id="calculators" data-spot="calculators">
               <GlowName>{t.planning}</GlowName>
               <h2 style={{ margin: "0 0 0.5rem" }}>{b.calcTitle}</h2>
@@ -407,7 +412,7 @@ export function LumenHome({ ctx, locale, onLocale, body }: SkinHomeProps) {
             </Glass>
           ) : null}
 
-          {isOn(config, "testimonials") && config.testimonials.length ? (
+          {showSection(path, "/insights") && isOn(config, "testimonials") && config.testimonials.length ? (
             <Glass id="testimonials" data-spot="testimonials">
               <GlowName>{t.quotesNav}</GlowName>
               <h2 style={{ margin: "0 0 0.6rem" }}>{b.quotesTitle}</h2>
@@ -419,7 +424,7 @@ export function LumenHome({ ctx, locale, onLocale, body }: SkinHomeProps) {
             </Glass>
           ) : null}
 
-          {isOn(config, "faq") && config.faq.length ? (
+          {showSection(path, "/blog") && isOn(config, "faq") && config.faq.length ? (
             <Glass id="faq" data-spot="faq">
               <GlowName>{t.faqNav}</GlowName>
               <h2 style={{ margin: "0 0 0.6rem" }}>{b.faqTitle}</h2>
@@ -433,7 +438,7 @@ export function LumenHome({ ctx, locale, onLocale, body }: SkinHomeProps) {
             </Glass>
           ) : null}
 
-          {isOn(config, "contact") ? (
+          {showSection(path, "/contact") && isOn(config, "contact") ? (
             <Glass id="contact" data-spot="contact">
               <GlowName>{t.contact}</GlowName>
               <h2 style={{ margin: "0 0 0.6rem" }}>{b.contactTitle}</h2>
@@ -441,7 +446,7 @@ export function LumenHome({ ctx, locale, onLocale, body }: SkinHomeProps) {
             </Glass>
           ) : null}
 
-          {isOn(config, "whatsapp_strip") ? (
+          {home && isOn(config, "whatsapp_strip") ? (
             <Pill id="whatsapp" data-spot="whatsapp" href={wa} target="_blank" rel="noreferrer" style={{ margin: "0.4rem 0 1.2rem" }}>
               <FaWhatsapp size={14} aria-hidden /> {t.wa} {d.name}
             </Pill>

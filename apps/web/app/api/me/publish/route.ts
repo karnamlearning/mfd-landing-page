@@ -30,5 +30,5 @@ export async function POST() {
 
   const next = await getTenant(session.tenantId)
   if (!next) return json({ error: "missing_tenant" }, 404)
-  return json(toMePayload(next))
+  return json(await toMePayload(next))
 }

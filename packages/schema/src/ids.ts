@@ -1,4 +1,4 @@
-export const familyIds = ["classic", "herald", "lumen"] as const
+export const familyIds = ["classic", "herald", "lumen", "capital"] as const
 export type FamilyId = (typeof familyIds)[number]
 
 export const lookIds = ["studio", "folio", "counter"] as const

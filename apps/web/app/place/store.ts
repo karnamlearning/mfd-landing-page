@@ -2,9 +2,9 @@
 
 import { create } from "zustand"
 import {
+  applyFamily,
   applyTemplate,
   emptyPracticeConfig,
-  familyMeta,
   lockedSectionIds,
   type AddonId,
   type FamilyId,
@@ -141,16 +141,10 @@ export const useDraft = create<DraftState>((set) => ({
     })),
   setFamily: (id) =>
     set((s) => {
-      const meta = familyMeta[id]
-      const switched = s.config.family !== id
+      const switched = s.config.family !== id || s.config.pickedFamily === false
       return {
-        config: {
-          ...s.config,
-          family: id,
-          look: "studio",
-          pickedFamily: true,
-          ...(switched ? { theme: meta.theme, font: meta.font } : {}),
-        },
+        config: applyFamily(s.config, id),
+        ...(switched ? { step: "details" as const } : {}),
       }
     }),
   setTemplate: (id) => set((s) => ({ config: applyTemplate(s.config, id) })),

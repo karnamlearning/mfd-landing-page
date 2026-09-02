@@ -960,6 +960,27 @@ const lumenPulse = css`
   }
 `
 
+const capitalShine = css`
+  @keyframes mfd-capital-bar {
+    0%,
+    100% {
+      width: 42%;
+    }
+    50% {
+      width: 62%;
+    }
+  }
+  @keyframes mfd-capital-card {
+    0%,
+    100% {
+      opacity: 0.7;
+    }
+    50% {
+      opacity: 1;
+    }
+  }
+`
+
 export const MotionThumb = styled.div<{ $id: string }>`
   height: 132px;
   border-radius: 12px;
@@ -1090,6 +1111,34 @@ export const MotionThumb = styled.div<{ $id: string }>`
                 animation-delay: 0.35s;
               }
             `
+          : $id === "capital"
+            ? css`
+                ${capitalShine}
+                background: #faf7f1;
+                .hero {
+                  position: absolute;
+                  left: 12px;
+                  top: 16px;
+                  right: 42%;
+                  height: 10px;
+                  border-radius: 2px;
+                  background: #1e3a5f;
+                  animation: mfd-capital-bar 2.8s ease-in-out infinite;
+                }
+                .cards {
+                  position: absolute;
+                  top: 36px;
+                  right: 12px;
+                  bottom: 12px;
+                  width: 38%;
+                  border: 1px solid #b08d4a55;
+                  background: #ffffff;
+                  animation: mfd-capital-card 3.2s ease-in-out infinite;
+                }
+                .cards i {
+                  display: none;
+                }
+              `
           : css`
               background: #ece7dc;
               &::after {

@@ -4,6 +4,7 @@ export {
   classicThemeIds,
   heraldThemeIds,
   lumenThemeIds,
+  capitalThemeIds,
   themes,
   themesByFamily,
   getTheme,

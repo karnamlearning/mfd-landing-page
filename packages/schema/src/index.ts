@@ -20,7 +20,7 @@ export type { TenantConfig, TenantDetails, Wording, WordingLine, ServiceWording 
 export { sampleFill, samplePracticeConfig, emptyPracticeConfig, emptyDraftConfig, sampleTestimonials, sampleFaq } from "./sample"
 export { mergeSample, pruneEmptyContent } from "./merge"
 export { sectionsByTemplate, applyTemplate } from "./defaults"
-export { familyMeta, lookMeta, templateMeta, familyOf, lookOf, templateOf } from "./families"
+export { familyMeta, lookMeta, templateMeta, familyOf, lookOf, templateOf, applyFamily } from "./families"
 export { visibleToolIds, readyToolIds } from "./tools"
 export type { ReadyToolId } from "./tools"
 export { reservedSlugs, slugifyName, isPhoneStubSlug, isReservedSlug, phoneStubSlug } from "./slug"

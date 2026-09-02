@@ -16,6 +16,7 @@ import * as S from "./styles"
 import { parseInternalHref, scrollSiteTo, waHref } from "./utils"
 import { HeraldHome } from "./HeraldHome"
 import { LumenHome } from "./LumenHome"
+import { CapitalHome } from "./CapitalHome"
 import { heroLayout, onHashNav, SERVICE_ICONS, type SkinCtx } from "./skin-shared"
 
 const ICONS = SERVICE_ICONS
@@ -599,6 +600,7 @@ export function Site({ config, preview = false, embedded = false, previewFocus =
   const [nav, setNav] = useState({ path: "/", hash: "top", tick: 0 })
   const [spot, setSpot] = useState<PreviewSpotId | null>(null)
   const rootRef = useRef<HTMLDivElement>(null)
+  const lastFocusTick = useRef(0)
   const theme = getTheme(coerceTheme(family, resolved.theme))
   const font = fontPairs[resolved.font]
   const bilingual = resolved.addons.includes("bilingual")
@@ -616,19 +618,19 @@ export function Site({ config, preview = false, embedded = false, previewFocus =
   }
 
   useLayoutEffect(() => {
-    if (!embedded) return
+    if (!embedded || nav.path !== "/") return
     const root = rootRef.current
     if (!root) return
-    const id =
-      nav.hash ||
-      (nav.path.startsWith("/calculators") ? "calculators" : nav.path === "/" ? "top" : "")
+    const id = nav.hash || "top"
     if (!id) return
     scrollSiteTo(root, id)
   }, [embedded, nav.hash, nav.path, nav.tick])
 
   useLayoutEffect(() => {
     if (!embedded || !previewFocus) return
-    if (nav.path !== "/") {
+    const jumped = previewFocus.tick !== lastFocusTick.current
+    if (jumped) lastFocusTick.current = previewFocus.tick
+    if (jumped && nav.path !== "/") {
       setSpot(previewFocus.id)
       setNav({
         path: "/",
@@ -637,6 +639,7 @@ export function Site({ config, preview = false, embedded = false, previewFocus =
       })
       return
     }
+    if (nav.path !== "/") return
     const root = rootRef.current
     if (!root) return
     setSpot(previewFocus.id)
@@ -705,6 +708,8 @@ export function Site({ config, preview = false, embedded = false, previewFocus =
           <HeraldHome ctx={ctx} locale={locale} onLocale={setLocale} body={embedded && nav.path !== "/" ? body : children} />
         ) : family === "lumen" ? (
           <LumenHome ctx={ctx} locale={locale} onLocale={setLocale} body={embedded && nav.path !== "/" ? body : children} />
+        ) : family === "capital" ? (
+          <CapitalHome ctx={ctx} locale={locale} onLocale={setLocale} body={embedded && nav.path !== "/" ? body : children} />
         ) : (
           <>
             <Header ctx={ctx} locale={locale} onLocale={setLocale} />

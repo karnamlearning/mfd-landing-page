@@ -23,8 +23,9 @@ export const classicThemeIds = [
 
 export const heraldThemeIds = ["newsprint", "indigo", "brick"] as const
 export const lumenThemeIds = ["dusk", "aurora", "ember"] as const
+export const capitalThemeIds = ["ivory", "gilt", "obsidian"] as const
 
-export const themeIds = [...classicThemeIds, ...heraldThemeIds, ...lumenThemeIds] as const
+export const themeIds = [...classicThemeIds, ...heraldThemeIds, ...lumenThemeIds, ...capitalThemeIds] as const
 
 export type ThemeId = (typeof themeIds)[number]
 
@@ -212,12 +213,49 @@ export const themes: Record<ThemeId, Theme> = {
     accent: "#f0c29e",
     btnText: "#1a0e08",
   },
+  gilt: {
+    ...shared,
+    id: "gilt",
+    name: "Gilt",
+    bg: "#f6f1e6",
+    surface: "#fffcf6",
+    text: "#1c1915",
+    muted: "#5f584c",
+    primary: "#1a2744",
+    accent: "#9a7429",
+    btnText: "#fffcf6",
+  },
+  ivory: {
+    ...shared,
+    id: "ivory",
+    name: "Ivory",
+    bg: "#faf7f1",
+    surface: "#ffffff",
+    text: "#1a1d23",
+    muted: "#5c616a",
+    primary: "#1e3a5f",
+    accent: "#b08d4a",
+    btnText: "#ffffff",
+  },
+  obsidian: {
+    ...shared,
+    id: "obsidian",
+    name: "Pearl",
+    bg: "#f3f5f8",
+    surface: "#ffffff",
+    text: "#1b2430",
+    muted: "#5b6573",
+    primary: "#2a4a6e",
+    accent: "#8a7344",
+    btnText: "#ffffff",
+  },
 }
 
 export const themesByFamily = {
   classic: classicThemeIds,
   herald: heraldThemeIds,
   lumen: lumenThemeIds,
+  capital: capitalThemeIds,
 } as const
 
 export function getTheme(id: ThemeId): Theme {

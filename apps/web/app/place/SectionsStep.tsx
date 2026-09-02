@@ -13,6 +13,7 @@ import { SortableContext, arrayMove, useSortable, verticalListSortingStrategy } 
 import { CSS } from "@dnd-kit/utilities"
 import { FiChevronDown, FiChevronRight, FiEye, FiEyeOff, FiMenu } from "react-icons/fi"
 import {
+  familyOf,
   lockedSectionIds,
   serviceIds,
   type SectionId,
@@ -38,6 +39,20 @@ const LABELS: Record<SectionId, string> = {
   faq: "FAQ",
   contact: "Contact",
   whatsapp_strip: "WhatsApp strip",
+}
+
+const CAPITAL_LABELS: Partial<Record<SectionId, string>> = {
+  about: "About Us",
+  services: "Our Services",
+  calculators: "Wealth Calculator",
+  testimonials: "Insights",
+  faq: "Blog",
+}
+
+function sectionLabel(id: SectionId) {
+  const family = familyOf(useDraft.getState().config)
+  if (family === "capital") return CAPITAL_LABELS[id] ?? LABELS[id]
+  return LABELS[id]
 }
 
 const SERVICE_LABELS: Record<ServiceId, string> = {
@@ -114,10 +129,10 @@ function SortableRow({
           }}
           title="Show this block on the preview"
         >
-          {LABELS[id]}
+          {sectionLabel(id)}
         </U.SecName>
         {EDITABLE.has(id) ? (
-          <U.IconBtn type="button" onClick={onEdit} aria-label={`Edit ${LABELS[id]}`}>
+          <U.IconBtn type="button" onClick={onEdit} aria-label={`Edit ${sectionLabel(id)}`}>
             {open ? <FiChevronDown size={16} /> : <FiChevronRight size={16} />}
           </U.IconBtn>
         ) : null}
@@ -127,7 +142,7 @@ function SortableRow({
           disabled={locked}
           onClick={onToggle}
           title={locked ? "Always on" : on ? "Hide" : "Show"}
-          aria-label={on ? `Hide ${LABELS[id]}` : `Show ${LABELS[id]}`}
+          aria-label={on ? `Hide ${sectionLabel(id)}` : `Show ${sectionLabel(id)}`}
         >
           {on ? <FiEye size={16} /> : <FiEyeOff size={16} />}
         </U.IconBtn>

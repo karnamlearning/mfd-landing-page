@@ -52,6 +52,14 @@ function Thumb({ id }: { id: FamilyId | "custom" }) {
       </U.MotionThumb>
     )
   }
+  if (id === "capital") {
+    return (
+      <U.MotionThumb $id="capital" aria-hidden>
+        <div className="hero" />
+        <div className="cards" />
+      </U.MotionThumb>
+    )
+  }
   return <U.MotionThumb $id="custom" aria-hidden />
 }
 
@@ -94,7 +102,9 @@ export function TemplateGallery({
           <U.GalleryKicker>Buyer Place</U.GalleryKicker>
           <U.GalleryTitle>Choose a template</U.GalleryTitle>
           <U.GalleryLead>
-            Three different sites. Practice is the usual advisor page. Newspaper is a city paper. Night is dark glass.
+            Four sites. Switching a template starts it clean — layout, theme, and page copy reset. Your name, contact,
+            and photos stay. Practice is the usual advisor page. Newspaper is a city paper. Night is dark glass. Capital
+            is a light wealth-house with a consult form and a services menu.
           </U.GalleryLead>
         </U.GalleryCopy>
       </U.GalleryHead>

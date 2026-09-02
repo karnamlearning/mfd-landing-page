@@ -2,8 +2,8 @@
 
 import { useState } from "react"
 import { ThemeProvider } from "styled-components"
-import { familyMeta, samplePracticeConfig, type FamilyId, type TenantConfig } from "@mfd/schema"
-import { coerceTheme, getTheme, type FontId, type ThemeId } from "@mfd/tokens"
+import { applyFamily, samplePracticeConfig, type FamilyId, type TenantConfig } from "@mfd/schema"
+import { getTheme, type FontId, type ThemeId } from "@mfd/tokens"
 import { LookDock } from "./LookDock"
 import { Site } from "./Site"
 
@@ -18,15 +18,7 @@ export function FixtureApp() {
           familyId={config.family ?? "classic"}
           themeId={config.theme}
           fontId={config.font}
-          onFamily={(id: FamilyId) =>
-            setConfig((c) => ({
-              ...c,
-              family: id,
-              look: "studio",
-              theme: coerceTheme(id, familyMeta[id].theme),
-              font: familyMeta[id].font,
-            }))
-          }
+          onFamily={(id: FamilyId) => setConfig((c) => applyFamily(c, id))}
           onTheme={(id: ThemeId) => setConfig((c) => ({ ...c, theme: id }))}
           onFont={(id: FontId) => setConfig((c) => ({ ...c, font: id }))}
         />

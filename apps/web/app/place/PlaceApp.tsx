@@ -2,10 +2,13 @@
 
 import { useEffect, useState } from "react"
 import { ThemeProvider } from "styled-components"
+import { useRouter } from "next/navigation"
 import { FiCopy, FiEye, FiExternalLink, FiMonitor, FiSmartphone } from "react-icons/fi"
-import { FaWhatsapp } from "react-icons/fa6"
 import { ADDON_LABEL, ADDON_PRICE, addonIds, familyIds, familyMeta, formatInr, isPhoneStubSlug, type AddonId } from "@mfd/schema"
 import { themes } from "@mfd/tokens"
+import { BrandLogo } from "../BrandLogo"
+import { PLACE_LOGO } from "../brand"
+import { CustomSiteBar } from "./CustomSiteBar"
 import { DetailsStep } from "./DetailsStep"
 import { FontStep } from "./FontStep"
 import { LeadsStep } from "./LeadsStep"
@@ -16,9 +19,7 @@ import { ReviewStep } from "./ReviewStep"
 import { SectionsStep } from "./SectionsStep"
 import { STEPS, useDraft, type ServerDraft, type StepId } from "./store"
 import * as U from "./styles"
-import { TemplateGallery } from "./TemplateGallery"
 import { ThemeStep } from "./ThemeStep"
-import { OtpForm } from "../signup/OtpForm"
 
 const NEXT: Partial<Record<StepId, StepId>> = {
   details: "theme",
@@ -68,28 +69,6 @@ const ADDON_BLURB: Record<AddonId, string> = {
     "Extra investor calculators on the Calculators section. They show in preview now, and on the live site once the site is published.",
   bilingual:
     "English and Hindi on the site: header toggle, and Hindi fields in Details and Sections. They show in preview now, and on the live site once the site is published.",
-}
-
-const SALES_WA =
-  "https://wa.me/919611235245?text=" +
-  encodeURIComponent("Hi Advisorkhoj — I need a custom MFD site beyond Buyer Place.")
-
-function CustomSiteBar({ dock }: { dock?: boolean }) {
-  return (
-    <U.CustomBar $dock={dock}>
-      <U.CustomCopy>
-        <strong>Want a custom site?</strong>
-        <U.CustomMore>
-          {" "}
-          Extra pages, a unique layout, or work this builder doesn’t cover — we’ll build it for you.
-        </U.CustomMore>
-      </U.CustomCopy>
-      <U.CustomCta href={SALES_WA} target="_blank" rel="noreferrer">
-        <FaWhatsapp size={14} aria-hidden />
-        Talk to us
-      </U.CustomCta>
-    </U.CustomBar>
-  )
 }
 
 function FamilySwitch({ onBrowse }: { onBrowse: () => void }) {
@@ -162,6 +141,7 @@ function SiteChrome() {
 }
 
 function Editor() {
+  const router = useRouter()
   const step = useDraft((s) => s.step)
   const setStep = useDraft((s) => s.setStep)
   const viewport = useDraft((s) => s.viewport)
@@ -173,9 +153,7 @@ function Editor() {
   const status = useDraft((s) => s.status)
   const trialEndsAt = useDraft((s) => s.trialEndsAt)
   const impersonating = useDraft((s) => s.impersonating)
-  const pickedFamily = useDraft((s) => s.config.pickedFamily)
   const [publishOpen, setPublishOpen] = useState(false)
-  const [browse, setBrowse] = useState(false)
   const next = NEXT[step]
   const yours = slugLocked || status !== "draft" || !isPhoneStubSlug(slug)
   usePersistDraft()
@@ -188,24 +166,15 @@ function Editor() {
     setPublishOpen(true)
   }
 
-  if (pickedFamily === false || browse) {
-    return (
-      <>
-        <TemplateGallery browsing={browse} onPicked={() => setBrowse(false)} />
-        <CustomSiteBar />
-      </>
-    )
-  }
-
   return (
     <U.Shell>
       <U.Chrome>
         <U.Top>
           <U.BrandMark>
-            <U.BrandName>Advisorkhoj</U.BrandName>
+            <BrandLogo src={PLACE_LOGO} size="sm" />
             <U.BrandSub>{yours ? "Your site" : "Buyer Place"}</U.BrandSub>
           </U.BrandMark>
-          <FamilySwitch onBrowse={() => setBrowse(true)} />
+          <FamilySwitch onBrowse={() => router.push("/templates")} />
           <SiteChrome />
           <U.TopGrow />
           <U.GhostBtn type="button" onClick={() => setPreviewOpen(!previewOpen)}>
@@ -289,51 +258,44 @@ function Editor() {
 }
 
 export function PlaceApp() {
+  const router = useRouter()
   const hydrate = useDraft((s) => s.hydrate)
-  const [gate, setGate] = useState<"loading" | "auth" | "ready">("loading")
-
-  async function load() {
-    const res = await fetch("/api/me/config")
-    if (res.status === 401) {
-      setGate("auth")
-      return
-    }
-    if (!res.ok) {
-      setGate("auth")
-      return
-    }
-    const data = (await res.json()) as ServerDraft
-    hydrate(data)
-    setGate("ready")
-  }
+  const [ready, setReady] = useState(false)
 
   useEffect(() => {
+    let cancelled = false
+    async function load() {
+      const res = await fetch("/api/me/config")
+      if (res.status === 401 || !res.ok) {
+        router.replace("/")
+        return
+      }
+      const data = (await res.json()) as ServerDraft
+      if (cancelled) return
+      if (data.config.pickedFamily === false) {
+        router.replace("/templates")
+        return
+      }
+      hydrate(data)
+      setReady(true)
+    }
     void load()
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- mount
-  }, [])
+    return () => {
+      cancelled = true
+    }
+  }, [hydrate, router])
 
   return (
     <ThemeProvider theme={themes.slate}>
       <U.EditorGlobal />
-      {gate === "loading" ? (
+      {ready ? (
+        <Editor />
+      ) : (
         <U.Marketing>
+          <BrandLogo src={PLACE_LOGO} size="md" />
           <U.StepLead>Loading your draft…</U.StepLead>
         </U.Marketing>
-      ) : null}
-      {gate === "auth" ? (
-        <U.Marketing>
-          <U.BrandMark>
-            <U.BrandName>Advisorkhoj</U.BrandName>
-            <U.BrandSub>Buyer Place</U.BrandSub>
-          </U.BrandMark>
-          <OtpForm
-            onAuthed={() => {
-              void load()
-            }}
-          />
-        </U.Marketing>
-      ) : null}
-      {gate === "ready" ? <Editor /> : null}
+      )}
     </ThemeProvider>
   )
 }

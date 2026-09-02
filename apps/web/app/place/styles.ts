@@ -447,13 +447,13 @@ export const Input = styled.input`
   font-size: 0.88rem;
 `
 
-export const PhoneField = styled.div`
+export const PhoneField = styled.div<{ $white?: boolean }>`
   display: flex;
   align-items: center;
   width: 100%;
   box-sizing: border-box;
   border: 1px solid ${({ theme }) => theme.text}18;
-  background: ${({ theme }) => theme.bg};
+  background: ${({ $white, theme }) => ($white ? "#fff" : theme.bg)};
   border-radius: 10px;
 `
 
@@ -721,18 +721,62 @@ export const TplAction = styled.span<{ $on: boolean }>`
   font-weight: 650;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: ${({ $on, theme }) => ($on ? theme.primary : theme.muted)};
+  color: ${({ $on, theme }) => ($on ? "#0e2a5a" : theme.muted)};
 `
 
 export const Gallery = styled.div`
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  gap: 1.1rem;
-  padding: 2rem 1.25rem 6rem;
-  background: ${({ theme }) => theme.bg};
+  align-items: center;
+  gap: 1.4rem;
+  padding: 1.6rem 1.25rem 6rem;
+  background: #fff;
   color: ${({ theme }) => theme.text};
   font-family: var(--font-modern), system-ui, sans-serif;
+`
+
+export const GalleryHead = styled.header`
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1.1rem;
+  width: min(58rem, 100%);
+`
+
+export const GalleryBrand = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  width: 100%;
+`
+
+export const GalleryLogo = styled.div`
+  padding: 0.45rem 0.7rem;
+  border-radius: 12px;
+  background: #fff;
+  border: 1px solid #0e2a5a12;
+`
+
+export const GalleryCopy = styled.div`
+  width: 100%;
+`
+
+export const GalleryKicker = styled.p`
+  margin: 0 0 0.2rem;
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #c9a227;
+  font-weight: 650;
+`
+
+export const GalleryTitle = styled.h1`
+  margin: 0 0 0.35rem;
+  font-size: 1.55rem;
+  letter-spacing: -0.03em;
+  color: #0e2a5a;
 `
 
 export const GalleryLead = styled.p`
@@ -745,8 +789,8 @@ export const GalleryLead = styled.p`
 
 export const GalleryGrid = styled.div`
   display: grid;
-  gap: 0.85rem;
-  width: min(56rem, 100%);
+  gap: 1rem;
+  width: min(58rem, 100%);
 
   @media (min-width: 760px) {
     grid-template-columns: 1fr 1fr;
@@ -758,12 +802,17 @@ export const GalleryCard = styled.button<{ $on: boolean; $id: string }>`
   text-align: left;
   text-decoration: none;
   color: inherit;
-  border: 1px solid ${({ $on, theme }) => ($on ? theme.primary : `${theme.text}16`)};
-  background: ${({ theme }) => theme.surface};
-  border-radius: 16px;
-  padding: 0.75rem;
+  border: 1px solid ${({ $on, $id, theme }) => ($on ? "#0e2a5a" : $id === "custom" ? "#c9a22755" : `${theme.text}16`)};
+  background: #fff;
+  border-radius: 18px;
+  padding: 0.85rem;
   cursor: pointer;
-  box-shadow: ${({ $on, theme }) => ($on ? `0 0 0 1px ${theme.primary}` : "none")};
+  box-shadow: ${({ $on }) => ($on ? "0 0 0 1px #0e2a5a, 0 14px 32px #0e2a5a14" : "0 8px 24px #0e2a5a0a")};
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+  }
 `
 
 export const GalleryThumb = styled.div<{ $id: string }>`
@@ -1585,7 +1634,7 @@ export const SaveHint = styled.span<{ $err?: boolean }>`
   flex-shrink: 0;
 `
 
-export const Marketing = styled.div`
+export const Marketing = styled.div<{ $white?: boolean }>`
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -1593,7 +1642,7 @@ export const Marketing = styled.div`
   justify-content: center;
   gap: 1rem;
   padding: 2rem 1.25rem;
-  background: ${({ theme }) => theme.bg};
+  background: ${({ $white, theme }) => ($white ? "#fff" : theme.bg)};
   color: ${({ theme }) => theme.text};
   font-family: var(--font-modern), system-ui, sans-serif;
 `

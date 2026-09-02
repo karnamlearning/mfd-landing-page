@@ -9,4 +9,5 @@ dist
 .DS_Store
 apps/web/public/uploads/**
 !apps/web/public/uploads/.gitkeep
+.tmp-otp-shot/
 

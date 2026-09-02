@@ -1,6 +1,10 @@
 import { NextResponse, type NextRequest } from "next/server"
 import { parseHost } from "./lib/host"
 
+function isPrefix(pathname: string, root: string) {
+  return pathname === root || pathname.startsWith(`${root}/`)
+}
+
 export function middleware(req: NextRequest) {
   const host = req.headers.get("x-forwarded-host") || req.headers.get("host") || ""
   const parsed = parseHost(host)
@@ -15,21 +19,31 @@ export function middleware(req: NextRequest) {
     pathname.startsWith("/_next") ||
     pathname.startsWith("/uploads")
 
-  if (parsed.role === "public" && (pathname === "/admin" || pathname.startsWith("/admin/"))) {
+  const publicBlocked =
+    isPrefix(pathname, "/admin") ||
+    isPrefix(pathname, "/place") ||
+    isPrefix(pathname, "/verify") ||
+    isPrefix(pathname, "/templates")
+
+  if (parsed.role === "public" && publicBlocked) {
     const url = req.nextUrl.clone()
     url.pathname = "/missing"
     return NextResponse.rewrite(url, { request: { headers } })
   }
 
-  if (parsed.role === "app" && !pass && pathname !== "/place" && !pathname.startsWith("/place/")) {
+  const appAllowed =
+    pathname === "/" ||
+    isPrefix(pathname, "/place") ||
+    isPrefix(pathname, "/verify") ||
+    isPrefix(pathname, "/templates") ||
+    isPrefix(pathname, "/admin") ||
+    isPrefix(pathname, "/look") ||
+    isPrefix(pathname, "/blank") ||
+    isPrefix(pathname, "/missing")
+
+  if (parsed.role === "app" && !pass && !appAllowed) {
     const url = req.nextUrl.clone()
     url.pathname = "/place"
-    return NextResponse.rewrite(url, { request: { headers } })
-  }
-
-  if (parsed.role === "public" && (pathname === "/place" || pathname.startsWith("/place/"))) {
-    const url = req.nextUrl.clone()
-    url.pathname = "/missing"
     return NextResponse.rewrite(url, { request: { headers } })
   }
 

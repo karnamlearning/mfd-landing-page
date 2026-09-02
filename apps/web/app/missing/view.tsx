@@ -1,3 +1,5 @@
+import { PLACE_LOGO } from "../brand"
+
 export function MissingView() {
   return <ErrorStand title="Page not found" copy="This site is not available." />
 }
@@ -33,17 +35,11 @@ export function ErrorStand({
       }}
     >
       <div style={{ maxWidth: 420, textAlign: "center" }}>
-        <p
-          style={{
-            margin: "0 0 0.35rem",
-            fontSize: "0.68rem",
-            letterSpacing: "0.1em",
-            textTransform: "uppercase",
-            color: "#78716c",
-          }}
-        >
-          Advisorkhoj
-        </p>
+        <img
+          src={PLACE_LOGO}
+          alt="Advisorkhoj"
+          style={{ height: 40, width: "auto", margin: "0 auto 0.85rem", display: "block" }}
+        />
         <h1 style={{ margin: "0 0 0.5rem", fontSize: "1.4rem", letterSpacing: "-0.03em" }}>{title}</h1>
         <p style={{ margin: 0, color: "#57534e", lineHeight: 1.5 }}>{copy}</p>
         {onRetry ? (

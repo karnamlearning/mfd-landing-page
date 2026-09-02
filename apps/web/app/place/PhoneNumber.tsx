@@ -8,12 +8,14 @@ export function PhoneNumber({
   onChange,
   placeholder = "98765 43210",
   autoComplete = "tel",
+  white,
   "aria-label": ariaLabel,
 }: {
   value: string
   onChange: (value: string) => void
   placeholder?: string
   autoComplete?: string
+  white?: boolean
   "aria-label"?: string
 }) {
   function handle(e: ChangeEvent<HTMLInputElement>) {
@@ -21,7 +23,7 @@ export function PhoneNumber({
   }
 
   return (
-    <U.PhoneField>
+    <U.PhoneField $white={white}>
       <U.PhonePrefix>+91</U.PhonePrefix>
       <U.PhoneInput
         type="tel"

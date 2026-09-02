@@ -3,6 +3,8 @@
 import { useEffect, useState, type FormEvent } from "react"
 import { ThemeProvider } from "styled-components"
 import { themes } from "@mfd/tokens"
+import { BrandLogo } from "../BrandLogo"
+import { ADMIN_LOGO } from "../brand"
 import * as A from "./styles"
 
 type TenantRow = {
@@ -123,7 +125,7 @@ export function AdminApp() {
         <A.Global />
         <A.Top>
           <A.Brand>
-            <A.BrandName>Advisorkhoj</A.BrandName>
+            <BrandLogo src={ADMIN_LOGO} size="sm" />
             <A.BrandSub>Ops</A.BrandSub>
           </A.Brand>
           {gate === "ready" ? (

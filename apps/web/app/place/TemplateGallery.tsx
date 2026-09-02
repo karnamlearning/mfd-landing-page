@@ -2,6 +2,9 @@
 
 import { FaWhatsapp } from "react-icons/fa6"
 import { familyIds, familyMeta, type FamilyId } from "@mfd/schema"
+import { BrandLogo } from "../BrandLogo"
+import { TEMPLATES_LOGO } from "../brand"
+import { saveConfig } from "./persist"
 import { useDraft } from "./store"
 import * as U from "./styles"
 
@@ -60,31 +63,39 @@ export function TemplateGallery({
   const current = useDraft((s) => s.config.family ?? "classic")
   const setFamily = useDraft((s) => s.setFamily)
 
-  function pick(id: FamilyId) {
+  async function pick(id: FamilyId) {
     setFamily(id)
+    await saveConfig(true)
     onPicked?.()
   }
 
   return (
     <U.Gallery>
-      <U.BrandMark>
-        <U.BrandName>Advisorkhoj</U.BrandName>
-        <U.BrandSub>Choose a template</U.BrandSub>
-      </U.BrandMark>
-      <U.GalleryLead>
-        Three different sites. Practice is the usual advisor page. Newspaper is a city paper. Night is dark glass.
-      </U.GalleryLead>
-      {browsing ? (
-        <U.NextBtn type="button" onClick={() => onPicked?.()} style={{ width: "fit-content" }}>
-          Back to editor
-        </U.NextBtn>
-      ) : null}
+      <U.GalleryHead>
+        <U.GalleryBrand>
+          <U.GalleryLogo>
+            <BrandLogo src={TEMPLATES_LOGO} size="md" />
+          </U.GalleryLogo>
+          {browsing ? (
+            <U.NextBtn type="button" onClick={() => onPicked?.()}>
+              Back to editor
+            </U.NextBtn>
+          ) : null}
+        </U.GalleryBrand>
+        <U.GalleryCopy>
+          <U.GalleryKicker>Buyer Place</U.GalleryKicker>
+          <U.GalleryTitle>Choose a template</U.GalleryTitle>
+          <U.GalleryLead>
+            Three different sites. Practice is the usual advisor page. Newspaper is a city paper. Night is dark glass.
+          </U.GalleryLead>
+        </U.GalleryCopy>
+      </U.GalleryHead>
       <U.GalleryGrid>
         {familyIds.map((id) => {
           const meta = familyMeta[id]
           const on = id === current
           return (
-            <U.GalleryCard key={id} type="button" $on={on} $id={id} onClick={() => pick(id)}>
+            <U.GalleryCard key={id} type="button" $on={on} $id={id} onClick={() => void pick(id)}>
               <Thumb id={id} />
               <U.TplName>{meta.name}</U.TplName>
               <U.TplBlurb>{meta.blurb}</U.TplBlurb>

@@ -5,6 +5,7 @@ import { FiLogOut } from "react-icons/fi"
 import { familyIds, familyMeta, type FamilyId } from "@mfd/schema"
 import { BrandLogo } from "../BrandLogo"
 import { TEMPLATES_LOGO } from "../brand"
+import { GalleryLiveThumb } from "./GalleryLiveThumb"
 import { logoutBuyer } from "./logout"
 import { saveConfig } from "./persist"
 import { useDraft } from "./store"
@@ -15,52 +16,8 @@ const SALES_WA =
   encodeURIComponent("Hi Advisorkhoj — I need a custom MFD site beyond Buyer Place.")
 
 function Thumb({ id }: { id: FamilyId | "custom" }) {
-  if (id === "classic") {
-    return (
-      <U.MotionThumb $id="classic" aria-hidden>
-        <div className="hero" />
-        <div className="cards">
-          <i />
-          <i />
-          <i />
-        </div>
-      </U.MotionThumb>
-    )
-  }
-  if (id === "herald") {
-    return (
-      <U.MotionThumb $id="herald" aria-hidden>
-        <span className="rule" />
-        <span className="rule" />
-        <div className="cols">
-          <i />
-          <i />
-          <i />
-        </div>
-      </U.MotionThumb>
-    )
-  }
-  if (id === "lumen") {
-    return (
-      <U.MotionThumb $id="lumen" aria-hidden>
-        <span className="orb a" />
-        <span className="orb b" />
-        <div className="cards">
-          <i />
-          <i />
-        </div>
-      </U.MotionThumb>
-    )
-  }
-  if (id === "capital") {
-    return (
-      <U.MotionThumb $id="capital" aria-hidden>
-        <div className="hero" />
-        <div className="cards" />
-      </U.MotionThumb>
-    )
-  }
-  return <U.MotionThumb $id="custom" aria-hidden />
+  if (id === "custom") return <U.MotionThumb $id="custom" aria-hidden />
+  return <GalleryLiveThumb id={id} />
 }
 
 export function TemplateGallery({

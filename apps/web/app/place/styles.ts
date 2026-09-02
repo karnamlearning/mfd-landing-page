@@ -884,273 +884,91 @@ export const GalleryThumb = styled.div<{ $id: string }>`
             `}
 `
 
-const classicPulse = css`
-  @keyframes mfd-classic-bar {
+const galleryPan = css`
+  @keyframes mfd-gallery-pan {
     0%,
+    12% {
+      transform: scale(var(--s, 0.45)) translateY(0);
+    }
+    46%,
+    58% {
+      transform: scale(var(--s, 0.45)) translateY(var(--pan, 0px));
+    }
+    92%,
     100% {
-      width: 38%;
-      opacity: 0.75;
-    }
-    50% {
-      width: 52%;
-      opacity: 1;
-    }
-  }
-  @keyframes mfd-classic-card {
-    0%,
-    100% {
-      transform: translateY(6px);
-      opacity: 0.7;
-    }
-    50% {
-      transform: translateY(0);
-      opacity: 1;
+      transform: scale(var(--s, 0.45)) translateY(0);
     }
   }
 `
 
-const heraldDraw = css`
-  @keyframes mfd-herald-draw {
-    0% {
-      width: 12%;
-      opacity: 0.4;
-    }
-    40% {
-      width: 92%;
-      opacity: 1;
-    }
-    100% {
-      width: 70%;
-      opacity: 0.85;
-    }
-  }
-  @keyframes mfd-herald-col {
-    0%,
-    100% {
-      transform: translateY(8px);
-      opacity: 0.55;
-    }
-    50% {
-      transform: translateY(0);
-      opacity: 1;
-    }
-  }
-`
-
-const lumenPulse = css`
-  @keyframes mfd-lumen-orb {
-    0%,
-    100% {
-      transform: translate3d(0, 0, 0) scale(1);
-      opacity: 0.55;
-    }
-    50% {
-      transform: translate3d(12px, -10px, 0) scale(1.15);
-      opacity: 0.9;
-    }
-  }
-  @keyframes mfd-lumen-card {
-    0%,
-    100% {
-      transform: translateY(6px);
-    }
-    50% {
-      transform: translateY(0);
-    }
-  }
-`
-
-const capitalShine = css`
-  @keyframes mfd-capital-bar {
-    0%,
-    100% {
-      width: 42%;
-    }
-    50% {
-      width: 62%;
-    }
-  }
-  @keyframes mfd-capital-card {
-    0%,
-    100% {
-      opacity: 0.7;
-    }
-    50% {
-      opacity: 1;
-    }
-  }
-`
-
-export const MotionThumb = styled.div<{ $id: string }>`
-  height: 132px;
+export const LiveThumb = styled.div<{ $id: string }>`
+  ${galleryPan}
+  --s: 0.45;
+  --pan: 0px;
+  --delay: ${({ $id }) =>
+    $id === "herald" ? "2.2s" : $id === "lumen" ? "4.4s" : $id === "capital" ? "1.1s" : "0s"};
+  height: 210px;
   border-radius: 12px;
   margin-bottom: 0.7rem;
   overflow: hidden;
   position: relative;
+  pointer-events: none;
+  user-select: none;
+  contain: paint;
+  background: ${({ $id }) =>
+    $id === "lumen" ? "#0b1020" : $id === "herald" ? "#e8e8e8" : $id === "capital" ? "#faf7f1" : "#f3efe6"};
 
-  ${({ $id }) =>
-    $id === "classic"
-      ? css`
-          ${classicPulse}
-          background: #f3efe6;
-          .hero {
-            height: 54%;
-            background:
-              linear-gradient(#0f2a22cc, #0f2a22aa),
-              linear-gradient(90deg, #134e3a, #1b6b4a);
-            position: relative;
-          }
-          .hero::after {
-            content: "";
-            position: absolute;
-            left: 14px;
-            bottom: 12px;
-            height: 10px;
-            border-radius: 4px;
-            background: #f3efe6;
-            animation: mfd-classic-bar 2.8s ease-in-out infinite;
-          }
-          .cards {
-            position: absolute;
-            inset: auto 12px 12px;
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 8px;
-            height: 38%;
-          }
-          .cards i {
-            background: #fffdf8;
-            border: 1px solid #134e3a22;
-            border-radius: 6px;
-            animation: mfd-classic-card 2.6s ease-in-out infinite;
-          }
-          .cards i:nth-child(2) {
-            animation-delay: 0.15s;
-          }
-          .cards i:nth-child(3) {
-            animation-delay: 0.3s;
-          }
-        `
-      : $id === "herald"
-        ? css`
-            ${heraldDraw}
-            background: #e4e4e4;
-            .rule {
-              position: absolute;
-              left: 10px;
-              height: 2px;
-              background: #111111;
-              animation: mfd-herald-draw 3.6s ease-in-out infinite;
-            }
-            .rule:nth-child(1) {
-              top: 18px;
-              animation-delay: 0s;
-            }
-            .rule:nth-child(2) {
-              top: 36px;
-              animation-delay: 0.25s;
-            }
-            .cols {
-              position: absolute;
-              inset: 52px 10px 12px;
-              display: grid;
-              grid-template-columns: 1fr 1fr 1fr;
-              gap: 8px;
-            }
-            .cols i {
-              background: #11111112;
-              border-top: 2px solid #c4101a;
-              animation: mfd-herald-col 2.8s ease-in-out infinite;
-            }
-            .cols i:nth-child(2) {
-              animation-delay: 0.2s;
-            }
-            .cols i:nth-child(3) {
-              animation-delay: 0.4s;
-            }
-          `
-        : $id === "lumen"
-          ? css`
-              ${lumenPulse}
-              background: #0b1020;
-              .orb {
-                position: absolute;
-                border-radius: 50%;
-                filter: blur(0.5px);
-                animation: mfd-lumen-orb 4.2s ease-in-out infinite;
-              }
-              .orb.a {
-                width: 90px;
-                height: 90px;
-                left: -10px;
-                top: -16px;
-                background: #8aa4ff66;
-              }
-              .orb.b {
-                width: 70px;
-                height: 70px;
-                right: 8px;
-                bottom: 8px;
-                background: #c4b5fd55;
-                animation-delay: 0.6s;
-              }
-              .cards {
-                position: absolute;
-                inset: 28px 16px 16px;
-                display: grid;
-                grid-template-columns: 1.2fr 0.8fr;
-                gap: 8px;
-              }
-              .cards i {
-                border-radius: 10px;
-                background: #151c32cc;
-                border: 1px solid #eef1ff22;
-                animation: mfd-lumen-card 3.4s ease-in-out infinite;
-              }
-              .cards i:last-child {
-                animation-delay: 0.35s;
-              }
-            `
-          : $id === "capital"
-            ? css`
-                ${capitalShine}
-                background: #faf7f1;
-                .hero {
-                  position: absolute;
-                  left: 12px;
-                  top: 16px;
-                  right: 42%;
-                  height: 10px;
-                  border-radius: 2px;
-                  background: #1e3a5f;
-                  animation: mfd-capital-bar 2.8s ease-in-out infinite;
-                }
-                .cards {
-                  position: absolute;
-                  top: 36px;
-                  right: 12px;
-                  bottom: 12px;
-                  width: 38%;
-                  border: 1px solid #b08d4a55;
-                  background: #ffffff;
-                  animation: mfd-capital-card 3.2s ease-in-out infinite;
-                }
-                .cards i {
-                  display: none;
-                }
-              `
-          : css`
-              background: #ece7dc;
-              &::after {
-                content: "+";
-                position: absolute;
-                inset: 0;
-                display: grid;
-                place-items: center;
-                font-size: 2rem;
-                color: #7a4e28;
-              }
-            `}
+  &::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 36px;
+    z-index: 1;
+    pointer-events: none;
+    background: linear-gradient(transparent, ${({ $id }) => ($id === "lumen" ? "#0b1020" : "#fff0")});
+  }
+`
+
+export const LiveStage = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 920px;
+  transform-origin: top left;
+  transform: scale(var(--s, 0.45));
+  animation: mfd-gallery-pan 22s ease-in-out infinite;
+  animation-delay: var(--delay, 0s);
+  animation-play-state: running;
+  will-change: transform;
+
+  ${LiveThumb}[data-play="0"] & {
+    animation-play-state: paused;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
+`
+
+export const MotionThumb = styled.div<{ $id: string }>`
+  height: 210px;
+  border-radius: 12px;
+  margin-bottom: 0.7rem;
+  overflow: hidden;
+  position: relative;
+  background: #ece7dc;
+
+  &::after {
+    content: "+";
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    font-size: 2rem;
+    color: #7a4e28;
+  }
 `
 
 export const SwatchGrid = styled.div`

@@ -39,15 +39,33 @@ const BarInner = styled(Shell)`
 
 const Brand = styled.a`
   display: flex;
-  flex-direction: column;
-  gap: 2px;
+  align-items: center;
+  gap: 0.65rem;
   min-width: 0;
   flex: 1;
   color: inherit;
   text-decoration: none;
+`
+
+const Logo = styled.img`
+  display: block;
+  height: 36px;
+  width: auto;
+  max-width: 120px;
+  object-fit: contain;
+  flex-shrink: 0;
+`
+
+const BrandCopy = styled.span`
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  overflow: hidden;
   font-family: var(--heading), Georgia, serif;
   font-size: 1.05rem;
   letter-spacing: -0.03em;
+  line-height: 1.15;
 `
 
 const Amfi = styled.span`
@@ -437,8 +455,11 @@ export function CapitalHome({ ctx, locale, onLocale, body }: SkinHomeProps) {
       <Bar data-spot="header">
         <BarInner>
           <Brand href="/" onClick={onHashNav}>
-            {d.name || "Practice"}
-            <Amfi>{t.amfi}</Amfi>
+            {d.logoUrl ? <Logo src={d.logoUrl} alt={d.name || "Practice"} /> : null}
+            <BrandCopy>
+              {d.name || "Practice"}
+              <Amfi>{t.amfi}</Amfi>
+            </BrandCopy>
           </Brand>
           <Nav>
             <a href="/" onClick={onHashNav}>

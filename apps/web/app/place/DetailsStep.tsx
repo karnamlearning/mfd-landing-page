@@ -2,7 +2,7 @@
 
 import { useRef, useState, type ChangeEvent, type FormEvent } from "react"
 import { FiUpload } from "react-icons/fi"
-import type { TenantDetails } from "@mfd/schema"
+import { familyOf, templateOf, type TenantDetails } from "@mfd/schema"
 import { saveConfig } from "./persist"
 import { PhoneNumber } from "./PhoneNumber"
 import { blank, useDraft } from "./store"
@@ -94,9 +94,13 @@ function AssetField({
 export function DetailsStep() {
   const details = useDraft((s) => s.config.details)
   const bilingual = useDraft((s) => s.config.addons.includes("bilingual"))
+  const family = useDraft((s) => familyOf(s.config))
+  const variant = useDraft((s) => templateOf(s.config))
   const patch = useDraft((s) => s.patchDetails)
   const [langDraft, setLangDraft] = useState("")
   const d = details
+  const showPhoto = family !== "capital" || variant === "solo"
+  const showHero = family !== "capital"
 
   function set<K extends keyof TenantDetails>(key: K, value: TenantDetails[K]) {
     patch({ [key]: value } as Partial<TenantDetails>)
@@ -131,8 +135,11 @@ export function DetailsStep() {
     >
       <U.StepTitle>Your details</U.StepTitle>
       <U.StepLead>
-        Empty fields stay filled with sample data in the preview until you type. Photos only appear on the live site
-        after you upload them. Click a field, or <strong>On site</strong>, to jump to that place on the preview.
+        Empty fields stay filled with sample data in the preview until you type.
+        {showPhoto || showHero
+          ? " Photos only appear on the live site after you upload them."
+          : ""}{" "}
+        Click a field, or <strong>On site</strong>, to jump to that place on the preview.
       </U.StepLead>
 
       <U.Field {...spot("header")}>
@@ -152,8 +159,12 @@ export function DetailsStep() {
       </U.Field>
 
       <AssetField label="Logo" kind="logo" value={d.logoUrl} onUrl={(url) => set("logoUrl", url)} />
-      <AssetField label="Photo" kind="photo" value={d.photoUrl} onUrl={(url) => set("photoUrl", url)} />
-      <AssetField label="Hero image" kind="hero" value={d.heroImageUrl} onUrl={(url) => set("heroImageUrl", url)} />
+      {showPhoto ? (
+        <AssetField label="Photo" kind="photo" value={d.photoUrl} onUrl={(url) => set("photoUrl", url)} />
+      ) : null}
+      {showHero ? (
+        <AssetField label="Hero image" kind="hero" value={d.heroImageUrl} onUrl={(url) => set("heroImageUrl", url)} />
+      ) : null}
 
       <U.Field {...spot("top")}>
         <U.LabelRow>

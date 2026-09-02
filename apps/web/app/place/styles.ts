@@ -760,10 +760,9 @@ export const GalleryActions = styled.div`
 `
 
 export const GalleryLogo = styled.div`
-  padding: 0.45rem 0.7rem;
+  padding: 0.45rem 0;
   border-radius: 12px;
   background: #fff;
-  border: 1px solid #0e2a5a12;
 `
 
 export const GalleryCopy = styled.div`

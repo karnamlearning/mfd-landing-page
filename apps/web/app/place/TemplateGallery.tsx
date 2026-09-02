@@ -76,7 +76,7 @@ export function TemplateGallery({
       <U.GalleryHead>
         <U.GalleryBrand>
           <U.GalleryLogo>
-            <BrandLogo src={TEMPLATES_LOGO} size="md" />
+            <BrandLogo src={TEMPLATES_LOGO} size="sm" />
           </U.GalleryLogo>
           <U.GalleryActions>
             {browsing ? (
